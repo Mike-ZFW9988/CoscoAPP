@@ -2844,6 +2844,57 @@ function PageProdRepair() {
         </div>
       </Card>
 
+      {/* 修船完工 */}
+      <Card title="修船完工·计划与实绩" extra="下钻明细" onExtra={() => nav("prod-repair-completion")} className="app-production-card repair-completion-card">
+        <div className="repair-completion-status"><span />达标</div>
+        {/* 汇总数字行 */}
+        <div className="repair-completion-summary">
+          <div><span>实际完工</span><strong>9<small>艘</small></strong></div>
+          <div><span>计划完工</span><strong>10<small>艘</small></strong></div>
+          <div><span>完成率</span><strong>90<small>%</small></strong></div>
+        </div>
+        {/* 企业进度条 */}
+        {[
+          { n: "舟山重工", label: "达标", pct: 100, ok: true },
+          { n: "大连重工", label: "达标", pct: 100, ok: true },
+          { n: "广东重工", label: "3/10",  pct: 30,  ok: false },
+        ].map((it, i) => (
+          <div key={i} className="repair-completion-row">
+            <span>{it.n}</span>
+            <Progress value={it.pct} className="app-standard-progress flex-1" />
+            <strong className={it.ok ? "is-good" : "is-late"}>{it.label}</strong>
+          </div>
+        ))}
+        {/* 归因备注 */}
+        <div className="app-alert-strip">
+          <span style={{ fontSize: 11, fontWeight: 700, color: C.warning, flexShrink: 0 }}>注</span>
+          <span style={{ fontSize: 11, color: C.t2, lineHeight: 1.5 }}>
+            广东重工1艘延迟至2026年7月14日完工，延期5天
+          </span>
+        </div>
+        {/* 本月完工汇总 + 走势迷你折线 */}
+        <div className="repair-completion-trend">
+          <div className="repair-chart-title">近6个月完工出厂艘数趋势</div>
+          <div className="repair-chart-summary">本月完工 <strong>30艘</strong> · 完工产值 <strong>100万元</strong></div>
+          <svg width="100%" height="86" viewBox="0 0 300 86" preserveAspectRatio="none" aria-label="近6个月完工出厂艘数趋势">
+            {/* 面积填充 */}
+            <path d="M8 60 C28 56 42 61 66 52 C94 42 116 48 148 38 C178 30 210 24 242 16 C262 12 280 10 292 8 L292 72 L8 72 Z"
+              fill="rgba(0,80,180,0.07)" />
+            <path d="M8 60 C28 56 42 61 66 52 C94 42 116 48 148 38 C178 30 210 24 242 16 C262 12 280 10 292 8"
+              fill="none" stroke="#00508E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            {[[8,60,22],[66,52,24],[124,46,25],[182,29,27],[242,16,29],[292,8,30]].map(([x,y,v]) => (
+              <g key={x}><circle cx={x} cy={y} r="3.5" fill="#FFFFFF" stroke="#00508E" strokeWidth="2" /><text x={x} y={y - 7} textAnchor="middle" fontSize="8" fontWeight="700" fill="#00508E">{v}</text></g>
+            ))}
+          </svg>
+          {/* X轴月份标签 */}
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
+            {["2月", "3月", "4月", "5月", "6月", "7月"].map(m => (
+              <span key={m}>{m}</span>
+            ))}
+          </div>
+        </div>
+      </Card>
+
       <div className="repair-section-heading">
         <span className="app-title-icon"><Anchor size={16} strokeWidth={2} /></span>
         <div><strong>核心资源</strong><small>支撑修船生产的关键设施能力</small></div>
