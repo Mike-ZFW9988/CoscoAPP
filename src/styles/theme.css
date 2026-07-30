@@ -7527,6 +7527,48 @@
   font-size: 14px !important;
   line-height: 19px !important;
 }
+.app-phone-screen .biz-project-company-filter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.app-phone-screen .biz-project-company-filter > span {
+  flex-shrink: 0;
+  color: var(--app-text-regular);
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.app-phone-screen .biz-project-company-select {
+  position: relative;
+  display: inline-flex;
+  width: 88px;
+  height: 30px;
+  align-items: center;
+}
+.app-phone-screen .biz-project-company-select select {
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  appearance: none;
+  outline: none;
+  border: 1px solid var(--app-primary-300);
+  border-color: var(--app-primary-300);
+  border-radius: var(--app-radius-control);
+  background: var(--app-primary-100);
+  padding: 0 22px 0 7px;
+  color: var(--app-primary-900);
+  font-size: 11px;
+  font-weight: 650;
+  box-shadow: none;
+  cursor: pointer;
+}
+.app-phone-screen .biz-project-company-select svg {
+  position: absolute;
+  right: 6px;
+  color: var(--app-primary-900);
+  pointer-events: none;
+}
 .app-phone-screen .biz-project-detail-list {
   display: grid;
   gap: 8px;
@@ -7558,7 +7600,7 @@
 }
 .app-phone-screen .biz-project-detail-item dl {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   margin: 9px 0 0;
 }
@@ -7594,6 +7636,17 @@
   color: var(--app-text-secondary);
   font-size: 12px;
   line-height: 18px;
+}
+.app-phone-screen .biz-project-detail-empty {
+  display: flex;
+  min-height: 120px;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--app-border);
+  border-radius: var(--app-radius-kpi);
+  background: var(--app-fill-extra-light);
+  color: var(--app-text-regular);
+  font-size: 12px;
 }
 
 .app-phone-screen :is(.repair-ranking-card, .repair-completion-card) .app-card-title {

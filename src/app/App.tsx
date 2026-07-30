@@ -2223,10 +2223,10 @@ function PageBiz() {
         </div>
         <div className="biz-project-entry-grid">
           {[
-            { label: "船舶修理", Icon: BusinessRepairIcon, page: "biz-progress" },
-            { label: "船舶建造", Icon: BusinessShipbuildingIcon, page: "biz-progress" },
-            { label: "海工业务", Icon: BusinessOffshoreIcon, page: "biz-progress" },
-            { label: "配套服务", Icon: BusinessSupportIcon, page: "biz-progress" },
+            { label: "船舶修理", Icon: BusinessRepairIcon, page: "biz-progress-repair" },
+            { label: "船舶建造", Icon: BusinessShipbuildingIcon, page: "biz-progress-shipbuilding" },
+            { label: "海工业务", Icon: BusinessOffshoreIcon, page: "biz-progress-offshore" },
+            { label: "配套服务", Icon: BusinessSupportIcon, page: "biz-progress-support" },
           ].map(({ label, Icon, page }) => (
             <button key={label} type="button" className="biz-project-entry-item" onClick={() => nav(page)}>
               <span className="biz-project-entry-icon"><Icon /></span>
@@ -2242,24 +2242,78 @@ function PageBiz() {
   );
 }
 
-function PageBizProgress() {
-  const projects = [
+type BizProjectSection = "repair" | "shipbuilding" | "offshore" | "support";
+
+const BIZ_PROJECTS: Record<BizProjectSection, {
+  index: string;
+  name: string;
+  count: string;
+  company: string;
+  owner: string;
+  progress: string;
+}[]> = {
+  repair: [
+    { index: "01", name: "集装箱船节能改装", count: "1艘", company: "南通船务", owner: "中远海运集运", progress: "节能装置方案完成评审，关键设备已进入采购阶段，计划本月底进厂施工。" },
+    { index: "02", name: "VLCC坞修项目", count: "2艘", company: "舟山重工", owner: "中远海运能源", progress: "船东技术澄清已完成，坞期及生产资源完成锁定，重点跟踪长周期物资到货。" },
+  ],
+  shipbuilding: [
     { index: "01", name: "PANAMAX（带艏装载）", count: "2艘", company: "启东海工", owner: "中远海运能源", progress: "意向书已大签，重工已过会。跟踪能源董事会上会进展（预计4月中旬）。" },
     { index: "02", name: "13kTEU集装箱船", count: "12艘", company: "扬州重工", owner: "中远海运集运", progress: "常规燃料和 LNG 双燃料方案详规均已提供，技术沟通谈判预计延迟至3月末或4月初。" },
-  ];
+  ],
+  offshore: [
+    { index: "01", name: "FPSO模块建造项目", count: "1座", company: "启东海工", owner: "海洋石油工程", progress: "详细设计按计划推进，首批结构件已开工，当前重点协调核心设备接口资料。" },
+    { index: "02", name: "海上风电安装平台", count: "1座", company: "大连重工", owner: "中远海运特运", progress: "主船体分段进入连续建造阶段，关键节点总体受控，计划下月完成阶段性验收。" },
+  ],
+  support: [
+    { index: "01", name: "船用配套设备升级", count: "6套", company: "南通重工装备", owner: "扬州重工", progress: "首套设备完成联调，剩余设备按船期分批交付，当前重点跟踪现场安装反馈。" },
+    { index: "02", name: "智能能效系统交付", count: "4套", company: "威海重工科技", owner: "大连川崎", progress: "系统功能测试完成，船端数据接口已联通，计划本周完成用户验收。" },
+  ],
+};
+
+function PageBizProgress({ section = "shipbuilding" }: { section?: BizProjectSection }) {
+  const [selectedCompany, setSelectedCompany] = useState("all");
+  const projects = BIZ_PROJECTS[section];
+  const companies = Array.from(new Set(projects.map(project => project.company)));
+  const visibleProjects = selectedCompany === "all"
+    ? projects
+    : projects.filter(project => project.company === selectedCompany);
   return (
     <>
       <StatusBar />
       <NavBar title="经营主题" backLabel="返回经营主题" backPage="biz" />
       <BreadcrumbBar crumbs={["首页", "经营主题", "本周进展"]} period="截至7.10" />
 
-      <Card title="本周重点项目进展明细" className="mt-3 biz-project-detail-card">
+      <Card
+        title="本周重点项目进展明细"
+        className="mt-3 biz-project-detail-card"
+        extra={(
+          <label className="biz-project-company-filter">
+            <span>承建企业</span>
+            <span className="biz-project-company-select">
+              <select
+                value={selectedCompany}
+                onChange={(event) => setSelectedCompany(event.target.value)}
+                aria-label="按承建企业筛选项目"
+              >
+                <option value="all">全部企业</option>
+                {companies.map(company => <option key={company} value={company}>{company}</option>)}
+              </select>
+              <ChevronDown size={12} strokeWidth={2.2} aria-hidden="true" />
+            </span>
+          </label>
+        )}
+      >
         <div className="biz-project-detail-list">
-          {projects.map(project => <article key={project.index} className="biz-project-detail-item">
+          {visibleProjects.map(project => <article key={project.index} className="biz-project-detail-item">
             <header><span>{project.index}</span><strong>{project.name}</strong><StatusBadge tone="info">{project.count}</StatusBadge></header>
-            <dl><div><dt>承建企业</dt><dd>{project.company}</dd></div><div><dt>船东</dt><dd>{project.owner}</dd></div></dl>
+            <dl><div><dt>船东</dt><dd>{project.owner}</dd></div></dl>
             <div className="biz-project-detail-progress"><span>项目进展</span><p>{project.progress}</p></div>
           </article>)}
+          {visibleProjects.length === 0 && (
+            <div className="biz-project-detail-empty">
+              当前承建企业暂无重点项目
+            </div>
+          )}
         </div>
       </Card>
 
@@ -5009,6 +5063,10 @@ function renderPage(id: string) {
     case "home":              return <PageHome />;
     case "biz":               return <PageBiz />;
     case "biz-progress":      return <PageBizProgress />;
+    case "biz-progress-repair": return <PageBizProgress section="repair" />;
+    case "biz-progress-shipbuilding": return <PageBizProgress section="shipbuilding" />;
+    case "biz-progress-offshore": return <PageBizProgress section="offshore" />;
+    case "biz-progress-support": return <PageBizProgress section="support" />;
     case "biz-overdue":       return <PageBizOverdue />;
     case "biz-kpi-progress":  return <PageBizKpiProgress />;
     case "prod-repair":       return <PageProdRepair />;
