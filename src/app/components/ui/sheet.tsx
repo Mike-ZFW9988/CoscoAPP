@@ -48,14 +48,12 @@ function SheetContent({
   className,
   children,
   side = "right",
-  container,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: "top" | "right" | "bottom" | "left";
-  container?: HTMLElement | null;
 }) {
   return (
-    <SheetPortal container={container ?? undefined}>
+    <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content
         data-slot="sheet-content"

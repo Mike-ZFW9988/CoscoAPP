@@ -2735,27 +2735,17 @@
 }
 
 .home-freshness-sheet {
-  position: absolute !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
+  right: auto !important;
+  left: 50% !important;
+  width: min(375px, 100vw) !important;
   max-width: 375px !important;
-  max-height: calc(100% - 24px);
   gap: 0 !important;
-  transform: none !important;
-  overflow-x: hidden;
-  overflow-y: auto;
+  transform: translateX(-50%) !important;
+  overflow: hidden;
   border: 1px solid rgb(0 80 142 / 12%) !important;
   border-radius: 20px 20px 0 0 !important;
   background: linear-gradient(180deg, #fff 0%, #f6faff 100%) !important;
   box-shadow: 0 -14px 36px rgb(18 58 99 / 18%) !important;
-}
-
-.app-phone-screen > [data-slot="sheet-overlay"] {
-  position: absolute !important;
-  inset: 0 !important;
-  border-radius: inherit;
 }
 
 .home-freshness-head {
@@ -2852,6 +2842,10 @@
 
 @media (min-width: 600px) {
   .finance-fund-sheet {
+    left: calc(50% + 100px) !important;
+  }
+
+  .home-freshness-sheet {
     left: calc(50% + 100px) !important;
   }
 }
