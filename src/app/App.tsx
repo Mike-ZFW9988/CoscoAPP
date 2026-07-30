@@ -1529,9 +1529,17 @@ function PageBiz() {
   type BizInsightTab = "修船" | "造船" | "海工" | "配套";
   const [bizTab, setBizTab] = useState<BizInsightTab>("修船");
   const [trendTab, setTrendTab] = useState<"月度趋势" | "区域分布">("月度趋势");
+  const [repairChartTooltipIndex, setRepairChartTooltipIndex] = useState<number | null>(null);
   const [selectedMarketRegion, setSelectedMarketRegion] = useState(0);
   const [showDonut, setShowDonut] = useState(false);
   const [includeKawasaki, setIncludeKawasaki] = useState(false);
+  const repairChartData = [
+    { x: 42,  label: "南通船务", actual: 270, target: 750,  marginRate: 78 },
+    { x: 104, label: "大连重工", actual: 275, target: 750,  marginRate: 70 },
+    { x: 166, label: "舟山重工", actual: 380, target: 780,  marginRate: 82 },
+    { x: 228, label: "上海重工", actual: 430, target: 1280, marginRate: 43 },
+    { x: 290, label: "广东重工", actual: 280, target: 1250, marginRate: 76 },
+  ];
   const marketRegions = [
     { short: "希腊区", full: "希腊区", target: 9.5, actual: 11.2 },
     { short: "中欧西葡", full: "中欧及西葡区", target: 3.1, actual: 2.7 },
@@ -1819,6 +1827,9 @@ function PageBiz() {
                         <stop offset="0%" stopColor="#B9CDDE" />
                         <stop offset="100%" stopColor="#91AAC0" />
                       </linearGradient>
+                      <filter id="repairTooltipShadow" x="-20%" y="-20%" width="140%" height="150%">
+                        <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#10263A" floodOpacity="0.24" />
+                      </filter>
                     </defs>
 
                     <text x="4" y="16" fontSize="10" fill={C.t3}>万元</text>
@@ -1836,23 +1847,26 @@ function PageBiz() {
                       );
                     })}
 
-                    <path d="M42 70 C54 42 69 43 82 70 C95 92 109 82 122 60 C139 31 158 48 176 74 C192 98 204 121 218 125 C234 129 247 93 258 93 C272 93 282 76 292 70 L292 162 L42 162 Z" fill="url(#repairMarginArea)" />
-                    <path d="M42 70 C54 42 69 43 82 70 C95 92 109 82 122 60 C139 31 158 48 176 74 C192 98 204 121 218 125 C234 129 247 93 258 93 C272 93 282 76 292 70" fill="none" stroke={C.success} strokeWidth="2" strokeLinecap="round" />
-
-                    {[
-                      { x: 42, label: "南通船务", actual: 270, target: 750, mark: "750" },
-                      { x: 104, label: "大连重工", actual: 275, target: 750, mark: "750" },
-                      { x: 166, label: "舟山重工", actual: 380, target: 780, mark: "780" },
-                      { x: 228, label: "上海重工", actual: 430, target: 1280, mark: "1280" },
-                      { x: 290, label: "广东重工", actual: 280, target: 1250, mark: "1250" },
-                    ].map(item => {
+                    {repairChartData.map(item => {
                       const targetH = Math.max(34, Math.min(116, item.target / 1280 * 116));
                       const actualH = Math.max(30, Math.min(110, item.actual / 800 * 110));
-                        return (
-                          <g key={item.label}>
+                      return (
+                        <g key={item.label}>
                           <rect x={item.x - 7} y={162 - targetH} width="14" height={targetH} rx="7" fill="url(#repairTargetBar)" stroke="#7897B2" strokeWidth="0.9" />
                           <rect x={item.x - 7} y={162 - actualH} width="14" height={actualH} rx="7" fill="url(#repairActualBar)" />
-                          <text x={item.x} y={154 - targetH} textAnchor="middle" fontSize="10" fill={C.t2}>{item.mark}</text>
+                        </g>
+                      );
+                    })}
+
+                    {/* 面积与趋势线置于柱体上层，避免目标柱遮挡趋势。 */}
+                    <path d="M42 70 C54 42 69 43 82 70 C95 92 109 82 122 60 C139 31 158 48 176 74 C192 98 204 121 218 125 C234 129 247 93 258 93 C272 93 282 76 292 70 L292 162 L42 162 Z" fill="url(#repairMarginArea)" pointerEvents="none" />
+                    <path d="M42 70 C54 42 69 43 82 70 C95 92 109 82 122 60 C139 31 158 48 176 74 C192 98 204 121 218 125 C234 129 247 93 258 93 C272 93 282 76 292 70" fill="none" stroke={C.success} strokeWidth="2.2" strokeLinecap="round" pointerEvents="none" />
+
+                    {repairChartData.map(item => {
+                      const targetH = Math.max(34, Math.min(116, item.target / 1280 * 116));
+                      return (
+                        <g key={`${item.label}-labels`} pointerEvents="none">
+                          <text x={item.x} y={154 - targetH} textAnchor="middle" fontSize="10" fill={C.t2}>{item.target}</text>
                           <text x={item.x} y="184" textAnchor="middle" fontSize="10" fill={C.t2}>{item.label}</text>
                         </g>
                       );
@@ -1861,6 +1875,65 @@ function PageBiz() {
                     <text x="17" y="166" textAnchor="end" fontSize="10" fill={C.t3}>0</text>
                     <text x="304" y="166" fontSize="10" fill={C.t3}>20</text>
                     <line x1="24" y1="162" x2="292" y2="162" stroke={C.divider} strokeWidth="0.8" />
+
+                    {repairChartData.map((item, index) => (
+                      <rect
+                        key={`${item.label}-touch`}
+                        x={Math.max(24, item.x - 27)}
+                        y="26"
+                        width={item.x === 290 ? 30 : 54}
+                        height="166"
+                        fill="transparent"
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${item.label}，实际产值${item.actual}万元，目标产值${item.target}万元，实际边贡率${item.marginRate}%`}
+                        style={{ cursor: "pointer", outline: "none", touchAction: "pan-y" }}
+                        onPointerEnter={(event) => {
+                          if (event.pointerType === "mouse") setRepairChartTooltipIndex(index);
+                        }}
+                        onPointerLeave={(event) => {
+                          if (event.pointerType === "mouse") setRepairChartTooltipIndex(null);
+                        }}
+                        onPointerDown={(event) => {
+                          if (event.pointerType !== "mouse") {
+                            setRepairChartTooltipIndex(index);
+                          }
+                        }}
+                        onFocus={() => setRepairChartTooltipIndex(index)}
+                        onBlur={() => setRepairChartTooltipIndex(null)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setRepairChartTooltipIndex(index);
+                          }
+                        }}
+                      />
+                    ))}
+
+                    {repairChartTooltipIndex !== null && (() => {
+                      const item = repairChartData[repairChartTooltipIndex];
+                      const tooltipX = Math.max(6, Math.min(186, item.x - 62));
+                      const marginY = 162 - ((item.marginRate - 20) / 80) * 128;
+                      return (
+                        <g pointerEvents="none">
+                          <line x1={item.x} y1="28" x2={item.x} y2="162" stroke="#7897B2" strokeWidth="1" strokeDasharray="3 3" opacity="0.72" />
+                          <circle cx={item.x} cy={marginY} r="4" fill="#FFFFFF" stroke={C.success} strokeWidth="2" />
+                          <g filter="url(#repairTooltipShadow)">
+                            <rect x={tooltipX} y="28" width="128" height="76" rx="7" fill="#26384A" fillOpacity="0.97" />
+                            <text x={tooltipX + 10} y="44" fontSize="10" fontWeight="700" fill="#FFFFFF">{item.label}</text>
+                            <circle cx={tooltipX + 11} cy="57" r="3" fill={C.brand} />
+                            <text x={tooltipX + 19} y="60" fontSize="9" fill="#DCE8F2">实际产值</text>
+                            <text x={tooltipX + 118} y="60" textAnchor="end" fontSize="9" fontWeight="700" fill="#FFFFFF">{item.actual} 万元</text>
+                            <circle cx={tooltipX + 11} cy="73" r="3" fill="#AFC4D6" stroke="#7897B2" strokeWidth="0.8" />
+                            <text x={tooltipX + 19} y="76" fontSize="9" fill="#DCE8F2">目标产值</text>
+                            <text x={tooltipX + 118} y="76" textAnchor="end" fontSize="9" fontWeight="700" fill="#FFFFFF">{item.target} 万元</text>
+                            <line x1={tooltipX + 8} y1="89" x2={tooltipX + 14} y2="89" stroke={C.success} strokeWidth="2" strokeLinecap="round" />
+                            <text x={tooltipX + 19} y="92" fontSize="9" fill="#DCE8F2">实际边贡率</text>
+                            <text x={tooltipX + 118} y="92" textAnchor="end" fontSize="9" fontWeight="700" fill="#FFFFFF">{item.marginRate}%</text>
+                          </g>
+                        </g>
+                      );
+                    })()}
                   </svg>
                 </div>
               )}
