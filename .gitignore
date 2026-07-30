@@ -1,0 +1,35 @@
+# Dependencies and local package stores
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+
+# Temporary and generated files
+tmp/
+exports/
+
+# Historical binary backups
+backups/
+_backups/
+
+# Local logs
+*.log
+*.err.log
+
+# Environment and local configuration
+.env
+.env.*
+!.env.example
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Test and coverage output
+coverage/
+playwright-report/
+test-results/
