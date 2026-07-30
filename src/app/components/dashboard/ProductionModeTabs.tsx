@@ -10,7 +10,7 @@ type ProductionModeTabsProps = {
 };
 
 const modes: Array<{ value: ProductionMode; label: string; icon: LucideIcon }> = [
-  { value: "ship", label: "造船", icon: Ship },
+  { value: "ship", label: "新造", icon: Ship },
   { value: "repair", label: "修船", icon: Wrench },
 ];
 
