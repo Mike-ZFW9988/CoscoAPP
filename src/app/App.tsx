@@ -1796,7 +1796,7 @@ function PageBiz() {
                       实际产值
                     </span>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: C.t2, fontSize: 10 }}>
-                      <i style={{ width: 9, height: 9, borderRadius: 2, background: "#CDD6E2", display: "inline-block" }} />
+                      <i style={{ width: 9, height: 9, border: "1px solid #7897B2", borderRadius: 2, background: "#AFC4D6", display: "inline-block" }} />
                       目标产值
                     </span>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: C.t2, fontSize: 10 }}>
@@ -1816,8 +1816,8 @@ function PageBiz() {
                         <stop offset="100%" stopColor={C.brand} />
                       </linearGradient>
                       <linearGradient id="repairTargetBar" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#E4EAF1" />
-                        <stop offset="100%" stopColor="#CDD6E2" />
+                        <stop offset="0%" stopColor="#B9CDDE" />
+                        <stop offset="100%" stopColor="#91AAC0" />
                       </linearGradient>
                     </defs>
 
@@ -1848,9 +1848,9 @@ function PageBiz() {
                     ].map(item => {
                       const targetH = Math.max(34, Math.min(116, item.target / 1280 * 116));
                       const actualH = Math.max(30, Math.min(110, item.actual / 800 * 110));
-                      return (
-                        <g key={item.label}>
-                          <rect x={item.x - 7} y={162 - targetH} width="14" height={targetH} rx="7" fill="url(#repairTargetBar)" />
+                        return (
+                          <g key={item.label}>
+                          <rect x={item.x - 7} y={162 - targetH} width="14" height={targetH} rx="7" fill="url(#repairTargetBar)" stroke="#7897B2" strokeWidth="0.9" />
                           <rect x={item.x - 7} y={162 - actualH} width="14" height={actualH} rx="7" fill="url(#repairActualBar)" />
                           <text x={item.x} y={154 - targetH} textAnchor="middle" fontSize="10" fill={C.t2}>{item.mark}</text>
                           <text x={item.x} y="184" textAnchor="middle" fontSize="10" fill={C.t2}>{item.label}</text>
