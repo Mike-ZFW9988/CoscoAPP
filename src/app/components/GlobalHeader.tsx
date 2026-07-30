@@ -7,10 +7,22 @@ type GlobalHeaderProps = {
   pageTitle?: string;
   pageSubtitle?: string;
   onBack?: () => void;
+  badgeMode?: "date" | "freshness";
+  badgeExpanded?: boolean;
+  onBadgeClick?: () => void;
 };
 
-function GlobalHeader({ dateLabel = DEFAULT_GLOBAL_DATE, pageTitle, pageSubtitle, onBack }: GlobalHeaderProps) {
+function GlobalHeader({
+  dateLabel = DEFAULT_GLOBAL_DATE,
+  pageTitle,
+  pageSubtitle,
+  onBack,
+  badgeMode = "date",
+  badgeExpanded = false,
+  onBadgeClick,
+}: GlobalHeaderProps) {
   const hasPageChrome = Boolean(pageTitle && onBack);
+  const isFreshnessBadge = badgeMode === "freshness";
   return (
     <header
       className={cn("brand-nav brand-nav-home shrink-0 relative overflow-visible", hasPageChrome && "brand-nav-page")}
@@ -91,7 +103,10 @@ function GlobalHeader({ dateLabel = DEFAULT_GLOBAL_DATE, pageTitle, pageSubtitle
           <div className={cn("absolute left-[4px]", hasPageChrome ? "bottom-[-11px]" : "bottom-[8px]")}>
             <button
               type="button"
-              aria-label={`Date range filter ${dateLabel}`}
+              aria-label={isFreshnessBadge ? "查看数据更新时间说明" : `日期范围筛选 ${dateLabel}`}
+              aria-haspopup={isFreshnessBadge ? "dialog" : undefined}
+              aria-expanded={isFreshnessBadge ? badgeExpanded : undefined}
+              onClick={onBadgeClick}
               className="inline-flex items-center justify-start border-none cursor-pointer p-0"
               style={{
                 minHeight: 44,
@@ -118,12 +133,28 @@ function GlobalHeader({ dateLabel = DEFAULT_GLOBAL_DATE, pageTitle, pageSubtitle
                 }}
               >
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ marginRight: 8, flexShrink: 0, color: "#00508E" }}>
-                  <rect x="2.25" y="3.5" width="11.5" height="10" rx="2" stroke="currentColor" strokeWidth="1.4" opacity="0.72"/>
-                  <path d="M5 2.25v2.5M11 2.25v2.5M2.75 6.5h10.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.72"/>
+                  {isFreshnessBadge ? (
+                    <>
+                      <circle cx="8" cy="8" r="5.75" stroke="currentColor" strokeWidth="1.4" opacity="0.72" />
+                      <path d="M8 4.75v3.4l2.25 1.35" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </>
+                  ) : (
+                    <>
+                      <rect x="2.25" y="3.5" width="11.5" height="10" rx="2" stroke="currentColor" strokeWidth="1.4" opacity="0.72"/>
+                      <path d="M5 2.25v2.5M11 2.25v2.5M2.75 6.5h10.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.72"/>
+                    </>
+                  )}
                 </svg>
                 {dateLabel}
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ marginLeft: 8, flexShrink: 0, color: "#6F7F90" }}>
-                  <path d="M2.5 3.75L5 6.25L7.5 3.75" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
+                  {isFreshnessBadge ? (
+                    <>
+                      <circle cx="5" cy="5" r="4" stroke="currentColor" strokeWidth="1.1" opacity="0.65" />
+                      <path d="M5 4.5v2.2M5 3.1v.1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                    </>
+                  ) : (
+                    <path d="M2.5 3.75L5 6.25L7.5 3.75" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
+                  )}
                 </svg>
               </span>
             </button>

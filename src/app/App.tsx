@@ -148,8 +148,18 @@ function NavBar({
   subtitle,
   backPage,
   dateBadge,
+  badgeMode,
+  badgeExpanded,
+  onBadgeClick,
 }: {
-  title: string; subtitle?: string; backLabel?: string; backPage?: string; dateBadge?: string;
+  title: string;
+  subtitle?: string;
+  backLabel?: string;
+  backPage?: string;
+  dateBadge?: string;
+  badgeMode?: "date" | "freshness";
+  badgeExpanded?: boolean;
+  onBadgeClick?: () => void;
 }) {
   return (
     <GlobalHeader
@@ -157,6 +167,9 @@ function NavBar({
       pageTitle={backPage ? title : undefined}
       pageSubtitle={backPage ? subtitle : undefined}
       onBack={backPage ? () => nav(backPage) : undefined}
+      badgeMode={badgeMode}
+      badgeExpanded={badgeExpanded}
+      onBadgeClick={onBadgeClick}
     />
   );
 }
@@ -1147,6 +1160,14 @@ function MetricPair({ a, b }: { a: { label: string; value: string; target: strin
 
 function PageHome({ repairMode = false }: { repairMode?: boolean }) {
   const [alertExpanded, setAlertExpanded] = useState(false);
+  const [freshnessOpen, setFreshnessOpen] = useState(false);
+
+  const DATA_FRESHNESS = [
+    { module: "新接订单", date: "2026年8月8日", cadence: "每日更新" },
+    { module: "年度交付", date: "2026年7月31日", cadence: "按月更新" },
+    { module: "完工出厂", date: "2026年7月31日", cadence: "按月更新" },
+    { module: "逾期应收", date: "2026年8月7日", cadence: "每日更新" },
+  ];
 
   const ALERTS = [
     { cat: "生产", text: "广东重工交付完成率 90%",                 pri: "高优先级", link: "生产",  page: "prod-repair" },
@@ -1160,7 +1181,13 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
   return (
     <>
       <StatusBar />
-      <NavBar title="重工数字化运营平台" dateBadge="2026年8月8日" />
+      <NavBar
+        title="重工数字化运营平台"
+        dateBadge="数据口径：最新可用"
+        badgeMode="freshness"
+        badgeExpanded={freshnessOpen}
+        onBadgeClick={() => setFreshnessOpen(true)}
+      />
 
       {/* L3 KPI区：上下结构 */}
       <div style={{ padding: "0 10px 0", background: "linear-gradient(180deg, var(--app-primary-200) 0%, var(--app-border-extra-light) 34%, var(--background) 86%)" }}>
@@ -1521,6 +1548,29 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
       </div>
 
       <Footer text="数据口径混合日更/月更 · 点主题卡下钻至详情" />
+
+      <Sheet open={freshnessOpen} onOpenChange={setFreshnessOpen}>
+        <SheetContent side="bottom" className="home-freshness-sheet">
+          <SheetHeader className="home-freshness-head">
+            <SheetTitle>数据更新时间说明</SheetTitle>
+            <SheetDescription>首页按各业务系统最近一次可用数据展示</SheetDescription>
+          </SheetHeader>
+          <div className="home-freshness-list">
+            {DATA_FRESHNESS.map((item) => (
+              <div className="home-freshness-item" key={item.module}>
+                <div>
+                  <strong>{item.module}</strong>
+                  <span>{item.cadence}</span>
+                </div>
+                <time>{item.date}</time>
+              </div>
+            ))}
+          </div>
+          <p className="home-freshness-note">
+            不同指标更新频率不同，详情页中的口径说明及更新时间优先。
+          </p>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

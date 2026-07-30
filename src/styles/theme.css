@@ -2734,8 +2734,118 @@
   font-weight: 500;
 }
 
+.home-freshness-sheet {
+  right: auto !important;
+  left: 50% !important;
+  width: min(375px, 100vw) !important;
+  max-width: 375px !important;
+  gap: 0 !important;
+  transform: translateX(-50%) !important;
+  overflow: hidden;
+  border: 1px solid rgb(0 80 142 / 12%) !important;
+  border-radius: 20px 20px 0 0 !important;
+  background: linear-gradient(180deg, #fff 0%, #f6faff 100%) !important;
+  box-shadow: 0 -14px 36px rgb(18 58 99 / 18%) !important;
+}
+
+.home-freshness-head {
+  gap: 3px !important;
+  padding: 18px 20px 13px !important;
+  border-bottom: 1px solid rgb(0 80 142 / 8%);
+}
+
+.home-freshness-head [data-slot="sheet-title"] {
+  color: var(--app-text-primary);
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.home-freshness-head [data-slot="sheet-description"] {
+  color: var(--app-text-secondary);
+  font-size: 12px;
+}
+
+.home-freshness-sheet [data-slot="sheet-close"] {
+  top: 14px !important;
+  right: 16px !important;
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px !important;
+  background: var(--app-primary-100) !important;
+  color: var(--app-text-regular);
+  opacity: 1 !important;
+  box-shadow: inset 0 0 0 1px rgb(0 80 142 / 10%) !important;
+}
+
+.home-freshness-sheet [data-slot="sheet-close"]:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgb(0 80 142 / 18%), 0 0 0 2px rgb(121 187 255 / 45%) !important;
+}
+
+.home-freshness-list {
+  padding: 4px 20px;
+}
+
+.home-freshness-item {
+  display: flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(0 80 142 / 7%);
+}
+
+.home-freshness-item:last-child {
+  border-bottom: 0;
+}
+
+.home-freshness-item > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-freshness-item strong {
+  color: var(--app-text-primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.home-freshness-item span {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--app-primary-100);
+  color: var(--app-primary);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.home-freshness-item time {
+  color: var(--app-text-regular);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+.home-freshness-note {
+  margin: 4px 20px 18px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: rgb(238 245 252 / 80%);
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
 @media (min-width: 600px) {
   .finance-fund-sheet {
+    left: calc(50% + 100px) !important;
+  }
+
+  .home-freshness-sheet {
     left: calc(50% + 100px) !important;
   }
 }
