@@ -1161,6 +1161,11 @@ function MetricPair({ a, b }: { a: { label: string; value: string; target: strin
 function PageHome({ repairMode = false }: { repairMode?: boolean }) {
   const [alertExpanded, setAlertExpanded] = useState(false);
   const [freshnessOpen, setFreshnessOpen] = useState(false);
+  const [freshnessContainer, setFreshnessContainer] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setFreshnessContainer(document.querySelector<HTMLElement>(".app-phone-screen"));
+  }, []);
 
   const DATA_FRESHNESS = [
     { module: "新接订单", date: "2026年8月8日", cadence: "每日更新" },
@@ -1550,7 +1555,7 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
       <Footer text="数据口径混合日更/月更 · 点主题卡下钻至详情" />
 
       <Sheet open={freshnessOpen} onOpenChange={setFreshnessOpen}>
-        <SheetContent side="bottom" className="home-freshness-sheet">
+        <SheetContent side="bottom" className="home-freshness-sheet" container={freshnessContainer}>
           <SheetHeader className="home-freshness-head">
             <SheetTitle>数据更新时间说明</SheetTitle>
             <SheetDescription>首页按各业务系统最近一次可用数据展示</SheetDescription>
