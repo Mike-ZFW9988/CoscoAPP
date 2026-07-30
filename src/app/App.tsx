@@ -2477,34 +2477,25 @@ function PageBizKpiProgress() {
 function PageBizOverdue() {
   const [distTab, setDistTab] = useState<"合计" | "系内" | "系外">("合计");
 
-  // 合计 = 系内 + 系外；系外=≥1年高危；系内=<1年短期
-  const DATA: Record<string, Array<{ label: string; dark: number; light: number }>> = {
-    合计: [
-      { label: "船舶建造",   dark: 0,    light: 0    },
-      { label: "修理改装",   dark: 5800, light: 4200 },
-      { label: "海工及新能源", dark: 2100, light: 1800 },
-      { label: "配套业务",   dark: 879,  light: 715  },
-    ],
-    系外: [
-      { label: "船舶建造",   dark: 0,    light: 0    },
-      { label: "修理改装",   dark: 5800, light: 0    },
-      { label: "海工及新能源", dark: 2100, light: 0    },
-      { label: "配套业务",   dark: 879,  light: 0    },
-    ],
-    系内: [
-      { label: "船舶建造",   dark: 0,    light: 0    },
-      { label: "修理改装",   dark: 0,    light: 4200 },
-      { label: "海工及新能源", dark: 0,    light: 1800 },
-      { label: "配套业务",   dark: 0,    light: 715  },
-    ],
-  };
-  const segments = DATA[distTab];
-  const maxVal = Math.max(...segments.map(s => s.dark + s.light), 1);
+  type AgingAmount = { overYear: number; underYear: number };
+  const distributionData: Array<{
+    label: string;
+    internal: AgingAmount;
+    external: AgingAmount;
+  }> = [
+    { label: "船舶建造", internal: { overYear: 0, underYear: 0 }, external: { overYear: 0, underYear: 0 } },
+    { label: "修理改装", internal: { overYear: 1200, underYear: 3000 }, external: { overYear: 3600, underYear: 2200 } },
+    { label: "海工及新能源", internal: { overYear: 540, underYear: 1260 }, external: { overYear: 1350, underYear: 750 } },
+    { label: "配套业务", internal: { overYear: 215, underYear: 500 }, external: { overYear: 560, underYear: 319 } },
+  ];
+  const axisMax = 10000;
   const overdueColors = {
     external: C.danger,
-    externalSoft: C.dangerSoft,
     internal: C.brand,
-    internalSoft: C.brandSoft,
+    overYear: C.danger,
+    overYearSoft: C.dangerSoft,
+    underYear: C.brand,
+    underYearSoft: C.brandSoft,
     risk: C.warning,
     riskSoft: C.warningSoft,
     recovery: C.success,
@@ -2529,15 +2520,15 @@ function PageBizOverdue() {
         <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px", marginBottom: 10 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <div style={{ width: 8, height: 8, borderRadius: 2, background: overdueColors.external, flexShrink: 0 }} />
-            <span style={{ fontSize: 11, color: C.t2 }}>系外逾期</span>
+            <span style={{ fontSize: 11, color: C.t2 }}>逾期</span>
             <span style={{ fontSize: 11, color: C.t3 }}>≥1年</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: overdueColors.external }}>8,779</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: overdueColors.external }}>7,465</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <div style={{ width: 8, height: 8, borderRadius: 2, background: overdueColors.internal, flexShrink: 0 }} />
-            <span style={{ fontSize: 11, color: C.t2 }}>系内逾期</span>
+            <span style={{ fontSize: 11, color: C.t2 }}>逾期</span>
             <span style={{ fontSize: 11, color: C.t3 }}>{"<"}1年</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: overdueColors.internal }}>6,715</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: overdueColors.internal }}>8,029</span>
           </div>
         </div>
         {/* 分隔 */}
@@ -2558,11 +2549,14 @@ function PageBizOverdue() {
       </div>
 
       {/* 堆叠横向条形图 */}
-      <div style={{ background: C.card, border: "1px solid rgba(0,80,142,0.07)", margin: "8px 10px 8px", borderRadius: 12, padding: "10px 10px 10px", boxShadow: "0 4px 10px rgba(20,76,128,0.055)" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: C.t1 }}>各业务板块逾期分布</span>
+      <div className="biz-overdue-distribution-card" style={{ background: C.card, border: "1px solid rgba(0,80,142,0.07)", margin: "8px 10px 8px", borderRadius: 12, padding: "10px 10px 10px", boxShadow: "0 4px 10px rgba(20,76,128,0.055)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 12 }}>
+          <div style={{ display: "flex", minWidth: 0, alignItems: "baseline", gap: 6 }}>
+            <span style={{ fontSize: 14, fontWeight: 700, color: C.t1, whiteSpace: "nowrap" }}>各业务板块逾期分布</span>
+            <span style={{ fontSize: 9, color: C.t3, whiteSpace: "nowrap" }}>单位：万元</span>
+          </div>
           {/* 合计 / 系内 / 系外 切换 */}
-          <div style={{ display: "flex", background: "rgba(217,236,255,0.72)", border: "1px solid rgba(0,80,142,0.10)", borderRadius: 999, padding: 2, gap: 2 }}>
+          <div style={{ display: "flex", flexShrink: 0, background: "rgba(217,236,255,0.72)", border: "1px solid rgba(0,80,142,0.10)", borderRadius: 999, padding: 2, gap: 2 }}>
             {(["合计", "系内", "系外"] as const).map(tab => (
               <button key={tab} onClick={() => setDistTab(tab)} style={{ borderRadius: 999, padding: "3px 10px", border: "none", cursor: "pointer", background: distTab === tab ? "linear-gradient(135deg, #00508E 0%, #0B69C7 100%)" : "transparent", boxShadow: distTab === tab ? "0 2px 6px rgba(0,80,142,0.16)" : "none" }}>
                 <span style={{ fontSize: 11, fontWeight: 600, color: distTab === tab ? "#FFFFFF" : C.brand }}>{tab}</span>
@@ -2570,60 +2564,85 @@ function PageBizOverdue() {
             ))}
           </div>
         </div>
-        {/* 图例（合计时双色，系内/系外时单色） */}
+        {/* 账龄图例：三个视图均保持一致 */}
         <div style={{ display: "flex", gap: 14, marginBottom: 14 }}>
-          {(distTab === "合计" || distTab === "系外") && (
-            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <div style={{ width: 12, height: 10, borderRadius: 2, background: overdueColors.external }} />
-              <span style={{ fontSize: 10, color: C.t3 }}>系外逾期 ≥1年</span>
-            </div>
-          )}
-          {(distTab === "合计" || distTab === "系内") && (
-            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <div style={{ width: 12, height: 10, borderRadius: 2, background: overdueColors.internal }} />
-              <span style={{ fontSize: 10, color: C.t3 }}>系内逾期 {"<"}1年</span>
-            </div>
-          )}
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 12, height: 10, borderRadius: 2, background: overdueColors.overYear }} />
+            <span style={{ fontSize: 10, color: C.t3 }}>逾期 ≥1年</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 12, height: 10, borderRadius: 2, background: overdueColors.underYear }} />
+            <span style={{ fontSize: 10, color: C.t3 }}>逾期 {"<"}1年</span>
+          </div>
         </div>
         {/* 条形图 */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {segments.map((seg) => {
-            const total = seg.dark + seg.light;
-            const darkW  = (seg.dark  / maxVal) * 100;
-            const lightW = (seg.light / maxVal) * 100;
+        <div style={{ display: "flex", flexDirection: "column", gap: distTab === "合计" ? 13 : 16 }}>
+          {distributionData.map((item) => {
+            const internalTotal = item.internal.overYear + item.internal.underYear;
+            const externalTotal = item.external.overYear + item.external.underYear;
+            const total = internalTotal + externalTotal;
+            const sourceRows = distTab === "合计"
+              ? [
+                  { label: "系外", amount: item.external },
+                  { label: "系内", amount: item.internal },
+                ]
+              : distTab === "系内"
+                ? [{ label: "系内", amount: item.internal }]
+                : [{ label: "系外", amount: item.external }];
+            const viewTotal = distTab === "合计"
+              ? total
+              : distTab === "系内"
+                ? internalTotal
+                : externalTotal;
             return (
-              <div key={seg.label}>
+              <div key={item.label}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
-                  <span style={{ fontSize: 12, color: C.t2, fontWeight: 500 }}>{seg.label}</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: total === 0 ? C.t3 : C.t1, fontVariantNumeric: "tabular-nums" }}>
-                    {total === 0 ? "—" : total.toLocaleString()}
+                  <span style={{ fontSize: 12, color: C.t2, fontWeight: 500 }}>{item.label}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: viewTotal === 0 ? C.t3 : C.t1, fontVariantNumeric: "tabular-nums" }}>
+                    {viewTotal === 0 ? "—" : viewTotal.toLocaleString()}
                   </span>
                 </div>
-                <div style={{ display: "flex", height: 20, borderRadius: 5, overflow: "hidden", background: "rgba(236,245,255,0.64)" }}>
-                  {seg.dark > 0 && (
-                    <div style={{ width: `${darkW}%`, background: overdueColors.external, borderRadius: seg.light > 0 ? "5px 0 0 5px" : 5, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {darkW > 12 && <span style={{ fontSize: 9, color: "#FFFFFF", fontWeight: 600 }}>{seg.dark.toLocaleString()}</span>}
-                    </div>
-                  )}
-                  {seg.light > 0 && (
-                    <div style={{ width: `${lightW}%`, background: overdueColors.internal, borderRadius: seg.dark > 0 ? "0 5px 5px 0" : 5, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {lightW > 12 && <span style={{ fontSize: 9, color: "#FFFFFF", fontWeight: 600 }}>{seg.light.toLocaleString()}</span>}
-                    </div>
-                  )}
-                  {total === 0 && (
-                    <div style={{ width: "100%", display: "flex", alignItems: "center", paddingLeft: 8 }}>
-                      <span style={{ fontSize: 9, color: C.t3 }}>暂无逾期</span>
-                    </div>
-                  )}
-                </div>
+                {viewTotal === 0 ? (
+                  <div style={{ display: "flex", height: 20, alignItems: "center", borderRadius: 5, background: "rgba(236,245,255,0.64)", paddingLeft: 8 }}>
+                    <span style={{ fontSize: 9, color: C.t3 }}>暂无逾期</span>
+                  </div>
+                ) : (
+                  <div style={{ display: "grid", gap: 4 }}>
+                    {sourceRows.map(source => {
+                      const sourceTotal = source.amount.overYear + source.amount.underYear;
+                      const overYearW = (source.amount.overYear / axisMax) * 100;
+                      const underYearW = (source.amount.underYear / axisMax) * 100;
+                      return (
+                        <div key={source.label} style={{ display: "grid", gridTemplateColumns: "30px minmax(0,1fr)", alignItems: "center", gap: 5 }}>
+                          <span style={{ fontSize: 9, color: C.t3, textAlign: "right" }}>{source.label}</span>
+                          <div style={{ display: "flex", height: distTab === "合计" ? 14 : 20, borderRadius: 5, overflow: "hidden", background: "rgba(236,245,255,0.64)" }}>
+                            {source.amount.overYear > 0 && (
+                              <div style={{ width: `${overYearW}%`, background: overdueColors.overYear, borderRadius: source.amount.underYear > 0 ? "5px 0 0 5px" : 5, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                {overYearW > 11 && <span style={{ fontSize: distTab === "合计" ? 8 : 9, color: "#FFFFFF", fontWeight: 600 }}>{source.amount.overYear.toLocaleString()}</span>}
+                              </div>
+                            )}
+                            {source.amount.underYear > 0 && (
+                              <div style={{ width: `${underYearW}%`, background: overdueColors.underYear, borderRadius: source.amount.overYear > 0 ? "0 5px 5px 0" : 5, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                {underYearW > 11 && <span style={{ fontSize: distTab === "合计" ? 8 : 9, color: "#FFFFFF", fontWeight: 600 }}>{source.amount.underYear.toLocaleString()}</span>}
+                              </div>
+                            )}
+                            {sourceTotal === 0 && (
+                              <span style={{ alignSelf: "center", paddingLeft: 6, fontSize: 8, color: C.t3 }}>—</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
         {/* X轴刻度 */}
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, paddingLeft: 0 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, paddingLeft: 35 }}>
           {[0, 2500, 5000, 7500, 10000].map(v => (
-            <span key={v} style={{ fontSize: 9, color: C.t3 }}>{v === 0 ? "0" : `${(v/1000).toFixed(1)}k`}</span>
+            <span key={v} style={{ fontSize: 9, color: C.t3 }}>{v.toLocaleString()}</span>
           ))}
         </div>
       </div>
