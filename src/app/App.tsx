@@ -266,7 +266,7 @@ const DETAIL_CARD_TITLES = new Set([
   "集采率对标管理",
   "质量运营总览",
   "质量活动分享",
-  "结构RT/PAUT一次性合规率质量总览",
+  "结构RT/PAUT一次性合规率总览",
   "企业结构RT/PAUT一次性合规率表现",
   "报验一次合规率总览",
   "企业报验一次合规率表现",
@@ -4794,7 +4794,7 @@ function PageQualityRT() {
       <NavBar title="质量-RT/PAUT合规率" backLabel="返回质量主题" backPage="quality" />
       <BreadcrumbBar crumbs={["首页", "质量主题", "质量-RT/PAUT合规率"]} />
 
-      <Card title="结构RT/PAUT一次性合规率质量总览" className="mt-3 quality-rt-summary-card">
+      <Card title="结构RT/PAUT一次性合规率总览" className="mt-3 quality-rt-summary-card">
         <div className="quality-rt-summary"><div><span>年度累计</span><strong>98.6%</strong><small className="is-good">高于目标 4.3%</small></div><div><span>本月合格率</span><strong>98.4%</strong></div><div><span>年度目标</span><strong>94.3%</strong></div></div>
         <div className="quality-rt-conclusion"><ShieldCheck size={14}/><span>年度累计与本月合格率均高于目标，整体质量表现稳定</span></div>
       </Card>
