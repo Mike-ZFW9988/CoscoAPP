@@ -3629,6 +3629,52 @@
   gap: 5px;
   margin: 0;
 }
+.app-phone-screen .steel-month-range {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 9px;
+  padding: 4px 7px 8px;
+  border-bottom: 1px solid var(--app-divider);
+}
+.app-phone-screen .steel-month-range-label {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  font-weight: 650;
+}
+.app-phone-screen .steel-month-range-label svg { color: var(--app-primary); }
+.app-phone-screen .steel-month-range-fields {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+}
+.app-phone-screen .steel-month-range-fields > span {
+  color: var(--app-text-secondary);
+  font-size: 10px;
+}
+.app-phone-screen .steel-month-range-fields select {
+  width: 92px;
+  height: 28px;
+  padding: 0 19px 0 7px;
+  border: 1px solid rgb(0 80 142 / 12%);
+  border-radius: 8px;
+  outline: none;
+  background-color: var(--app-primary-soft);
+  color: var(--app-primary);
+  font-size: 10px;
+  font-weight: 650;
+}
+.app-phone-screen .steel-month-range-fields select:focus-visible {
+  border-color: var(--app-primary-500);
+  box-shadow: 0 0 0 2px rgb(121 187 255 / 24%);
+}
 .app-phone-screen .steel-overview-surface .steel-overview-grid > div {
   display: grid;
   min-height: 62px;

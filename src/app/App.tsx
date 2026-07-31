@@ -4339,9 +4339,10 @@ function SteelMetricIcon({ type }: { type: "project" | "steel" | "delivered" | "
 }
 
 function PurchaseSteelPanel() {
-  const [costPeriod, setCostPeriod] = useState<"month" | "total">("month");
-  const [deliveryPeriod, setDeliveryPeriod] = useState<"month" | "total">("month");
+  const [steelStartMonth, setSteelStartMonth] = useState(3);
+  const [steelEndMonth, setSteelEndMonth] = useState(6);
   const [distributionMetric, setDistributionMetric] = useState<"count" | "tonnage">("count");
+  const steelMonthOptions = [3, 4, 5, 6];
   const overview = [
     { label: "项目总数量", value: "53", unit: "个", icon: "project" as const },
     { label: "钢板总数量", value: "82.58", unit: "万吨", icon: "steel" as const },
@@ -4350,6 +4351,34 @@ function PurchaseSteelPanel() {
   ];
   return <div className="purchase-business-panel">
     <div className="steel-overview-surface">
+      <div className="steel-month-range" role="group" aria-label="钢材采购统计时间范围">
+        <span className="steel-month-range-label"><CalendarClock size={14} strokeWidth={1.9} />统计时间</span>
+        <div className="steel-month-range-fields">
+          <select
+            aria-label="钢材采购起始月份"
+            value={steelStartMonth}
+            onChange={(event) => {
+              const month = Number(event.target.value);
+              setSteelStartMonth(month);
+              if (month > steelEndMonth) setSteelEndMonth(month);
+            }}
+          >
+            {steelMonthOptions.map((month) => <option key={month} value={month} disabled={month > steelEndMonth}>2026年{month}月</option>)}
+          </select>
+          <span>—</span>
+          <select
+            aria-label="钢材采购结束月份"
+            value={steelEndMonth}
+            onChange={(event) => {
+              const month = Number(event.target.value);
+              setSteelEndMonth(month);
+              if (month < steelStartMonth) setSteelStartMonth(month);
+            }}
+          >
+            {steelMonthOptions.map((month) => <option key={month} value={month} disabled={month < steelStartMonth}>2026年{month}月</option>)}
+          </select>
+        </div>
+      </div>
       <div className="steel-overview-grid">
         {overview.map((item) => <div key={item.label}><SteelMetricIcon type={item.icon}/><div><span>{item.label}</span><strong>{item.value}<small>{item.unit}</small></strong></div></div>)}
       </div>
@@ -4371,21 +4400,21 @@ function PurchaseSteelPanel() {
     </Card>
 
     <Card title="锁价交付" extra="各企业明细" onExtra={() => nav("purchase-steel-delivery")} className="app-production-card steel-delivery-card">
-      <div className="steel-delivery-toolbar"><span>单位：万吨</span><div className="purchase-structure-switch"><button type="button" className={deliveryPeriod === "month" ? "is-active" : ""} onClick={() => setDeliveryPeriod("month")}>月度</button><button type="button" className={deliveryPeriod === "total" ? "is-active" : ""} onClick={() => setDeliveryPeriod("total")}>累计</button></div></div>
-      {(() => { const data = deliveryPeriod === "month" ? { due:15, actual:10.25, pending:4.75, rate:68.3 } : { due:82.58, actual:10.25, pending:72.33, rate:12.4 }; return <><div className="steel-cost-overview steel-delivery-overview"><div className="budget"><span>应交付数量</span><strong>{data.due}<small>万吨</small></strong></div><div className="locked"><span>实绩交付数量</span><strong>{data.actual}<small>万吨</small></strong></div><div className="pending"><span>待交付数量</span><strong>{data.pending}<small>万吨</small></strong></div></div><div className="steel-delivery-progress-head"><span>交付比例</span><b>{data.rate}%</b></div><Progress value={data.rate} className="steel-delivery-progress" /></>; })()}
+      <div className="steel-delivery-toolbar"><span>单位：万吨</span></div>
+      <div className="steel-cost-overview steel-delivery-overview"><div className="budget"><span>应交付数量</span><strong>15<small>万吨</small></strong></div><div className="locked"><span>实绩交付数量</span><strong>10.25<small>万吨</small></strong></div><div className="pending"><span>待交付数量</span><strong>4.75<small>万吨</small></strong></div></div><div className="steel-delivery-progress-head"><span>交付比例</span><b>68.3%</b></div><Progress value={68.3} className="steel-delivery-progress" />
     </Card>
 
     <Card title="锁价成本与预算" extra="各企业明细" onExtra={() => nav("purchase-steel-cost")} className="app-production-card steel-cost-card">
-      <div className="steel-cost-toolbar"><span>单位：亿元</span><div className="purchase-structure-switch"><button type="button" className={costPeriod === "month" ? "is-active" : ""} onClick={() => setCostPeriod("month")}>月度</button><button type="button" className={costPeriod === "total" ? "is-active" : ""} onClick={() => setCostPeriod("total")}>累计</button></div></div>
+      <div className="steel-cost-toolbar"><span>单位：亿元</span></div>
       <div className="steel-cost-overview">{[
-        { label:"预算成本", value:costPeriod === "total" ? "37.56" : "3.18", tone:"budget" },
-        { label:"锁价成本", value:costPeriod === "total" ? "30.90" : "2.60", tone:"locked" },
-        { label:"节约金额", value:costPeriod === "total" ? "6.66" : "0.58", tone:"saving" },
+        { label:"预算成本", value:"3.18", tone:"budget" },
+        { label:"锁价成本", value:"2.60", tone:"locked" },
+        { label:"节约金额", value:"0.58", tone:"saving" },
       ].map(item=><div key={item.label} className={item.tone}><span>{item.label}</span><strong>{item.value}<small>亿</small></strong></div>)}</div>
       <div className="steel-cost-bars">
         {[
-          { label: "预算成本", value: costPeriod === "total" ? 37.56 : 3.18, max: costPeriod === "total" ? 40 : 3.5, tone: "budget" },
-          { label: "锁价成本", value: costPeriod === "total" ? 30.90 : 2.60, max: costPeriod === "total" ? 40 : 3.5, tone: "locked" },
+          { label: "预算成本", value: 3.18, max: 3.5, tone: "budget" },
+          { label: "锁价成本", value: 2.60, max: 3.5, tone: "locked" },
         ].map(item => <div key={item.label}><div><span>{item.label}</span><b>{item.value.toFixed(2)}亿</b></div><i><em className={item.tone} style={{ width: `${item.value / item.max * 100}%` }} /></i></div>)}
       </div>
     </Card>
@@ -4478,7 +4507,7 @@ function PagePurchaseGroup({ initialSection = "management" }: { initialSection?:
   return (
     <>
       <StatusBar />
-      <NavBar title="采购主题" backLabel="返回首页" backPage="home" />
+      <NavBar title="采购主题" backLabel="返回首页" backPage="home" dateBadge="2026年8月" />
       <div className="repair-mode-shell purchase-mode-shell">
         <PurchaseModeTabs value={activeSection} onValueChange={setActiveSection} />
       </div>
