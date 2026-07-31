@@ -108,6 +108,7 @@ const PAGES = [
   { id: "purchase-group-rate",  label: "5  集采·集采率" },
   { id: "quality",              label: "6  质量主题" },
   { id: "quality-rt",           label: "6  质量·RT合格率" },
+  { id: "quality-inspection",   label: "6  质量·报验一次" },
   { id: "energy",               label: "7  能源主题" },
   { id: "design-tokens",        label: "DS  Design Token System" },
   { id: "atomic-components",    label: "DS  Atomic Components" },
@@ -265,8 +266,10 @@ const DETAIL_CARD_TITLES = new Set([
   "集采率对标管理",
   "质量运营总览",
   "质量活动分享",
-  "RT/PAUT质量结果总览",
-  "企业RT/PAUT表现",
+  "结构RT/PAUT一次性合规率质量总览",
+  "企业结构RT/PAUT一次性合规率表现",
+  "报验一次合规率总览",
+  "企业报验一次合规率表现",
   "能效趋势",
   "年累计万元产值综合能耗排名",
 ]);
@@ -4664,7 +4667,7 @@ function PagePurchaseGroupRate() {
 function PageQuality() {
   const [activeMetric, setActiveMetric] = useState<"报验" | "RT">("RT");
   const [qualityView, setQualityView] = useState<"ranking" | "attention">("ranking");
-  const [activeAwardGroup, setActiveAwardGroup] = useState<"central" | "heavy" | "innovation" | "theme">("central");
+  const [activeAwardGroup, setActiveAwardGroup] = useState<"central" | "heavy" | "theme">("central");
   const [awardYear, setAwardYear] = useState("2026");
   const [showAllQualityActivities, setShowAllQualityActivities] = useState(false);
 
@@ -4717,11 +4720,6 @@ function PageQuality() {
       { level: "一等奖", company: "南通船务", title: "修船关键节点质量提升", summary: "提升重点项目交付质量" },
       { level: "二等奖", company: "广东重工", title: "检测流程标准化改善", summary: "统一检验标准与闭环流程" },
     ]},
-    { key: "innovation" as const, label: "质量创新赛", items: [
-      { level: "一等奖", company: "上海重工", title: "智能检测技术应用", summary: "推动检测数据在线采集" },
-      { level: "二等奖", company: "大连重工", title: "船体精度数字化管控", summary: "提升测量效率与准确率" },
-      { level: "三等奖", company: "舟山重工", title: "质量问题快速闭环机制", summary: "缩短异常处理周期" },
-    ]},
     { key: "theme" as const, label: "质量月活动", items: [
       { level: "03月11–12", company: "大连重工", title: "QC 小组活动专题培训班", summary: "112人参与 · 报告待上传" },
       { level: "03月10日", company: "上海环境 + 线上", title: "《碳达峰行动方案》编制工作部署会", summary: "69人参与 · 查看报告" },
@@ -4739,7 +4737,7 @@ function PageQuality() {
       <Card title="质量运营总览" className="mt-3 quality-overview-card">
         <div className="quality-overview-metrics">
           <div><span>报验一次合格率</span><strong>98.6%</strong><small>目标 ≥98%</small><b className="is-good"><ShieldCheck size={12}/>达标</b></div>
-          <div><span>结构RT一次合格率</span><strong>96.2%</strong><small>目标 ≥97%</small><b className="is-warning"><AlertTriangle size={12}/>待提升 0.8%</b></div>
+          <div><span>RT/PAUT一次合规率</span><strong>96.2%</strong><small>目标 ≥97%</small><b className="is-warning"><AlertTriangle size={12}/>待提升 0.8%</b></div>
         </div>
         <div className="quality-overview-alerts">
           <div className="quality-overview-alert-title"><AlertTriangle size={14}/><strong>重点提醒</strong><span>2项待关注</span></div>
@@ -4747,8 +4745,8 @@ function PageQuality() {
         </div>
       </Card>
 
-      <Card title="企业质量表现" className="quality-performance-card" extra="下钻明细" onExtra={() => nav("quality-rt")}>
-        <div className="quality-title-controls"><div className="quality-header-switch app-unified-segmented" role="group" aria-label="质量指标切换"><button type="button" className={activeMetric === "报验" ? "is-active" : ""} onClick={() => setActiveMetric("报验")}>报验一次</button><button type="button" className={activeMetric === "RT" ? "is-active" : ""} onClick={() => setActiveMetric("RT")}>结构RT</button></div><div className="quality-view-switch app-unified-segmented" role="group" aria-label="质量排序切换"><button type="button" className={qualityView === "ranking" ? "is-active" : ""} onClick={() => setQualityView("ranking")}>年度排名</button><button type="button" className={qualityView === "attention" ? "is-active" : ""} onClick={() => setQualityView("attention")}>待提升</button></div></div>
+      <Card title="企业质量表现" className="quality-performance-card" extra="下钻明细" onExtra={() => nav(activeMetric === "报验" ? "quality-inspection" : "quality-rt")}>
+        <div className="quality-title-controls"><div className="quality-header-switch app-unified-segmented" role="group" aria-label="质量指标切换"><button type="button" className={activeMetric === "报验" ? "is-active" : ""} onClick={() => setActiveMetric("报验")}>报验一次</button><button type="button" className={activeMetric === "RT" ? "is-active" : ""} onClick={() => setActiveMetric("RT")}>RT/PAUT一次</button></div><div className="quality-view-switch app-unified-segmented" role="group" aria-label="质量排序切换"><button type="button" className={qualityView === "ranking" ? "is-active" : ""} onClick={() => setQualityView("ranking")}>年度排名</button><button type="button" className={qualityView === "attention" ? "is-active" : ""} onClick={() => setQualityView("attention")}>待提升</button></div></div>
         <div className="quality-performance-head"><span>企业 / 业务</span><span>年度累计</span><span>较目标</span></div>
         <div className="quality-performance-list">
           {visibleQualityRows.length ? visibleQualityRows.map((row, index) => {
@@ -4793,21 +4791,51 @@ function PageQualityRT() {
   return (
     <>
       <StatusBar />
-      <NavBar title="质量RT合格率" backLabel="返回质量主题" backPage="quality" />
-      <BreadcrumbBar crumbs={["首页", "质量主题", "质量RT合格率"]} />
+      <NavBar title="质量-RT/PAUT合规率" backLabel="返回质量主题" backPage="quality" />
+      <BreadcrumbBar crumbs={["首页", "质量主题", "质量-RT/PAUT合规率"]} />
 
-      <Card title="RT/PAUT质量结果总览" className="mt-3 quality-rt-summary-card">
+      <Card title="结构RT/PAUT一次性合规率质量总览" className="mt-3 quality-rt-summary-card">
         <div className="quality-rt-summary"><div><span>年度累计</span><strong>98.6%</strong><small className="is-good">高于目标 4.3%</small></div><div><span>本月合格率</span><strong>98.4%</strong></div><div><span>年度目标</span><strong>94.3%</strong></div></div>
         <div className="quality-rt-conclusion"><ShieldCheck size={14}/><span>年度累计与本月合格率均高于目标，整体质量表现稳定</span></div>
       </Card>
 
-      <Card title="企业RT/PAUT表现" className="quality-rt-list-card">
-        <div className="quality-rt-filter app-unified-segmented" role="tablist" aria-label="RT合格率业务筛选">{(["全部","造船","修船","海工"] as QualityBusiness[]).map(item=><button type="button" role="tab" aria-selected={business===item} className={business===item?"is-active":""} key={item} onClick={()=>setBusiness(item)}>{item}</button>)}</div>
+      <Card title="企业结构RT/PAUT一次性合规率表现" className="quality-rt-list-card">
+        <div className="quality-rt-filter app-unified-segmented" role="tablist" aria-label="RT/PAUT合规率业务筛选">{(["全部","造船","修船","海工"] as QualityBusiness[]).map(item=><button type="button" role="tab" aria-selected={business===item} className={business===item?"is-active":""} key={item} onClick={()=>setBusiness(item)}>{item}</button>)}</div>
         <div className="quality-rt-head"><span>企业 / 业务</span><span>目标</span><span>本月</span><span>年度累计</span></div>
         <div className="quality-rt-list">{visibleRows.map(row=>{const target=Number(row[2].replace("%",""));const annual=row[4]==="—"?null:Number(row[4].replace("%",""));const good=annual!==null&&annual>=target;return <div key={`${row[0]}-${row[1]}`}><div><strong>{row[0]}</strong><span className={`quality-business-tag is-${row[1]}`}>{row[1]}</span></div><span>{row[2]}</span><b>{row[3]}</b><div><strong className={annual===null?"is-empty":good?"is-good":"is-risk"}>{row[4]}</strong><small className={annual===null?"is-empty":good?"is-good":"is-risk"}>{annual===null?"暂无年累":good?"达标":"待提升"}</small></div></div>})}</div>
       </Card>
 
       <Footer text="RT/PAUT 一次合格率 · 分造船/修船/海工业务口径" />
+    </>
+  );
+}
+
+function PageQualityInspection() {
+  const rows = [
+    ["南通川崎", "造船", "98.8%", "99.8%", "99.7%"],
+    ["大连川崎", "造船", "98.7%", "99.5%", "99.6%"],
+    ["扬州重工", "造船", "98.7%", "99.7%", "99.6%"],
+    ["大连重工", "海工", "98.5%", "99.6%", "99.7%"],
+    ["舟山重工", "造船", "98.7%", "99.9%", "99.9%"],
+    ["上海重工", "海工", "98.0%", "98.9%", "99.3%"],
+  ];
+  return (
+    <>
+      <StatusBar />
+      <NavBar title="质量-报验一次合规率" backLabel="返回质量主题" backPage="quality" />
+      <BreadcrumbBar crumbs={["首页", "质量主题", "质量-报验一次合规率"]} />
+
+      <Card title="报验一次合规率总览" className="mt-3 quality-rt-summary-card">
+        <div className="quality-rt-summary"><div><span>年度累计</span><strong>99.2%</strong><small className="is-good">高于目标 1.7%</small></div><div><span>本月合规率</span><strong>99.0%</strong></div><div><span>年度目标</span><strong>97.5%</strong></div></div>
+        <div className="quality-rt-conclusion"><ShieldCheck size={14}/><span>年度累计及本月报验一次合规率均达标，整体表现稳定</span></div>
+      </Card>
+
+      <Card title="企业报验一次合规率表现" className="quality-rt-list-card">
+        <div className="quality-rt-head"><span>企业 / 业务</span><span>目标</span><span>本月</span><span>年度累计</span></div>
+        <div className="quality-rt-list">{rows.map(row=>{const target=Number(row[2].replace("%",""));const annual=Number(row[4].replace("%",""));const good=annual>=target;return <div key={`${row[0]}-${row[1]}`}><div><strong>{row[0]}</strong><span className={`quality-business-tag is-${row[1]}`}>{row[1]}</span></div><span>{row[2]}</span><b>{row[3]}</b><div><strong className={good?"is-good":"is-risk"}>{row[4]}</strong><small className={good?"is-good":"is-risk"}>{good?"达标":"待提升"}</small></div></div>})}</div>
+      </Card>
+
+      <Footer text="报验一次合规率 · 精简展示核心企业指标" />
     </>
   );
 }
@@ -5141,6 +5169,7 @@ function renderPage(id: string) {
     case "purchase-group-rate": return <PagePurchaseGroupRate />;
     case "quality":           return <PageQuality />;
     case "quality-rt":        return <PageQualityRT />;
+    case "quality-inspection": return <PageQualityInspection />;
     case "energy":            return <PageEnergy />;
     case "design-tokens":     return <PageDesignTokens />;
     case "atomic-components": return <PageAtomicComponents />;

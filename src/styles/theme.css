@@ -6111,12 +6111,14 @@
   }
 
   .app-phone-screen .quality-header-switch {
-    width: 104px;
+    width: 172px !important;
+    flex: 0 0 172px;
     height: 28px;
   }
 
   .app-phone-screen .quality-view-switch {
-    width: 100px;
+    width: 116px !important;
+    flex: 0 0 116px;
     height: 28px;
   }
 
