@@ -2,12 +2,31 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "./ui/utils";
 
 const DEFAULT_GLOBAL_DATE = "2026年8月";
-const GLOBAL_MONTH_OPTIONS = Array.from({ length: 8 }, (_, index) => `2026年${index + 1}月`);
+const GLOBAL_YEAR_OPTIONS = [2024, 2025, 2026];
+const LATEST_AVAILABLE_YEAR = 2026;
+const LATEST_AVAILABLE_MONTH = 8;
 const GLOBAL_MONTH_STORAGE_KEY = "cosco-dashboard-global-month";
 
 function normalizeMonthLabel(label: string) {
   const match = label.match(/^(\d{4})年(\d{1,2})月/);
-  return match ? `${match[1]}年${Number(match[2])}月` : DEFAULT_GLOBAL_DATE;
+  if (!match) return DEFAULT_GLOBAL_DATE;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const maxMonth = year === LATEST_AVAILABLE_YEAR ? LATEST_AVAILABLE_MONTH : 12;
+  return GLOBAL_YEAR_OPTIONS.includes(year) && month >= 1 && month <= maxMonth
+    ? `${year}年${month}月`
+    : DEFAULT_GLOBAL_DATE;
+}
+
+function getDateParts(label: string) {
+  const normalized = normalizeMonthLabel(label);
+  const match = normalized.match(/^(\d{4})年(\d{1,2})月$/)!;
+  return { year: Number(match[1]), month: Number(match[2]) };
+}
+
+function getMonthOptions(year: number) {
+  const monthCount = year === LATEST_AVAILABLE_YEAR ? LATEST_AVAILABLE_MONTH : 12;
+  return Array.from({ length: monthCount }, (_, index) => `${year}年${index + 1}月`);
 }
 
 type GlobalHeaderProps = {
@@ -36,12 +55,14 @@ function GlobalHeader({
   const [selectedMonth, setSelectedMonth] = useState(() => {
     if (typeof window === "undefined") return normalizeMonthLabel(dateLabel);
     const savedMonth = window.sessionStorage.getItem(GLOBAL_MONTH_STORAGE_KEY);
-    return savedMonth && GLOBAL_MONTH_OPTIONS.includes(savedMonth) ? savedMonth : normalizeMonthLabel(dateLabel);
+    return savedMonth ? normalizeMonthLabel(savedMonth) : normalizeMonthLabel(dateLabel);
   });
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+  const { year: selectedYear } = getDateParts(selectedMonth);
+  const visibleMonthOptions = getMonthOptions(selectedYear);
 
   useEffect(() => {
-    if (!isFreshnessBadge && !GLOBAL_MONTH_OPTIONS.includes(selectedMonth)) {
+    if (!isFreshnessBadge && normalizeMonthLabel(selectedMonth) !== selectedMonth) {
       setSelectedMonth(normalizeMonthLabel(dateLabel));
     }
   }, [dateLabel, isFreshnessBadge, selectedMonth]);
@@ -73,6 +94,15 @@ function GlobalHeader({
     requestAnimationFrame(() => monthTriggerRef.current?.focus());
   };
 
+  const handleYearChange = (year: number) => {
+    const currentMonth = getDateParts(selectedMonth).month;
+    const nextMonth = year === LATEST_AVAILABLE_YEAR ? Math.min(currentMonth, LATEST_AVAILABLE_MONTH) : currentMonth;
+    const nextSelection = `${year}年${nextMonth}月`;
+    setSelectedMonth(nextSelection);
+    window.sessionStorage.setItem(GLOBAL_MONTH_STORAGE_KEY, nextSelection);
+    window.dispatchEvent(new CustomEvent("global-month-change", { detail: nextSelection }));
+  };
+
   const focusMonthOption = (month: string) => {
     requestAnimationFrame(() => {
       monthPickerRef.current?.querySelector<HTMLButtonElement>(`[data-month="${month}"]`)?.focus();
@@ -90,8 +120,8 @@ function GlobalHeader({
     if (!["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
     event.preventDefault();
     const step = event.key === "ArrowDown" ? 4 : event.key === "ArrowUp" ? -4 : event.key === "ArrowRight" ? 1 : -1;
-    const nextIndex = Math.max(0, Math.min(GLOBAL_MONTH_OPTIONS.length - 1, index + step));
-    focusMonthOption(GLOBAL_MONTH_OPTIONS[nextIndex]);
+    const nextIndex = Math.max(0, Math.min(visibleMonthOptions.length - 1, index + step));
+    focusMonthOption(visibleMonthOptions[nextIndex]);
   };
   return (
     <header
@@ -231,7 +261,7 @@ function GlobalHeader({
                   type="button"
                   className={cn("global-month-select-shell", monthPickerOpen && "is-open")}
                   aria-label={`月份筛选，当前${selectedMonth}`}
-                  aria-haspopup="listbox"
+                  aria-haspopup="dialog"
                   aria-expanded={monthPickerOpen}
                   onClick={() => setMonthPickerOpen((open) => !open)}
                   onKeyDown={handleMonthTriggerKeyDown}
@@ -246,13 +276,25 @@ function GlobalHeader({
                   </svg>
                 </button>
                 {monthPickerOpen && (
-                  <div className="global-month-popover" role="listbox" aria-label="选择月份">
+                  <div className="global-month-popover" role="dialog" aria-label="选择年月">
                     <div className="global-month-popover-head">
-                      <span>选择月份</span>
-                      <strong>2026年</strong>
+                      <span>选择年月</span>
+                      <div className="global-year-switch" role="group" aria-label="选择年份">
+                        {GLOBAL_YEAR_OPTIONS.map((year) => (
+                          <button
+                            key={year}
+                            type="button"
+                            aria-pressed={selectedYear === year}
+                            className={cn("global-year-option", selectedYear === year && "is-selected")}
+                            onClick={() => handleYearChange(year)}
+                          >
+                            {year}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <div className="global-month-option-grid">
-                      {GLOBAL_MONTH_OPTIONS.map((month, index) => (
+                    <div className="global-month-option-grid" role="listbox" aria-label={`${selectedYear}年月份`}>
+                      {visibleMonthOptions.map((month, index) => (
                         <button
                           key={month}
                           type="button"
