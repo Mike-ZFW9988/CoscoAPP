@@ -1,6 +1,14 @@
+import { useEffect, useState } from "react";
 import { cn } from "./ui/utils";
 
-const DEFAULT_GLOBAL_DATE = "2026年8月8日";
+const DEFAULT_GLOBAL_DATE = "2026年8月";
+const GLOBAL_MONTH_OPTIONS = Array.from({ length: 8 }, (_, index) => `2026年${index + 1}月`);
+const GLOBAL_MONTH_STORAGE_KEY = "cosco-dashboard-global-month";
+
+function normalizeMonthLabel(label: string) {
+  const match = label.match(/^(\d{4})年(\d{1,2})月/);
+  return match ? `${match[1]}年${Number(match[2])}月` : DEFAULT_GLOBAL_DATE;
+}
 
 type GlobalHeaderProps = {
   dateLabel?: string;
@@ -23,6 +31,23 @@ function GlobalHeader({
 }: GlobalHeaderProps) {
   const hasPageChrome = Boolean(pageTitle && onBack);
   const isFreshnessBadge = badgeMode === "freshness";
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    if (typeof window === "undefined") return normalizeMonthLabel(dateLabel);
+    const savedMonth = window.sessionStorage.getItem(GLOBAL_MONTH_STORAGE_KEY);
+    return savedMonth && GLOBAL_MONTH_OPTIONS.includes(savedMonth) ? savedMonth : normalizeMonthLabel(dateLabel);
+  });
+
+  useEffect(() => {
+    if (!isFreshnessBadge && !GLOBAL_MONTH_OPTIONS.includes(selectedMonth)) {
+      setSelectedMonth(normalizeMonthLabel(dateLabel));
+    }
+  }, [dateLabel, isFreshnessBadge, selectedMonth]);
+
+  const handleMonthChange = (month: string) => {
+    setSelectedMonth(month);
+    window.sessionStorage.setItem(GLOBAL_MONTH_STORAGE_KEY, month);
+    window.dispatchEvent(new CustomEvent("global-month-change", { detail: month }));
+  };
   return (
     <header
       className={cn("brand-nav brand-nav-home shrink-0 relative overflow-visible", hasPageChrome && "brand-nav-page")}
@@ -101,20 +126,16 @@ function GlobalHeader({
           </div>
 
           <div className={cn("absolute left-[4px]", hasPageChrome ? "bottom-[-11px]" : "bottom-[8px]")}>
-            <button
-              type="button"
-              aria-label={isFreshnessBadge ? "查看数据更新时间说明" : `日期范围筛选 ${dateLabel}`}
-              aria-haspopup={isFreshnessBadge ? "dialog" : undefined}
-              aria-expanded={isFreshnessBadge ? badgeExpanded : undefined}
-              onClick={onBadgeClick}
-              className="inline-flex items-center justify-start border-none cursor-pointer p-0"
-              style={{
-                minHeight: 44,
-                height: 44,
-                background: "transparent",
-                color: "#00508E",
-              }}
-            >
+            {isFreshnessBadge ? (
+              <button
+                type="button"
+                aria-label="查看数据更新时间说明"
+                aria-haspopup="dialog"
+                aria-expanded={badgeExpanded}
+                onClick={onBadgeClick}
+                className="inline-flex items-center justify-start border-none cursor-pointer p-0"
+                style={{ minHeight: 44, height: 44, background: "transparent", color: "#00508E" }}
+              >
               <span
                 className="whitespace-nowrap"
                 style={{
@@ -157,7 +178,23 @@ function GlobalHeader({
                   )}
                 </svg>
               </span>
-            </button>
+              </button>
+            ) : (
+              <div className="global-month-select-wrap">
+                <span className="global-month-select-shell">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <rect x="2.25" y="3.5" width="11.5" height="10" rx="2" stroke="currentColor" strokeWidth="1.4" opacity="0.72"/>
+                    <path d="M5 2.25v2.5M11 2.25v2.5M2.75 6.5h10.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.72"/>
+                  </svg>
+                  <select aria-label="月份筛选" value={selectedMonth} onChange={(event) => handleMonthChange(event.target.value)}>
+                    {GLOBAL_MONTH_OPTIONS.map((month) => <option key={month} value={month}>{month}</option>)}
+                  </select>
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                    <path d="M2.5 3.75L5 6.25L7.5 3.75" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
+                  </svg>
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

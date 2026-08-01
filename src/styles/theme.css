@@ -3629,6 +3629,49 @@
   gap: 5px;
   margin: 0;
 }
+
+.app-phone-screen .global-month-select-wrap {
+  display: inline-flex;
+  height: 44px;
+  min-height: 44px;
+  align-items: center;
+}
+
+.app-phone-screen .global-month-select-shell {
+  display: inline-flex;
+  height: 36px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: rgb(238 245 252 / 62%);
+  color: #00508e;
+  box-shadow: 0 8px 20px rgb(18 58 99 / 4%), inset 0 0 0 1px rgb(191 219 238 / 32%);
+}
+
+.app-phone-screen .global-month-select-shell select {
+  width: 82px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  appearance: none;
+  background: transparent;
+  color: #2f4053;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+}
+
+.app-phone-screen .global-month-select-shell:focus-within {
+  box-shadow: 0 8px 20px rgb(18 58 99 / 5%), inset 0 0 0 1px rgb(0 80 142 / 32%), 0 0 0 2px rgb(121 187 255 / 18%);
+}
+
+.app-phone-screen .global-month-select-shell > svg {
+  flex: 0 0 auto;
+}
 .app-phone-screen .steel-month-range {
   display: flex;
   min-height: 36px;
