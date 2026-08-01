@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "./ui/utils";
 
 const DEFAULT_GLOBAL_DATE = "2026年8月";
@@ -31,11 +31,14 @@ function GlobalHeader({
 }: GlobalHeaderProps) {
   const hasPageChrome = Boolean(pageTitle && onBack);
   const isFreshnessBadge = badgeMode === "freshness";
+  const monthPickerRef = useRef<HTMLDivElement | null>(null);
+  const monthTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(() => {
     if (typeof window === "undefined") return normalizeMonthLabel(dateLabel);
     const savedMonth = window.sessionStorage.getItem(GLOBAL_MONTH_STORAGE_KEY);
     return savedMonth && GLOBAL_MONTH_OPTIONS.includes(savedMonth) ? savedMonth : normalizeMonthLabel(dateLabel);
   });
+  const [monthPickerOpen, setMonthPickerOpen] = useState(false);
 
   useEffect(() => {
     if (!isFreshnessBadge && !GLOBAL_MONTH_OPTIONS.includes(selectedMonth)) {
@@ -43,14 +46,56 @@ function GlobalHeader({
     }
   }, [dateLabel, isFreshnessBadge, selectedMonth]);
 
+  useEffect(() => {
+    if (!monthPickerOpen) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!monthPickerRef.current?.contains(event.target as Node)) setMonthPickerOpen(false);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMonthPickerOpen(false);
+        monthTriggerRef.current?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [monthPickerOpen]);
+
   const handleMonthChange = (month: string) => {
     setSelectedMonth(month);
+    setMonthPickerOpen(false);
     window.sessionStorage.setItem(GLOBAL_MONTH_STORAGE_KEY, month);
     window.dispatchEvent(new CustomEvent("global-month-change", { detail: month }));
+    requestAnimationFrame(() => monthTriggerRef.current?.focus());
+  };
+
+  const focusMonthOption = (month: string) => {
+    requestAnimationFrame(() => {
+      monthPickerRef.current?.querySelector<HTMLButtonElement>(`[data-month="${month}"]`)?.focus();
+    });
+  };
+
+  const handleMonthTriggerKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    event.preventDefault();
+    setMonthPickerOpen(true);
+    focusMonthOption(selectedMonth);
+  };
+
+  const handleMonthOptionKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    if (!["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    event.preventDefault();
+    const step = event.key === "ArrowDown" ? 4 : event.key === "ArrowUp" ? -4 : event.key === "ArrowRight" ? 1 : -1;
+    const nextIndex = Math.max(0, Math.min(GLOBAL_MONTH_OPTIONS.length - 1, index + step));
+    focusMonthOption(GLOBAL_MONTH_OPTIONS[nextIndex]);
   };
   return (
     <header
-      className={cn("brand-nav brand-nav-home shrink-0 relative overflow-visible", hasPageChrome && "brand-nav-page")}
+      className={cn("brand-nav brand-nav-home shrink-0 relative overflow-visible", hasPageChrome && "brand-nav-page", monthPickerOpen && "month-picker-open")}
       style={{
         background: "transparent",
         borderBottom: "none",
@@ -180,19 +225,50 @@ function GlobalHeader({
               </span>
               </button>
             ) : (
-              <div className="global-month-select-wrap">
-                <span className="global-month-select-shell">
+              <div className="global-month-select-wrap" ref={monthPickerRef}>
+                <button
+                  ref={monthTriggerRef}
+                  type="button"
+                  className={cn("global-month-select-shell", monthPickerOpen && "is-open")}
+                  aria-label={`月份筛选，当前${selectedMonth}`}
+                  aria-haspopup="listbox"
+                  aria-expanded={monthPickerOpen}
+                  onClick={() => setMonthPickerOpen((open) => !open)}
+                  onKeyDown={handleMonthTriggerKeyDown}
+                >
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <rect x="2.25" y="3.5" width="11.5" height="10" rx="2" stroke="currentColor" strokeWidth="1.4" opacity="0.72"/>
                     <path d="M5 2.25v2.5M11 2.25v2.5M2.75 6.5h10.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.72"/>
                   </svg>
-                  <select aria-label="月份筛选" value={selectedMonth} onChange={(event) => handleMonthChange(event.target.value)}>
-                    {GLOBAL_MONTH_OPTIONS.map((month) => <option key={month} value={month}>{month}</option>)}
-                  </select>
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                  <span>{selectedMonth}</span>
+                  <svg className="global-month-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
                     <path d="M2.5 3.75L5 6.25L7.5 3.75" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
                   </svg>
-                </span>
+                </button>
+                {monthPickerOpen && (
+                  <div className="global-month-popover" role="listbox" aria-label="选择月份">
+                    <div className="global-month-popover-head">
+                      <span>选择月份</span>
+                      <strong>2026年</strong>
+                    </div>
+                    <div className="global-month-option-grid">
+                      {GLOBAL_MONTH_OPTIONS.map((month, index) => (
+                        <button
+                          key={month}
+                          type="button"
+                          role="option"
+                          aria-selected={selectedMonth === month}
+                          className={cn("global-month-option", selectedMonth === month && "is-selected")}
+                          data-month={month}
+                          onClick={() => handleMonthChange(month)}
+                          onKeyDown={(event) => handleMonthOptionKeyDown(event, index)}
+                        >
+                          {index + 1}月
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -3631,6 +3631,8 @@
 }
 
 .app-phone-screen .global-month-select-wrap {
+  position: relative;
+  z-index: 20;
   display: inline-flex;
   height: 44px;
   min-height: 44px;
@@ -3643,34 +3645,115 @@
   align-items: center;
   gap: 8px;
   padding: 0 12px;
+  border: 0;
   border-radius: 14px;
   background: rgb(238 245 252 / 62%);
   color: #00508e;
-  box-shadow: 0 8px 20px rgb(18 58 99 / 4%), inset 0 0 0 1px rgb(191 219 238 / 32%);
-}
-
-.app-phone-screen .global-month-select-shell select {
-  width: 82px;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  appearance: none;
-  background: transparent;
-  color: #2f4053;
   cursor: pointer;
   font-family: inherit;
+  box-shadow: 0 8px 20px rgb(18 58 99 / 4%), inset 0 0 0 1px rgb(191 219 238 / 32%);
+  transition: background 140ms ease, box-shadow 140ms ease;
+}
+
+.app-phone-screen .global-month-select-shell > span {
+  width: 82px;
+  color: #2f4053;
   font-size: 12px;
   font-weight: 700;
   line-height: 16px;
+  text-align: left;
 }
 
-.app-phone-screen .global-month-select-shell:focus-within {
+.app-phone-screen .global-month-select-shell:focus-visible,
+.app-phone-screen .global-month-select-shell.is-open {
+  outline: 0;
+  background: rgb(238 245 252 / 92%);
   box-shadow: 0 8px 20px rgb(18 58 99 / 5%), inset 0 0 0 1px rgb(0 80 142 / 32%), 0 0 0 2px rgb(121 187 255 / 18%);
 }
 
 .app-phone-screen .global-month-select-shell > svg {
   flex: 0 0 auto;
+}
+
+.app-phone-screen .global-month-chevron {
+  transition: transform 140ms ease;
+}
+
+.app-phone-screen .global-month-select-shell.is-open .global-month-chevron {
+  transform: rotate(180deg);
+}
+
+.app-phone-screen .brand-nav.month-picker-open {
+  z-index: 40;
+}
+
+.app-phone-screen .global-month-popover {
+  position: absolute;
+  top: 42px;
+  left: 0;
+  width: 226px;
+  padding: 12px;
+  border: 1px solid rgb(191 219 238 / 76%);
+  border-radius: 16px;
+  background: rgb(255 255 255 / 98%);
+  box-shadow: 0 14px 30px rgb(18 58 99 / 16%), 0 2px 8px rgb(18 58 99 / 7%);
+  backdrop-filter: blur(12px);
+}
+
+.app-phone-screen .global-month-popover-head {
+  display: flex;
+  height: 22px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #2f4053;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.app-phone-screen .global-month-popover-head strong {
+  color: #6f7f90;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.app-phone-screen .global-month-option-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.app-phone-screen .global-month-option {
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgb(191 219 238 / 52%);
+  border-radius: 10px;
+  background: #f5f9fe;
+  color: #3e5975;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 120ms ease;
+}
+
+.app-phone-screen .global-month-option:hover,
+.app-phone-screen .global-month-option:focus-visible {
+  outline: 0;
+  border-color: rgb(43 111 180 / 45%);
+  background: #eaf3ff;
+  color: #00508e;
+}
+
+.app-phone-screen .global-month-option:active {
+  transform: scale(0.96);
+}
+
+.app-phone-screen .global-month-option.is-selected {
+  border-color: #2867a8;
+  background: linear-gradient(135deg, #2f6faf, #1f5795);
+  color: #fff;
+  box-shadow: 0 4px 10px rgb(31 87 149 / 20%);
 }
 .app-phone-screen .steel-month-range {
   display: flex;
