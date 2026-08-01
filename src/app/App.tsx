@@ -1673,7 +1673,7 @@ function PageBiz() {
 
         <div className="biz-order-grid">
           {orderOverview.businesses.map((it) => (
-            <button type="button" key={it.name} className="biz-order-card" onClick={() => nav("biz-kpi-progress")}>
+            <div key={it.name} className="biz-order-card">
               <span className="biz-order-card-icon">{it.icon}</span>
               <span className="biz-order-card-main">
                 <span className="biz-order-card-name">{it.name}</span>
@@ -1682,7 +1682,7 @@ function PageBiz() {
               <span className="biz-order-card-side">
                 <span key={`${it.name}-rate-${includeKawasaki}`} className="biz-order-card-pct biz-order-value-change">{compactOrderValue(it.pct)}<em>%</em></span>
               </span>
-            </button>
+            </div>
           ))}
         </div>
       </section>

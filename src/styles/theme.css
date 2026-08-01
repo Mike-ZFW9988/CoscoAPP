@@ -6668,8 +6668,15 @@
     gap: 4px;
     border: 0;
     background: transparent;
+    cursor: pointer;
     padding: 0;
     text-align: left;
+  }
+
+  .biz-order-summary-main:focus-visible {
+    border-radius: 8px;
+    outline: 2px solid rgb(121 187 255 / 46%);
+    outline-offset: 1px;
   }
 
   .biz-order-summary-main:active {
@@ -6717,11 +6724,6 @@
 
   .biz-order-summary-arrow {
     color: var(--app-primary);
-  }
-
-  .biz-order-card:active {
-    background: rgb(0 80 142 / 0.045);
-    transform: scale(0.99);
   }
 
   .biz-order-grid {
