@@ -6790,9 +6790,10 @@
 
   .biz-order-card-side {
     display: flex;
-    align-items: flex-end;
-    flex-direction: column;
-    gap: 3px;
+    min-width: 42px;
+    align-self: stretch;
+    align-items: center;
+    justify-content: center;
   }
 
   .biz-order-card-pct {
@@ -6808,27 +6809,6 @@
     font-size: var(--app-type-caption);
     font-style: normal;
     font-weight: 700;
-  }
-
-  .biz-order-status {
-    display: inline-flex;
-    height: 16px;
-    align-items: center;
-    border-radius: 999px;
-    padding: 0 6px;
-    font-size: var(--app-type-micro);
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .biz-order-status.success {
-    background: var(--app-success-soft);
-    color: var(--app-success-900);
-  }
-
-  .biz-order-status.stable {
-    background: var(--app-primary-soft);
-    color: var(--app-primary);
   }
 
   .biz-radar-panel {

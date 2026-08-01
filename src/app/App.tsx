@@ -1615,19 +1615,19 @@ function PageBiz() {
     ? {
         summary: { target: "720.00", actual: "214.70", rate: "29.82" },
         businesses: [
-          { icon: <BusinessShipbuildingIcon />, name: "船舶建造", pct: "36.04", amount: "162.88", target: "452", status: "良好", tone: "success" },
-          { icon: <BusinessRepairIcon />, name: "船舶修理", pct: "14.95", amount: "15.69", target: "105", status: "良好", tone: "success" },
-          { icon: <BusinessOffshoreIcon />, name: "海工业务", pct: "20.60", amount: "18.54", target: "90", status: "稳定", tone: "stable" },
-          { icon: <BusinessSupportIcon />, name: "配套服务", pct: "24.10", amount: "17.59", target: "73", status: "良好", tone: "success" },
+          { icon: <BusinessShipbuildingIcon />, name: "船舶建造", pct: "36.04", amount: "162.88", target: "452" },
+          { icon: <BusinessRepairIcon />, name: "船舶修理", pct: "14.95", amount: "15.69", target: "105" },
+          { icon: <BusinessOffshoreIcon />, name: "海工业务", pct: "20.60", amount: "18.54", target: "90" },
+          { icon: <BusinessSupportIcon />, name: "配套服务", pct: "24.10", amount: "17.59", target: "73" },
         ],
       }
     : {
         summary: { target: "156", actual: "106", rate: "68" },
         businesses: [
-          { icon: <BusinessShipbuildingIcon />, name: "船舶建造", pct: "86", amount: "245", target: "285", status: "良好", tone: "success" },
-          { icon: <BusinessRepairIcon />, name: "船舶修理", pct: "78", amount: "45", target: "58", status: "良好", tone: "success" },
-          { icon: <BusinessOffshoreIcon />, name: "海工业务", pct: "72", amount: "80", target: "111", status: "稳定", tone: "stable" },
-          { icon: <BusinessSupportIcon />, name: "配套服务", pct: "90", amount: "30", target: "33", status: "良好", tone: "success" },
+          { icon: <BusinessShipbuildingIcon />, name: "船舶建造", pct: "86", amount: "245", target: "285" },
+          { icon: <BusinessRepairIcon />, name: "船舶修理", pct: "78", amount: "45", target: "58" },
+          { icon: <BusinessOffshoreIcon />, name: "海工业务", pct: "72", amount: "80", target: "111" },
+          { icon: <BusinessSupportIcon />, name: "配套服务", pct: "90", amount: "30", target: "33" },
         ],
       };
   const compactOrderValue = (value: string) => String(Math.round(Number(value)));
@@ -1681,7 +1681,6 @@ function PageBiz() {
               </span>
               <span className="biz-order-card-side">
                 <span key={`${it.name}-rate-${includeKawasaki}`} className="biz-order-card-pct biz-order-value-change">{compactOrderValue(it.pct)}<em>%</em></span>
-                <span className={`biz-order-status ${it.tone}`}>{it.status}</span>
               </span>
             </button>
           ))}
