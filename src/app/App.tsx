@@ -1775,8 +1775,8 @@ function PageBiz() {
             thirdLabel: "本月累计产值", thirdValue: "12.8", thirdUnit: "亿", thirdMeta: "较上月 +1.2亿 ▲",
           },
           造船: {
-            firstLabel: "今日在建船舶", firstValue: "36", firstUnit: "艘", firstMeta: "较昨日 +1 ▲",
-            secondLabel: "本月交付", secondValue: "12", secondUnit: "艘", secondMeta: "年累计 48艘",
+            firstLabel: "在建船舶", firstValue: "36", firstUnit: "艘", firstMeta: "较上月 +1 ▲",
+            secondLabel: "本月交付", secondValue: "12", secondUnit: "艘", secondMeta: "较上月 +1 ▲",
             thirdLabel: "本月累计产值", thirdValue: "8.2", thirdUnit: "亿", thirdMeta: "较上月 +0.8亿 ▲",
           },
           海工: {
@@ -1870,7 +1870,7 @@ function PageBiz() {
                   </span>
                   <span style={{ fontSize: 11, color: C.t3, paddingBottom: 2 }}>{insight.secondUnit}</span>
                 </div>
-                <span style={{ fontSize: 9, color: C.t3 }}>
+                <span style={{ fontSize: 9, color: bizTab === "造船" ? C.success : C.t3 }}>
                   {insight.secondMeta}
                 </span>
               </div>
