@@ -1779,9 +1779,10 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
   );
 }
 
-function PageBiz() {
-  type BizInsightTab = "修船" | "造船" | "海工" | "配套";
-  const [bizTab, setBizTab] = useState<BizInsightTab>("修船");
+type BizInsightTab = "修船" | "造船" | "海工" | "配套";
+
+function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {}) {
+  const [bizTab, setBizTab] = useState<BizInsightTab>(initialTab);
   const [trendTab, setTrendTab] = useState<"月度趋势" | "区域分布">("月度趋势");
   const [repairChartTooltipIndex, setRepairChartTooltipIndex] = useState<number | null>(null);
   const [selectedMarketRegion, setSelectedMarketRegion] = useState(0);
@@ -2666,8 +2667,8 @@ function PageBizCollectionPlan() {
   return (
     <>
       <StatusBar />
-      <NavBar title="经营计划收款" subtitle="海工·经营口径" backLabel="返回经营主题" backPage="biz" />
-      <BreadcrumbBar crumbs={["首页", "经营主题", "经营计划收款"]} period="截至2026.07" />
+      <NavBar title="海工经营计划收款" subtitle="海工·经营口径" backLabel="返回海工经营洞察" backPage="biz-offshore" />
+      <BreadcrumbBar crumbs={["首页", "经营主题", "海工经营计划收款"]} period="截至2026.07" />
 
       <section className="collection-plan-summary" aria-label="经营计划收款概览">
         <div className="collection-plan-summary-head">
@@ -5351,6 +5352,7 @@ function renderPage(id: string) {
   switch (id) {
     case "home":              return <PageHome />;
     case "biz":               return <PageBiz />;
+    case "biz-offshore":      return <PageBiz initialTab="海工" />;
     case "biz-progress":      return <PageBizProgress />;
     case "biz-progress-repair": return <PageBizProgress section="repair" />;
     case "biz-progress-shipbuilding": return <PageBizProgress section="shipbuilding" />;
