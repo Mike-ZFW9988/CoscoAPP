@@ -1780,7 +1780,7 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
 }
 
 type BizInsightTab = "修船" | "造船" | "海工" | "配套";
-type CollectionPlanBusiness = "修船" | "海工";
+type CollectionPlanBusiness = "修船" | "造船" | "海工";
 type CollectionPlanProject = {
   code: string;
   name: string;
@@ -1826,6 +1826,27 @@ const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
       { code: "R26002", name: "LNG运输船修理改装", status: "已结账未收款", customer: "东海能源航运", balance: "8,800", dueDate: "2026-07-28", overdue: "960", monthNew: "960", aging: { under3: 960, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "中风险", reason: "验收单据补充中，预计本月回款" },
       { code: "R26003", name: "特种工程船改装", status: "已结账未收款", customer: "远洋工程船务", balance: "15,500", dueDate: "2026-06-25", overdue: "3,280", monthNew: "680", aging: { under3: 0, m3to6: 2000, m6to12: 1280, y1to2: 0, y2to3: 0, over3: 0 }, risk: "高风险", reason: "增补工程量尚待客户确认" },
       { code: "R26004", name: "散货船常规修理", status: "已完成收款", customer: "蓝海船舶管理", balance: "0", dueDate: "2026-07-16", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "已按计划完成收款" },
+    ],
+  },
+  造船: {
+    overviewMetrics: [
+      { label: "本年计划收款", value: "245,000.00", meta: "同比 ↓ 2.8%", tone: "primary", trend: "down" },
+      { label: "本年实收金额", value: "216,800.00", meta: "同比 ↑ 7.6%", tone: "success", trend: "up" },
+      { label: "7月实收总额", value: "26,400.00", meta: "同比 ↑ 5.1%", tone: "primary", trend: "up" },
+    ],
+    annualPlan: "245,000.00",
+    annualReceived: "216,800.00",
+    completionRate: "88.5%",
+    progressWidth: "88.5%",
+    varianceText: "距计划 28,200.00万元",
+    stats: { planned: 24, pending: 13, overdue: 2 },
+    detailRoute: "biz-collection-plan-shipbuilding",
+    returnRoute: "biz-shipbuilding",
+    projects: [
+      { code: "S26001", name: "LNG双燃料船建造", status: "已结账未收款", customer: "远海航运", balance: "22,600", dueDate: "2026-08-22", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "按合同交船节点正常推进" },
+      { code: "S26002", name: "甲醇双燃料集装箱船", status: "已结账未收款", customer: "环球集运", balance: "18,900", dueDate: "2026-07-26", overdue: "1,260", monthNew: "1,260", aging: { under3: 1260, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "中风险", reason: "交船结算资料补充中，预计本月回款" },
+      { code: "S26003", name: "新能源汽车运输船", status: "已结账未收款", customer: "海洲汽车航运", balance: "31,800", dueDate: "2026-06-18", overdue: "4,380", monthNew: "920", aging: { under3: 0, m3to6: 2580, m6to12: 1800, y1to2: 0, y2to3: 0, over3: 0 }, risk: "高风险", reason: "设计变更结算尚待客户确认" },
+      { code: "S26004", name: "82000吨散货船", status: "已完成收款", customer: "蓝洋船务", balance: "0", dueDate: "2026-07-12", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "已按计划完成收款" },
     ],
   },
   海工: {
@@ -2400,7 +2421,7 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
       })()}
 
       {/* 经营计划收款 */}
-      {(bizTab === "修船" || bizTab === "海工") ? (
+      {(bizTab === "修船" || bizTab === "造船" || bizTab === "海工") ? (
       <CollectionPlanOverviewCard business={bizTab} />
       ) : (
       <div style={{ background: C.card, borderRadius: 12, boxShadow: "var(--app-shadow-card)", margin: "0 10px 8px", overflow: "hidden" }}>
@@ -5421,6 +5442,7 @@ function renderPage(id: string) {
     case "home":              return <PageHome />;
     case "biz":               return <PageBiz />;
     case "biz-repair":        return <PageBiz initialTab="修船" />;
+    case "biz-shipbuilding":  return <PageBiz initialTab="造船" />;
     case "biz-offshore":      return <PageBiz initialTab="海工" />;
     case "biz-progress":      return <PageBizProgress />;
     case "biz-progress-repair": return <PageBizProgress section="repair" />;
@@ -5430,6 +5452,7 @@ function renderPage(id: string) {
     case "biz-overdue":       return <PageBizOverdue />;
     case "biz-collection-plan": return <PageBizCollectionPlan business="海工" />;
     case "biz-collection-plan-repair": return <PageBizCollectionPlan business="修船" />;
+    case "biz-collection-plan-shipbuilding": return <PageBizCollectionPlan business="造船" />;
     case "biz-kpi-progress":  return <PageBizKpiProgress />;
     case "prod-repair":       return <PageProdRepair />;
     case "prod-repair-ships":      return <PageProdRepairShips />;
