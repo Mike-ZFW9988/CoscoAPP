@@ -9578,6 +9578,25 @@
   color: var(--app-text-secondary);
   font-weight: 650;
 }
+.app-phone-screen .collection-plan-overdue-detail {
+  margin-top: 10px;
+  padding: 9px;
+  border-radius: 8px;
+  background: var(--app-danger-soft);
+}
+.app-phone-screen .collection-plan-overdue-detail > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--app-text-secondary);
+  font-size: 11px;
+}
+.app-phone-screen .collection-plan-overdue-detail > span b {
+  color: var(--app-danger);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
 .app-phone-screen .collection-plan-aging {
   margin-top: 10px;
   padding: 9px;
@@ -9593,8 +9612,13 @@
 }
 .app-phone-screen .collection-plan-aging > div {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
   gap: 4px;
+}
+.app-phone-screen .collection-plan-overdue-detail .collection-plan-aging {
+  margin-top: 8px;
+  padding: 0;
+  background: transparent;
 }
 .app-phone-screen .collection-plan-aging > div > span {
   display: flex;
