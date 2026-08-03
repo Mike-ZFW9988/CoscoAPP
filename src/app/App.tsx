@@ -88,6 +88,7 @@ const PAGES = [
   { id: "biz",                  label: "2  经营主题" },
   { id: "biz-progress",         label: "2  经营·本周进展" },
   { id: "biz-overdue",          label: "2  经营·逾期应收" },
+  { id: "biz-collection-plan",  label: "2  经营·计划收款" },
   { id: "biz-kpi-progress",     label: "2  经营·指标进度" },
   { id: "prod-repair",          label: "3  生产·修船主题" },
   { id: "prod-repair-ships",      label: "3  修船·在厂艘数" },
@@ -2219,47 +2220,6 @@ function PageBiz() {
                 </div>
               )}
 
-              {/* 海工：在建项目产值三系列对比 */}
-              {bizTab === "海工" && (() => {
-                const projects = [
-                  { code: "N1234", total: 82, confirmed: 50, pending: 32 },
-                  { code: "N1235", total: 64, confirmed: 42, pending: 22 },
-                  { code: "N1236", total: 76, confirmed: 58, pending: 18 },
-                  { code: "N1237", total: 55, confirmed: 36, pending: 19 },
-                  { code: "N1238", total: 69, confirmed: 47, pending: 22 },
-                ];
-                return (
-                  <div className="biz-offshore-projects">
-                    <div className="biz-secondary-insight-title">在建项目产值</div>
-                    <div className="biz-offshore-legend">
-                      <span><i className="is-total" />当前总产值</span>
-                      <span><i className="is-confirmed" />当前确认产值</span>
-                      <span><i className="is-pending" />未确认产值</span>
-                    </div>
-                    <div className="biz-offshore-scroll">
-                      <div className="biz-offshore-chart">
-                        {projects.map((project) => (
-                          <div className="biz-offshore-group" key={project.code}>
-                            <div className="biz-offshore-bars">
-                              {[
-                                ["is-total", project.total],
-                                ["is-confirmed", project.confirmed],
-                                ["is-pending", project.pending],
-                              ].map(([tone, value]) => (
-                                <b className={String(tone)} style={{ height: `${Number(value)}%` }} key={String(tone)}>
-                                  <strong>{value}</strong>
-                                </b>
-                              ))}
-                            </div>
-                            <span>{project.code}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
               {/* 配套：仅呈现营业收入，不混入边贡口径 */}
               {bizTab === "配套" && (() => {
                 const revenueRows = [
@@ -2347,9 +2307,32 @@ function PageBiz() {
         );
       })()}
 
-      {/* 经营逾期收款 独立卡片 */}
+      {/* 经营计划收款 */}
+      {bizTab === "海工" ? (
+      <section className="biz-collection-overview" aria-labelledby="biz-collection-overview-title">
+        <div className="biz-collection-overview-head">
+          <div><CircleDollarSign aria-hidden="true" /><span id="biz-collection-overview-title">经营计划收款</span></div>
+          <button type="button" className="app-drilldown-link" onClick={() => nav("biz-collection-plan")}>查看全部 <ChevronRight size={13} strokeWidth={2.3} /></button>
+        </div>
+        <div className="biz-collection-overview-grid">
+          {[
+            { label: "本年计划收款", value: "200,809.58", meta: "计划基准", tone: "primary" },
+            { label: "本年实收金额", value: "234,514.33", meta: "达成率 116.8%", tone: "success" },
+            { label: "7月实收总额", value: "18,920.40", meta: "同比 ↑ 8.6%", tone: "primary" },
+          ].map((metric) => (
+            <article key={metric.label} className={metric.tone === "success" ? "is-success" : ""}>
+              <span>{metric.label}</span>
+              <div><strong>{metric.value}</strong><em>万元</em></div>
+              <small>{metric.meta}</small>
+            </article>
+          ))}
+        </div>
+        <div className="biz-collection-overview-progress">
+          <span>年度计划达成率</span><strong>116.8%</strong><em>超计划 33,704.75万元</em>
+        </div>
+      </section>
+      ) : (
       <div style={{ background: C.card, borderRadius: 12, boxShadow: "var(--app-shadow-card)", margin: "0 10px 8px", overflow: "hidden" }}>
-        {/* 卡头 */}
         <div style={{ padding: "12px 14px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${C.divider}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <CardIcon />
@@ -2357,7 +2340,6 @@ function PageBiz() {
           </div>
           <button type="button" className="app-drilldown-link" onClick={() => nav("biz-overdue")}>查看全部 <ChevronRight size={13} strokeWidth={2.3} /></button>
         </div>
-        {/* 3列数值 */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", padding: "12px 0 10px" }}>
           {[
             { label: "本周新增逾期", value: "+1931", unit: "万", status: "风险增加", color: C.danger, bg: C.dangerSoft },
@@ -2374,7 +2356,6 @@ function PageBiz() {
             </div>
           ))}
         </div>
-        {/* 逾期总额行 */}
         <div style={{ margin: "0 14px 10px", background: C.ph, borderRadius: 8, padding: "8px 12px", display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap" }}>
           <span style={{ fontSize: 20, fontWeight: 700, color: C.brand, fontVariantNumeric: "tabular-nums" }}>1.55</span>
           <span style={{ fontSize: 11, color: C.t3 }}>亿元 逾期总额</span>
@@ -2383,7 +2364,6 @@ function PageBiz() {
           <span style={{ fontSize: 11, color: C.t2, fontWeight: 500 }}>系外≥1年 8604万</span>
           <span style={{ fontSize: 11, color: C.t3 }}>（占55%，风险最高）</span>
         </div>
-        {/* 趋势提示 */}
         <div style={{ padding: "0 14px 12px", display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 11, color: C.t3 }}>逾期净额近4周</span>
           <div style={{ display: "flex", alignItems: "center", gap: 3, background: C.dangerSoft, borderRadius: 4, padding: "2px 8px" }}>
@@ -2391,6 +2371,7 @@ function PageBiz() {
           </div>
         </div>
       </div>
+      )}
 
       {/* L6 本周重点项目进展 */}
       <div className="biz-project-entry-card">
@@ -2655,6 +2636,97 @@ function PageBizKpiProgress() {
       </div>
 
       <Footer text="指标进度 · 年度接单口径 · 截至7.10" />
+    </>
+  );
+}
+
+function PageBizCollectionPlan() {
+  const [filter, setFilter] = useState<"全部" | "待收" | "逾期">("全部");
+  const projects = [
+    {
+      code: "N1234", name: "深海能源平台建造", status: "待收", customer: "中海油能源",
+      importance: "战略客户", credit: "AAA", balance: "28,600", dueDate: "2026-08-20",
+      overdue: "0", monthNew: "0", aging: "未逾期", risk: "低风险", reason: "按合同节点正常推进",
+    },
+    {
+      code: "N1235", name: "海上风电安装平台", status: "逾期", customer: "国家能源集团",
+      importance: "重点客户", credit: "AA", balance: "19,850", dueDate: "2026-07-31",
+      overdue: "1,680", monthNew: "1,680", aging: "3个月以内", risk: "中风险", reason: "验收资料补充中，预计本月回款",
+    },
+    {
+      code: "N1236", name: "FPSO模块建造项目", status: "逾期", customer: "中海油服",
+      importance: "战略客户", credit: "AAA", balance: "32,500", dueDate: "2026-06-30",
+      overdue: "5,620", monthNew: "1,250", aging: "3–6个月", risk: "高风险", reason: "变更签证尚未完成客户确认",
+    },
+    {
+      code: "N1237", name: "海工改装升级项目", status: "已收", customer: "招商海工",
+      importance: "重点客户", credit: "AA+", balance: "0", dueDate: "2026-07-18",
+      overdue: "0", monthNew: "0", aging: "已结清", risk: "低风险", reason: "已按计划完成收款",
+    },
+  ] as const;
+  const visibleProjects = projects.filter((project) => filter === "全部" || (filter === "待收" ? project.status === "待收" : project.status === "逾期"));
+
+  return (
+    <>
+      <StatusBar />
+      <NavBar title="经营计划收款" subtitle="海工·经营口径" backLabel="返回经营主题" backPage="biz" />
+      <BreadcrumbBar crumbs={["首页", "经营主题", "经营计划收款"]} period="截至2026.07" />
+
+      <section className="collection-plan-summary" aria-label="经营计划收款概览">
+        <div className="collection-plan-summary-head">
+          <span>年度收款计划执行</span><small>单位：万元</small>
+        </div>
+        <div className="collection-plan-summary-values">
+          <div><span>本年计划收款</span><strong>200,809.58</strong></div>
+          <div className="is-success"><span>本年实收金额</span><strong>234,514.33</strong></div>
+        </div>
+        <div className="collection-plan-progress" aria-label="年度计划达成率116.8%"><i style={{ width: "100%" }} /></div>
+        <div className="collection-plan-progress-meta"><span>年度计划达成率 <b>116.8%</b></span><em>超计划 33,704.75万元</em></div>
+        <div className="collection-plan-summary-stats">
+          <div><strong>12</strong><span>计划项目</span></div>
+          <div><strong>7</strong><span>待收项目</span></div>
+          <div className="is-risk"><strong>2</strong><span>逾期项目</span></div>
+        </div>
+      </section>
+
+      <section className="collection-plan-detail" aria-labelledby="collection-plan-detail-title">
+        <div className="collection-plan-detail-head">
+          <div><ClipboardList aria-hidden="true" /><span id="collection-plan-detail-title">项目收款计划明细</span></div>
+          <small>共 {visibleProjects.length} 项</small>
+        </div>
+        <div className="collection-plan-filters" role="tablist" aria-label="收款状态筛选">
+          {(["全部", "待收", "逾期"] as const).map((item) => (
+            <button key={item} type="button" role="tab" aria-selected={filter === item} className={filter === item ? "is-active" : ""} onClick={() => setFilter(item)}>{item}</button>
+          ))}
+        </div>
+        <div className="collection-plan-project-list">
+          {visibleProjects.map((project) => (
+            <article className="collection-plan-project" key={project.code}>
+              <div className="collection-plan-project-head">
+                <div><small>{project.code}</small><strong>{project.name}</strong></div>
+                <span className={`is-${project.status === "逾期" ? "overdue" : project.status === "已收" ? "received" : "pending"}`}>{project.status}</span>
+              </div>
+              <div className="collection-plan-customer-row">
+                <span>客户 <b>{project.customer}</b></span><em>{project.importance}</em><em>信用 {project.credit}</em>
+              </div>
+              <div className="collection-plan-amount-grid">
+                <div><span>期末账面余额</span><strong>{project.balance}<small>万元</small></strong></div>
+                <div className={project.overdue !== "0" ? "is-risk" : ""}><span>逾期应收合计</span><strong>{project.overdue}<small>万元</small></strong></div>
+              </div>
+              <div className="collection-plan-project-meta">
+                <span>计划收款日 <b>{project.dueDate}</b></span>
+                <span>账龄 <b>{project.aging}</b></span>
+              </div>
+              <div className="collection-plan-risk-row">
+                <span className={`is-${project.risk === "高风险" ? "high" : project.risk === "中风险" ? "medium" : "low"}`}>{project.risk}</span>
+                <p>{project.reason}</p>
+                {project.monthNew !== "0" && <em>本月新增逾期 {project.monthNew}万</em>}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+      <Footer text="经营计划收款 · 海工经营口径 · 模拟数据" />
     </>
   );
 }
@@ -5274,6 +5346,7 @@ function renderPage(id: string) {
     case "biz-progress-offshore": return <PageBizProgress section="offshore" />;
     case "biz-progress-support": return <PageBizProgress section="support" />;
     case "biz-overdue":       return <PageBizOverdue />;
+    case "biz-collection-plan": return <PageBizCollectionPlan />;
     case "biz-kpi-progress":  return <PageBizKpiProgress />;
     case "prod-repair":       return <PageProdRepair />;
     case "prod-repair-ships":      return <PageProdRepairShips />;

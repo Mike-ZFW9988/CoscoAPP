@@ -9206,3 +9206,414 @@
   font-size: 8px;
   font-weight: 650;
 }
+
+/* Business collection plan — overview and mobile drill-down. */
+.app-phone-screen .biz-collection-overview {
+  margin: 0 10px 8px;
+  overflow: hidden;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 12px;
+  background: var(--app-white);
+  box-shadow: var(--app-shadow-card);
+}
+.app-phone-screen .biz-collection-overview-head,
+.app-phone-screen .collection-plan-detail-head {
+  display: flex;
+  min-height: 43px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--app-divider);
+}
+.app-phone-screen .biz-collection-overview-head > div,
+.app-phone-screen .collection-plan-detail-head > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.app-phone-screen .biz-collection-overview-head svg,
+.app-phone-screen .collection-plan-detail-head svg {
+  width: 18px;
+  height: 18px;
+  padding: 3px;
+  border-radius: 6px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+}
+.app-phone-screen .biz-collection-overview-head > div > span,
+.app-phone-screen .collection-plan-detail-head > div > span {
+  color: var(--app-text-primary);
+  font-size: 14px;
+  font-weight: 750;
+}
+.app-phone-screen .biz-collection-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  padding: 9px 9px 7px;
+}
+.app-phone-screen .biz-collection-overview-grid > article {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 10px;
+  background: linear-gradient(180deg, var(--app-white), var(--app-primary-soft));
+}
+.app-phone-screen .biz-collection-overview-grid > article:nth-child(3) {
+  grid-column: 1 / -1;
+}
+.app-phone-screen .biz-collection-overview-grid > article > span {
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+}
+.app-phone-screen .biz-collection-overview-grid > article > div {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  margin: 6px 0 5px;
+}
+.app-phone-screen .biz-collection-overview-grid strong {
+  color: var(--app-primary);
+  font-size: 20px;
+  font-weight: var(--app-weight-data);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.app-phone-screen .biz-collection-overview-grid .is-success strong {
+  color: var(--app-success-900);
+}
+.app-phone-screen .biz-collection-overview-grid em {
+  padding-bottom: 1px;
+  color: var(--app-text-regular);
+  font-size: 9px;
+  font-style: normal;
+}
+.app-phone-screen .biz-collection-overview-grid small {
+  color: var(--app-text-secondary);
+  font-size: 9px;
+}
+.app-phone-screen .biz-collection-overview-grid .is-success small {
+  color: var(--app-success-900);
+}
+.app-phone-screen .biz-collection-overview-progress {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  margin: 0 9px 9px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: var(--app-success-soft);
+}
+.app-phone-screen .biz-collection-overview-progress span,
+.app-phone-screen .biz-collection-overview-progress em {
+  color: var(--app-text-secondary);
+  font-size: 9px;
+  font-style: normal;
+}
+.app-phone-screen .biz-collection-overview-progress strong {
+  color: var(--app-success-900);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.app-phone-screen .biz-collection-overview-progress em {
+  margin-left: auto;
+  color: var(--app-success-900);
+  white-space: nowrap;
+}
+
+.app-phone-screen .collection-plan-summary,
+.app-phone-screen .collection-plan-detail {
+  margin: 8px 10px 0;
+  overflow: hidden;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 12px;
+  background: var(--app-white);
+  box-shadow: var(--app-shadow-card);
+}
+.app-phone-screen .collection-plan-summary {
+  padding: 11px;
+}
+.app-phone-screen .collection-plan-summary-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.app-phone-screen .collection-plan-summary-head span {
+  color: var(--app-text-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+.app-phone-screen .collection-plan-summary-head small,
+.app-phone-screen .collection-plan-detail-head > small {
+  color: var(--app-text-regular);
+  font-size: 9px;
+}
+.app-phone-screen .collection-plan-summary-values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+.app-phone-screen .collection-plan-summary-values > div {
+  min-width: 0;
+  padding: 9px;
+  border-radius: 9px;
+  background: linear-gradient(180deg, var(--app-white), var(--app-primary-soft));
+}
+.app-phone-screen .collection-plan-summary-values span {
+  display: block;
+  color: var(--app-text-secondary);
+  font-size: 9px;
+}
+.app-phone-screen .collection-plan-summary-values strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--app-primary);
+  font-size: 20px;
+  font-weight: var(--app-weight-data);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.app-phone-screen .collection-plan-summary-values .is-success strong {
+  color: var(--app-success-900);
+}
+.app-phone-screen .collection-plan-progress {
+  height: 6px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--app-primary-100);
+}
+.app-phone-screen .collection-plan-progress > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--app-primary), var(--app-success));
+}
+.app-phone-screen .collection-plan-progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  color: var(--app-text-secondary);
+  font-size: 9px;
+}
+.app-phone-screen .collection-plan-progress-meta b,
+.app-phone-screen .collection-plan-progress-meta em {
+  color: var(--app-success-900);
+  font-style: normal;
+  font-weight: 700;
+}
+.app-phone-screen .collection-plan-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--app-divider);
+}
+.app-phone-screen .collection-plan-summary-stats > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+.app-phone-screen .collection-plan-summary-stats > div + div {
+  border-left: 1px solid var(--app-divider);
+}
+.app-phone-screen .collection-plan-summary-stats strong {
+  color: var(--app-primary);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.app-phone-screen .collection-plan-summary-stats span {
+  color: var(--app-text-secondary);
+  font-size: 9px;
+}
+.app-phone-screen .collection-plan-summary-stats .is-risk strong {
+  color: var(--app-danger);
+}
+.app-phone-screen .collection-plan-filters {
+  display: flex;
+  gap: 4px;
+  margin: 9px 10px 8px;
+  padding: 3px;
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  background: var(--app-primary-soft);
+}
+.app-phone-screen .collection-plan-filters button {
+  min-height: 27px;
+  flex: 1;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--app-primary-900);
+  font-size: 10px;
+  font-weight: 650;
+}
+.app-phone-screen .collection-plan-filters button.is-active {
+  background: linear-gradient(135deg, var(--app-primary), var(--app-primary-700));
+  box-shadow: 0 2px 6px rgb(0 80 142 / 16%);
+  color: var(--app-white);
+}
+.app-phone-screen .collection-plan-project-list {
+  display: grid;
+  gap: 8px;
+  padding: 0 9px 10px;
+}
+.app-phone-screen .collection-plan-project {
+  padding: 10px;
+  border: 1px solid rgb(0 80 142 / 9%);
+  border-radius: 10px;
+  background: linear-gradient(180deg, var(--app-white), var(--app-fill-soft));
+}
+.app-phone-screen .collection-plan-project-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.app-phone-screen .collection-plan-project-head > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 7px;
+}
+.app-phone-screen .collection-plan-project-head small {
+  color: var(--app-primary);
+  font-size: 10px;
+  font-weight: 750;
+}
+.app-phone-screen .collection-plan-project-head strong {
+  overflow: hidden;
+  color: var(--app-text-primary);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-phone-screen .collection-plan-project-head > span,
+.app-phone-screen .collection-plan-risk-row > span {
+  flex-shrink: 0;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+}
+.app-phone-screen .collection-plan-project-head .is-pending {
+  background: var(--app-warning-soft);
+  color: var(--app-warning-900);
+}
+.app-phone-screen .collection-plan-project-head .is-overdue {
+  background: var(--app-danger-soft);
+  color: var(--app-danger);
+}
+.app-phone-screen .collection-plan-project-head .is-received {
+  background: var(--app-success-soft);
+  color: var(--app-success-900);
+}
+.app-phone-screen .collection-plan-customer-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--app-text-regular);
+  font-size: 9px;
+}
+.app-phone-screen .collection-plan-customer-row b {
+  color: var(--app-text-secondary);
+  font-weight: 650;
+}
+.app-phone-screen .collection-plan-customer-row em {
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary-900);
+  font-size: 8px;
+  font-style: normal;
+  white-space: nowrap;
+}
+.app-phone-screen .collection-plan-amount-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 8px;
+}
+.app-phone-screen .collection-plan-amount-grid > div {
+  padding: 7px 8px;
+  border-radius: 7px;
+  background: var(--app-primary-soft);
+}
+.app-phone-screen .collection-plan-amount-grid span {
+  display: block;
+  color: var(--app-text-regular);
+  font-size: 8px;
+}
+.app-phone-screen .collection-plan-amount-grid strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--app-primary-900);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.app-phone-screen .collection-plan-amount-grid small {
+  margin-left: 2px;
+  color: var(--app-text-regular);
+  font-size: 8px;
+  font-weight: 500;
+}
+.app-phone-screen .collection-plan-amount-grid .is-risk {
+  background: var(--app-danger-soft);
+}
+.app-phone-screen .collection-plan-amount-grid .is-risk strong {
+  color: var(--app-danger);
+}
+.app-phone-screen .collection-plan-project-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  color: var(--app-text-regular);
+  font-size: 8px;
+}
+.app-phone-screen .collection-plan-project-meta b {
+  color: var(--app-text-secondary);
+  font-weight: 650;
+}
+.app-phone-screen .collection-plan-risk-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--app-divider);
+}
+.app-phone-screen .collection-plan-risk-row .is-low {
+  background: var(--app-success-soft);
+  color: var(--app-success-900);
+}
+.app-phone-screen .collection-plan-risk-row .is-medium {
+  background: var(--app-warning-soft);
+  color: var(--app-warning-900);
+}
+.app-phone-screen .collection-plan-risk-row .is-high {
+  background: var(--app-danger-soft);
+  color: var(--app-danger);
+}
+.app-phone-screen .collection-plan-risk-row p {
+  overflow: hidden;
+  margin: 0;
+  color: var(--app-text-secondary);
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-phone-screen .collection-plan-risk-row em {
+  grid-column: 1 / -1;
+  color: var(--app-danger);
+  font-size: 8px;
+  font-style: normal;
+}
