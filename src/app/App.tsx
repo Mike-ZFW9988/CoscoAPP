@@ -1151,6 +1151,11 @@ function ShipbuildingCoreMetricsCard() {
     { label: "手持", n: "72", nu: "艘", dwt: "860", dwtu: "万DWT", amt: "520", amtu: "亿" },
     { label: "交付", n: "6",  nu: "艘", dwt: "78",  dwtu: "万DWT", amt: "45",  amtu: "亿" },
   ];
+  const summaryMetrics = [
+    { label: "在建船舶", value: "36", unit: "艘", meta: "较上月 +1 ▲" },
+    { label: "本月交付", value: "12", unit: "艘", meta: "较上月 +1 ▲" },
+    { label: "本月累计交付订单", value: "8.2", unit: "亿", meta: "较上月 +0.8亿 ▲" },
+  ];
 
   return (
     <section
@@ -1173,6 +1178,15 @@ function ShipbuildingCoreMetricsCard() {
             <div><strong>{row.dwt}</strong><span className="is-dwt">{row.dwtu}</span></div>
             <div><strong>{row.amt}</strong><span>{row.amtu}</span></div>
           </div>
+        ))}
+      </div>
+      <div className="shipbuilding-core-summary-card">
+        {summaryMetrics.map((metric) => (
+          <article key={metric.label}>
+            <span>{metric.label}</span>
+            <div><strong>{metric.value}</strong><em>{metric.unit}</em></div>
+            <small>{metric.meta}</small>
+          </article>
         ))}
       </div>
     </section>
@@ -1871,28 +1885,6 @@ function PageBiz() {
       {/* L5 经营洞察 */}
       {(() => {
         const isRepair = bizTab === "修船";
-        const insight = {
-          修船: {
-            firstLabel: "今日在厂船舶", firstValue: "48", firstUnit: "艘", firstMeta: "较昨日 +3 ▲",
-            secondLabel: "今日进厂", secondValue: "20", secondUnit: "艘", secondMeta: "今日出厂 15艘",
-            thirdLabel: "本月累计产值", thirdValue: "12.8", thirdUnit: "亿", thirdMeta: "较上月 +1.2亿 ▲",
-          },
-          造船: {
-            firstLabel: "在建船舶", firstValue: "36", firstUnit: "艘", firstMeta: "较上月 +1 ▲",
-            secondLabel: "本月交付", secondValue: "12", secondUnit: "艘", secondMeta: "较上月 +1 ▲",
-            thirdLabel: "本月累计交付订单", thirdValue: "8.2", thirdUnit: "亿", thirdMeta: "较上月 +0.8亿 ▲",
-          },
-          海工: {
-            firstLabel: "在手海工项目", firstValue: "18", firstUnit: "项", firstMeta: "较上月 +2 ▲",
-            secondLabel: "在手订单总产值", secondValue: "52.6", secondUnit: "亿", secondMeta: "覆盖18个项目",
-            thirdLabel: "已完成产值", thirdValue: "31.6", thirdUnit: "亿", thirdMeta: "占比60%",
-          },
-          配套: {
-            firstLabel: "在手配套订单", firstValue: "26", firstUnit: "项", firstMeta: "较上月 +3 ▲",
-            secondLabel: "本月交付", secondValue: "5", secondUnit: "项", secondMeta: "年累计 21项",
-            thirdLabel: "本月营业收入", thirdValue: "3.8", thirdUnit: "亿", thirdMeta: "较上月 +0.4亿 ▲",
-          },
-        }[bizTab];
         // 环形图数据
         const donutData = isRepair
           ? [
@@ -1946,51 +1938,6 @@ function PageBiz() {
             </div>
 
             {isRepair ? <RepairCoreMetricsCard /> : bizTab === "造船" ? <ShipbuildingCoreMetricsCard /> : bizTab === "海工" ? <OffshoreCoreMetricsCard /> : <SupportCoreMetricsCard />}
-
-            {/* ── 一行三个等宽指标卡 ── */}
-            {bizTab === "造船" && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, padding: "9px 12px 0" }}>
-              {/* 卡1：今日在厂/在建 */}
-              <div style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(236,245,255,0.58))", borderRadius: 10, border: "1px solid rgba(0,80,142,0.08)", padding: "8px 8px 7px" }}>
-                <div style={{ fontSize: 10, color: C.t2, fontWeight: 500, marginBottom: 4, lineHeight: "13px" }}>
-                  {insight.firstLabel}
-                </div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 2, marginBottom: 3 }}>
-                  <span style={{ fontSize: 22, fontWeight: 700, color: C.t1, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
-                    {insight.firstValue}
-                  </span>
-                  <span style={{ fontSize: 11, color: C.t3, paddingBottom: 2 }}>{insight.firstUnit}</span>
-                </div>
-                <span style={{ fontSize: 9, color: C.success }}>{insight.firstMeta}</span>
-              </div>
-              {/* 卡2：今日进/出厂 */}
-              <div style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(236,245,255,0.58))", borderRadius: 10, border: "1px solid rgba(0,80,142,0.08)", padding: "8px 8px 7px" }}>
-                <div style={{ fontSize: 10, color: C.t2, fontWeight: 500, marginBottom: 4, lineHeight: "13px" }}>
-                  {insight.secondLabel}
-                </div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 2, marginBottom: 3 }}>
-                  <span style={{ fontSize: 22, fontWeight: 700, color: C.t1, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
-                    {insight.secondValue}
-                  </span>
-                  <span style={{ fontSize: 11, color: C.t3, paddingBottom: 2 }}>{insight.secondUnit}</span>
-                </div>
-                <span style={{ fontSize: 9, color: bizTab === "造船" ? C.success : C.t3 }}>
-                  {insight.secondMeta}
-                </span>
-              </div>
-              {/* 卡3：产值 */}
-              <div style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(236,245,255,0.58))", borderRadius: 10, border: "1px solid rgba(0,80,142,0.08)", padding: "8px 8px 7px" }}>
-                <div style={{ fontSize: 10, color: C.t2, fontWeight: 500, marginBottom: 4, lineHeight: "13px" }}>{insight.thirdLabel}</div>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 2, marginBottom: 3 }}>
-                  <span style={{ fontSize: 22, fontWeight: 700, color: C.t1, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
-                    {insight.thirdValue}
-                  </span>
-                  <span style={{ fontSize: 11, color: C.t3, paddingBottom: 2 }}>{insight.thirdUnit}</span>
-                </div>
-                <span style={{ fontSize: 9, color: C.success }}>
-                  {insight.thirdMeta}
-                </span>
-              </div>
-            </div>}
 
             {/* ── 趋势分析区 ── */}
             <div style={{ borderTop: `1px solid ${C.divider}`, margin: "9px 0 0" }}>
@@ -2992,12 +2939,11 @@ function PageProdRepair() {
           <strong>今日动态</strong>
           <span>查看详情 <ChevronRight aria-hidden="true" /></span>
         </div>
-        <div className="repair-today-metrics">
+        <div className="repair-today-metrics repair-today-metrics-three">
           {[
             { label: "在厂船舶",  value: "92",    unit: "艘" },
             { label: "今日进厂", value: "18", unit: "艘" },
             { label: "今日出厂", value: "15", unit: "艘", tone: "success" },
-            { label: "平均日出勤", value: "4200",  unit: "人" },
           ].map((it, i) => (
             <div key={i}>
               <div className={`repair-metric-value${it.tone === "success" ? " is-success" : ""}`}>{it.value}<span>{it.unit}</span></div>
@@ -3252,7 +3198,7 @@ function PageProdRepairDaily() {
 
       <div className="production-detail-page repair-daily-page">
         <Card title="今日运营摘要" className="production-summary-card">
-          <div className="production-summary-grid four"><div><span>在厂船舶</span><strong>92<small>艘</small></strong></div><div><span>今日进厂</span><strong>18<small>艘</small></strong></div><div><span>今日出厂</span><strong className="is-good">15<small>艘</small></strong></div><div><span>平均日出勤</span><strong>4,200<small>人</small></strong></div></div>
+          <div className="production-summary-grid"><div><span>在厂船舶</span><strong>92<small>艘</small></strong></div><div><span>今日进厂</span><strong>18<small>艘</small></strong></div><div><span>今日出厂</span><strong className="is-good">15<small>艘</small></strong></div></div>
         </Card>
         <Card title="企业今日动态" className="production-list-card">
           <div className="daily-list-head"><span>企业</span><span>进厂 / 出厂</span><span>劳动力</span></div>
