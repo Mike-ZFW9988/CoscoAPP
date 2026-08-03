@@ -2662,7 +2662,15 @@ function PageBizCollectionPlan() {
       overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "已按计划完成收款",
     },
   ] as const;
-  const visibleProjects = projects.filter((project) => filter === "全部" || (filter === "待收" ? project.status === "已结账未收款" : project.overdue !== "0"));
+  const parseCollectionAmount = (value: string | number) => {
+    const parsed = Number(String(value).replace(/,/g, ""));
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  const visibleProjects = projects.filter((project) => {
+    if (filter === "全部") return true;
+    if (filter === "待收") return project.status === "已结账未收款";
+    return parseCollectionAmount(project.overdue) > 0;
+  });
 
   return (
     <>
@@ -2706,7 +2714,8 @@ function PageBizCollectionPlan() {
               ["1–2年", project.aging.y1to2],
               ["2–3年", project.aging.y2to3],
               ["3年以上", project.aging.over3],
-            ].filter(([, value]) => Number(value) > 0);
+            ].filter(([, value]) => parseCollectionAmount(value) > 0);
+            const hasOverdue = parseCollectionAmount(project.overdue) > 0;
             const isReceived = project.status === "已完成收款";
             return <article className="collection-plan-project" key={project.code}>
               <div className="collection-plan-project-head">
@@ -2718,20 +2727,22 @@ function PageBizCollectionPlan() {
               </div>
               <div className="collection-plan-amount-grid">
                 <div><span>期末账面余额</span><strong>{project.balance}<small>万元</small></strong></div>
-                <div className={project.overdue !== "0" ? "is-risk" : ""}><span>逾期应收账款合计</span><strong>{project.overdue}<small>万元</small></strong></div>
+                <div className={hasOverdue ? "is-risk" : ""}><span>逾期应收账款合计</span><strong>{project.overdue}<small>万元</small></strong></div>
               </div>
               <div className="collection-plan-project-meta">
                 <span>合同约定付款日 <b>{project.dueDate}</b></span>
               </div>
-              {project.overdue !== "0" && (
+              {hasOverdue && (
                 <div className="collection-plan-overdue-detail">
                   <span>本月新增逾期 <b>{project.monthNew}万元</b></span>
+                  {agingItems.length > 0 && (
                   <div className="collection-plan-aging">
                     <span>非零账龄分布</span>
                     <div>{agingItems.map(([label, value]) => (
                     <span key={String(label)}><small>{label}</small><b>{Number(value).toLocaleString()}</b></span>
                     ))}</div>
                   </div>
+                  )}
                 </div>
               )}
               <div className="collection-plan-risk-row">
