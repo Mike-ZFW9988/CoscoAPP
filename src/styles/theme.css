@@ -3973,6 +3973,70 @@
   font-style: normal;
   font-weight: 600;
 }
+
+.app-phone-screen .shipbuilding-core-metrics {
+  cursor: pointer;
+}
+
+.app-phone-screen .shipbuilding-core-table {
+  overflow: hidden;
+  margin: 9px;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 11px;
+  background: linear-gradient(180deg, #fff, #f4f8fd);
+}
+
+.app-phone-screen .shipbuilding-core-table-head,
+.app-phone-screen .shipbuilding-core-table-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 1fr 1fr;
+  align-items: center;
+}
+
+.app-phone-screen .shipbuilding-core-table-head {
+  min-height: 32px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--app-divider);
+}
+
+.app-phone-screen .shipbuilding-core-table-head > span {
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  line-height: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.app-phone-screen .shipbuilding-core-table-row {
+  min-height: 48px;
+  padding: 0 8px;
+}
+
+.app-phone-screen .shipbuilding-core-table-row + .shipbuilding-core-table-row {
+  border-top: 1px solid var(--app-divider);
+}
+
+.app-phone-screen .shipbuilding-core-table-row > div {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.app-phone-screen .shipbuilding-core-table-row strong {
+  color: var(--app-text-primary);
+  font-size: 18px;
+  font-weight: var(--app-weight-data);
+  font-variant-numeric: tabular-nums;
+}
+
+.app-phone-screen .shipbuilding-core-table-row > div > span {
+  margin-left: 1px;
+  color: var(--app-text-secondary);
+  font-size: 10px;
+}
+
+.app-phone-screen .shipbuilding-core-table-row > div > span.is-dwt {
+  font-size: 9px;
+}
 .app-phone-screen .steel-month-range {
   display: flex;
   min-height: 36px;

@@ -1145,6 +1145,43 @@ function BizKpiProgressCard() {
   );
 }
 
+function ShipbuildingCoreMetricsCard() {
+  const rows = [
+    { label: "新接", n: "8",  nu: "艘", dwt: "95",  dwtu: "万DWT", amt: "62",  amtu: "亿" },
+    { label: "手持", n: "72", nu: "艘", dwt: "860", dwtu: "万DWT", amt: "520", amtu: "亿" },
+    { label: "交付", n: "6",  nu: "艘", dwt: "78",  dwtu: "万DWT", amt: "45",  amtu: "亿" },
+  ];
+
+  return (
+    <section
+      className="repair-core-metrics shipbuilding-core-metrics"
+      aria-labelledby="shipbuilding-core-metrics-title"
+      onClick={() => nav("biz-kpi-progress")}
+    >
+      <div className="repair-core-metrics-head">
+        <div><CardIcon /><span id="shipbuilding-core-metrics-title">造船核心指标</span></div>
+        <small>年度累计</small>
+      </div>
+      <div className="shipbuilding-core-table">
+        <div className="shipbuilding-core-table-head">
+          <span />
+          {['订单艘数', '万载重吨', '金额'].map((heading) => <span key={heading}>{heading}</span>)}
+        </div>
+        {rows.map((row) => (
+          <div key={row.label} className="shipbuilding-core-table-row">
+            <button type="button" className="home-progress-link" onClick={(event) => { event.stopPropagation(); nav("biz-kpi-progress"); }}>
+              {row.label}<ChevronRight size={12} strokeWidth={2.4} />
+            </button>
+            <div><strong>{row.n}</strong><span>{row.nu}</span></div>
+            <div><strong>{row.dwt}</strong><span className="is-dwt">{row.dwtu}</span></div>
+            <div><strong>{row.amt}</strong><span>{row.amtu}</span></div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function RepairCoreMetricsCard() {
   const financialMetrics = [
     { label: "完工产值", actual: "72.36", target: "108.00", rate: 67.00, yoy: "6.42" },
@@ -1808,7 +1845,7 @@ function PageBiz() {
               <span style={{ fontSize: 9, color: C.t3, flexShrink: 0 }}>截至2026.07</span>
             </div>
 
-            {isRepair ? <RepairCoreMetricsCard /> : <BizKpiProgressCard />}
+            {isRepair ? <RepairCoreMetricsCard /> : bizTab === "造船" ? <ShipbuildingCoreMetricsCard /> : <BizKpiProgressCard />}
 
             {/* ── 一行三个等宽指标卡 ── */}
             {!isRepair && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, padding: "9px 12px 0" }}>
