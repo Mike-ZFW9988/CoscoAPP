@@ -1780,6 +1780,97 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
 }
 
 type BizInsightTab = "修船" | "造船" | "海工" | "配套";
+type CollectionPlanBusiness = "修船" | "海工";
+type CollectionPlanProject = {
+  code: string;
+  name: string;
+  status: "已结账未收款" | "已完成收款";
+  customer: string;
+  balance: string;
+  dueDate: string;
+  overdue: string;
+  monthNew: string;
+  aging: { under3: number; m3to6: number; m6to12: number; y1to2: number; y2to3: number; over3: number };
+  risk: "低风险" | "中风险" | "高风险";
+  reason: string;
+};
+
+const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
+  overviewMetrics: Array<{ label: string; value: string; meta: string; tone: "primary" | "success"; trend: "up" | "down" }>;
+  annualPlan: string;
+  annualReceived: string;
+  completionRate: string;
+  progressWidth: string;
+  varianceText: string;
+  stats: { planned: number; pending: number; overdue: number };
+  detailRoute: string;
+  returnRoute: string;
+  projects: CollectionPlanProject[];
+}> = {
+  修船: {
+    overviewMetrics: [
+      { label: "本年计划收款", value: "128,400.00", meta: "同比 ↓ 3.6%", tone: "primary", trend: "down" },
+      { label: "本年实收金额", value: "116,850.00", meta: "同比 ↑ 8.2%", tone: "success", trend: "up" },
+      { label: "7月实收总额", value: "14,260.00", meta: "同比 ↑ 4.7%", tone: "primary", trend: "up" },
+    ],
+    annualPlan: "128,400.00",
+    annualReceived: "116,850.00",
+    completionRate: "91.0%",
+    progressWidth: "91%",
+    varianceText: "距计划 11,550.00万元",
+    stats: { planned: 18, pending: 9, overdue: 2 },
+    detailRoute: "biz-collection-plan-repair",
+    returnRoute: "biz-repair",
+    projects: [
+      { code: "R26001", name: "大型集装箱船坞修", status: "已结账未收款", customer: "华远航运", balance: "12,600", dueDate: "2026-08-18", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "按合同节点正常推进" },
+      { code: "R26002", name: "LNG运输船修理改装", status: "已结账未收款", customer: "东海能源航运", balance: "8,800", dueDate: "2026-07-28", overdue: "960", monthNew: "960", aging: { under3: 960, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "中风险", reason: "验收单据补充中，预计本月回款" },
+      { code: "R26003", name: "特种工程船改装", status: "已结账未收款", customer: "远洋工程船务", balance: "15,500", dueDate: "2026-06-25", overdue: "3,280", monthNew: "680", aging: { under3: 0, m3to6: 2000, m6to12: 1280, y1to2: 0, y2to3: 0, over3: 0 }, risk: "高风险", reason: "增补工程量尚待客户确认" },
+      { code: "R26004", name: "散货船常规修理", status: "已完成收款", customer: "蓝海船舶管理", balance: "0", dueDate: "2026-07-16", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "已按计划完成收款" },
+    ],
+  },
+  海工: {
+    overviewMetrics: [
+      { label: "本年计划收款", value: "186,500.00", meta: "同比 ↓ 4.8%", tone: "primary", trend: "down" },
+      { label: "本年实收金额", value: "172,360.00", meta: "同比 ↑ 9.6%", tone: "success", trend: "up" },
+      { label: "7月实收总额", value: "21,680.00", meta: "同比 ↑ 5.4%", tone: "primary", trend: "up" },
+    ],
+    annualPlan: "186,500.00",
+    annualReceived: "172,360.00",
+    completionRate: "92.4%",
+    progressWidth: "92.4%",
+    varianceText: "距计划 14,140.00万元",
+    stats: { planned: 12, pending: 7, overdue: 2 },
+    detailRoute: "biz-collection-plan",
+    returnRoute: "biz-offshore",
+    projects: [
+      { code: "N1234", name: "深海能源平台建造", status: "已结账未收款", customer: "中海油能源", balance: "28,600", dueDate: "2026-08-20", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "按合同节点正常推进" },
+      { code: "N1235", name: "海上风电安装平台", status: "已结账未收款", customer: "国家能源集团", balance: "19,850", dueDate: "2026-07-31", overdue: "1,680", monthNew: "1,680", aging: { under3: 1680, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "中风险", reason: "验收资料补充中，预计本月回款" },
+      { code: "N1236", name: "FPSO模块建造项目", status: "已结账未收款", customer: "中海油服", balance: "32,500", dueDate: "2026-06-30", overdue: "5,620", monthNew: "1,250", aging: { under3: 0, m3to6: 3200, m6to12: 1420, y1to2: 1000, y2to3: 0, over3: 0 }, risk: "高风险", reason: "变更签证尚未完成客户确认" },
+      { code: "N1237", name: "海工改装升级项目", status: "已完成收款", customer: "招商海工", balance: "0", dueDate: "2026-07-18", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "已按计划完成收款" },
+    ],
+  },
+};
+
+function CollectionPlanOverviewCard({ business }: { business: CollectionPlanBusiness }) {
+  const config = COLLECTION_PLAN_CONFIG[business];
+  return (
+    <section className="biz-collection-overview" aria-label={`${business}经营计划收款`}>
+      <div className="biz-collection-overview-head">
+        <div><CircleDollarSign aria-hidden="true" /><span>经营计划收款</span></div>
+        <button type="button" className="app-drilldown-link" onClick={() => nav(config.detailRoute)}>查看全部 <ChevronRight size={13} strokeWidth={2.3} /></button>
+      </div>
+      <div className="biz-collection-overview-grid">
+        {config.overviewMetrics.map((metric) => (
+          <article key={metric.label} className={metric.tone === "success" ? "is-success" : ""}>
+            <span>{metric.label}</span>
+            <div><strong>{metric.value}</strong><em>万元</em></div>
+            <small className={`is-${metric.trend}`}>{metric.meta}</small>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {}) {
   const [bizTab, setBizTab] = useState<BizInsightTab>(initialTab);
@@ -2309,26 +2400,8 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
       })()}
 
       {/* 经营计划收款 */}
-      {bizTab === "海工" ? (
-      <section className="biz-collection-overview" aria-labelledby="biz-collection-overview-title">
-        <div className="biz-collection-overview-head">
-          <div><CircleDollarSign aria-hidden="true" /><span id="biz-collection-overview-title">经营计划收款</span></div>
-          <button type="button" className="app-drilldown-link" onClick={() => nav("biz-collection-plan")}>查看全部 <ChevronRight size={13} strokeWidth={2.3} /></button>
-        </div>
-        <div className="biz-collection-overview-grid">
-          {[
-            { label: "本年计划收款", value: "186,500.00", meta: "同比 ↓ 4.8%", tone: "primary", trend: "down" },
-            { label: "本年实收金额", value: "172,360.00", meta: "同比 ↑ 9.6%", tone: "success", trend: "up" },
-            { label: "7月实收总额", value: "21,680.00", meta: "同比 ↑ 5.4%", tone: "primary", trend: "up" },
-          ].map((metric) => (
-            <article key={metric.label} className={metric.tone === "success" ? "is-success" : ""}>
-              <span>{metric.label}</span>
-              <div><strong>{metric.value}</strong><em>万元</em></div>
-              <small className={`is-${metric.trend}`}>{metric.meta}</small>
-            </article>
-          ))}
-        </div>
-      </section>
+      {(bizTab === "修船" || bizTab === "海工") ? (
+      <CollectionPlanOverviewCard business={bizTab} />
       ) : (
       <div style={{ background: C.card, borderRadius: 12, boxShadow: "var(--app-shadow-card)", margin: "0 10px 8px", overflow: "hidden" }}>
         <div style={{ padding: "12px 14px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${C.divider}` }}>
@@ -2638,30 +2711,10 @@ function PageBizKpiProgress() {
   );
 }
 
-function PageBizCollectionPlan() {
+function PageBizCollectionPlan({ business }: { business: CollectionPlanBusiness }) {
   const [filter, setFilter] = useState<"全部" | "待收" | "逾期">("全部");
-  const projects = [
-    {
-      code: "N1234", name: "深海能源平台建造", status: "已结账未收款", customer: "中海油能源",
-      balance: "28,600", dueDate: "2026-08-20",
-      overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "按合同节点正常推进",
-    },
-    {
-      code: "N1235", name: "海上风电安装平台", status: "已结账未收款", customer: "国家能源集团",
-      balance: "19,850", dueDate: "2026-07-31",
-      overdue: "1,680", monthNew: "1,680", aging: { under3: 1680, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "中风险", reason: "验收资料补充中，预计本月回款",
-    },
-    {
-      code: "N1236", name: "FPSO模块建造项目", status: "已结账未收款", customer: "中海油服",
-      balance: "32,500", dueDate: "2026-06-30",
-      overdue: "5,620", monthNew: "1,250", aging: { under3: 0, m3to6: 3200, m6to12: 1420, y1to2: 1000, y2to3: 0, over3: 0 }, risk: "高风险", reason: "变更签证尚未完成客户确认",
-    },
-    {
-      code: "N1237", name: "海工改装升级项目", status: "已完成收款", customer: "招商海工",
-      balance: "0", dueDate: "2026-07-18",
-      overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "已按计划完成收款",
-    },
-  ] as const;
+  const config = COLLECTION_PLAN_CONFIG[business];
+  const projects = config.projects;
   const parseCollectionAmount = (value: string | number) => {
     const parsed = Number(String(value).replace(/,/g, ""));
     return Number.isFinite(parsed) ? parsed : 0;
@@ -2675,23 +2728,23 @@ function PageBizCollectionPlan() {
   return (
     <>
       <StatusBar />
-      <NavBar title="海工经营计划收款" subtitle="海工·经营口径" backLabel="返回海工经营洞察" backPage="biz-offshore" />
-      <BreadcrumbBar crumbs={["首页", "经营主题", "海工经营计划收款"]} period="截至2026.07" />
+      <NavBar title={`${business}经营计划收款`} subtitle={`${business}·经营口径`} backLabel={`返回${business}经营洞察`} backPage={config.returnRoute} />
+      <BreadcrumbBar crumbs={["首页", "经营主题", `${business}经营计划收款`]} period="截至2026.07" />
 
       <section className="collection-plan-summary" aria-label="经营计划收款概览">
         <div className="collection-plan-summary-head">
           <span>年度收款计划执行</span><small>单位：万元</small>
         </div>
         <div className="collection-plan-summary-values">
-          <div><span>本年计划收款</span><strong>186,500.00</strong></div>
-          <div className="is-success"><span>本年实收金额</span><strong>172,360.00</strong></div>
+          <div><span>本年计划收款</span><strong>{config.annualPlan}</strong></div>
+          <div className="is-success"><span>本年实收金额</span><strong>{config.annualReceived}</strong></div>
         </div>
-        <div className="collection-plan-progress" aria-label="年度计划达成率92.4%"><i style={{ width: "92.4%" }} /></div>
-        <div className="collection-plan-progress-meta is-behind"><span>年度计划达成率 <b>92.4%</b></span><em>距计划 14,140.00万元</em></div>
+        <div className="collection-plan-progress" aria-label={`年度计划达成率${config.completionRate}`}><i style={{ width: config.progressWidth }} /></div>
+        <div className="collection-plan-progress-meta is-behind"><span>年度计划达成率 <b>{config.completionRate}</b></span><em>{config.varianceText}</em></div>
         <div className="collection-plan-summary-stats">
-          <div><strong>12</strong><span>计划项目</span></div>
-          <div><strong>7</strong><span>待收项目</span></div>
-          <div className="is-risk"><strong>2</strong><span>逾期项目</span></div>
+          <div><strong>{config.stats.planned}</strong><span>计划项目</span></div>
+          <div><strong>{config.stats.pending}</strong><span>待收项目</span></div>
+          <div className="is-risk"><strong>{config.stats.overdue}</strong><span>逾期项目</span></div>
         </div>
       </section>
 
@@ -2753,7 +2806,7 @@ function PageBizCollectionPlan() {
           })}
         </div>
       </section>
-      <Footer text="经营计划收款 · 海工经营口径 · 模拟数据" />
+      <Footer text={`经营计划收款 · ${business}经营口径 · 模拟数据`} />
     </>
   );
 }
@@ -5367,6 +5420,7 @@ function renderPage(id: string) {
   switch (id) {
     case "home":              return <PageHome />;
     case "biz":               return <PageBiz />;
+    case "biz-repair":        return <PageBiz initialTab="修船" />;
     case "biz-offshore":      return <PageBiz initialTab="海工" />;
     case "biz-progress":      return <PageBizProgress />;
     case "biz-progress-repair": return <PageBizProgress section="repair" />;
@@ -5374,7 +5428,8 @@ function renderPage(id: string) {
     case "biz-progress-offshore": return <PageBizProgress section="offshore" />;
     case "biz-progress-support": return <PageBizProgress section="support" />;
     case "biz-overdue":       return <PageBizOverdue />;
-    case "biz-collection-plan": return <PageBizCollectionPlan />;
+    case "biz-collection-plan": return <PageBizCollectionPlan business="海工" />;
+    case "biz-collection-plan-repair": return <PageBizCollectionPlan business="修船" />;
     case "biz-kpi-progress":  return <PageBizKpiProgress />;
     case "prod-repair":       return <PageProdRepair />;
     case "prod-repair-ships":      return <PageProdRepairShips />;
