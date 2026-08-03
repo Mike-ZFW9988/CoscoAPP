@@ -9310,7 +9310,14 @@
   box-shadow: var(--app-shadow-card);
 }
 .app-phone-screen .collection-plan-summary {
-  padding: 11px;
+  padding: 12px;
+}
+.app-phone-screen .collection-plan-detail-head {
+  min-height: 48px;
+  padding: 10px 12px;
+}
+.app-phone-screen .collection-plan-detail-head > div > span {
+  font-size: 15px;
 }
 .app-phone-screen .collection-plan-summary-head {
   display: flex;
@@ -9320,13 +9327,13 @@
 }
 .app-phone-screen .collection-plan-summary-head span {
   color: var(--app-text-primary);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
 }
 .app-phone-screen .collection-plan-summary-head small,
 .app-phone-screen .collection-plan-detail-head > small {
   color: var(--app-text-regular);
-  font-size: 9px;
+  font-size: 11px;
 }
 .app-phone-screen .collection-plan-summary-values {
   display: grid;
@@ -9342,13 +9349,13 @@
 .app-phone-screen .collection-plan-summary-values span {
   display: block;
   color: var(--app-text-secondary);
-  font-size: 9px;
+  font-size: 11px;
 }
 .app-phone-screen .collection-plan-summary-values strong {
   display: block;
   margin-top: 6px;
   color: var(--app-primary);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: var(--app-weight-data);
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -9375,7 +9382,7 @@
   justify-content: space-between;
   margin-top: 6px;
   color: var(--app-text-secondary);
-  font-size: 9px;
+  font-size: 11px;
 }
 .app-phone-screen .collection-plan-progress-meta b,
 .app-phone-screen .collection-plan-progress-meta em {
@@ -9404,12 +9411,12 @@
 }
 .app-phone-screen .collection-plan-summary-stats strong {
   color: var(--app-primary);
-  font-size: 18px;
+  font-size: 20px;
   font-variant-numeric: tabular-nums;
 }
 .app-phone-screen .collection-plan-summary-stats span {
   color: var(--app-text-secondary);
-  font-size: 9px;
+  font-size: 11px;
 }
 .app-phone-screen .collection-plan-summary-stats .is-risk strong {
   color: var(--app-danger);
@@ -9424,13 +9431,13 @@
   background: var(--app-primary-soft);
 }
 .app-phone-screen .collection-plan-filters button {
-  min-height: 27px;
+  min-height: 32px;
   flex: 1;
   border: 0;
   border-radius: 999px;
   background: transparent;
   color: var(--app-primary-900);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 650;
 }
 .app-phone-screen .collection-plan-filters button.is-active {
@@ -9440,11 +9447,11 @@
 }
 .app-phone-screen .collection-plan-project-list {
   display: grid;
-  gap: 8px;
-  padding: 0 9px 10px;
+  gap: 10px;
+  padding: 0 10px 11px;
 }
 .app-phone-screen .collection-plan-project {
-  padding: 10px;
+  padding: 12px;
   border: 1px solid rgb(0 80 142 / 9%);
   border-radius: 10px;
   background: linear-gradient(180deg, var(--app-white), var(--app-fill-soft));
@@ -9463,22 +9470,22 @@
 }
 .app-phone-screen .collection-plan-project-head small {
   color: var(--app-primary);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 750;
 }
 .app-phone-screen .collection-plan-project-head strong {
   overflow: hidden;
   color: var(--app-text-primary);
-  font-size: 12px;
+  font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .app-phone-screen .collection-plan-project-head > span,
 .app-phone-screen .collection-plan-risk-row > span {
   flex-shrink: 0;
-  padding: 3px 7px;
+  padding: 4px 8px;
   border-radius: 999px;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   line-height: 1;
 }
@@ -9498,10 +9505,10 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 8px;
+  margin-top: 10px;
   color: var(--app-text-regular);
-  font-size: 9px;
+  font-size: 11px;
 }
 .app-phone-screen .collection-plan-customer-row > span {
   flex: 1 0 100%;
@@ -9511,11 +9518,11 @@
   font-weight: 650;
 }
 .app-phone-screen .collection-plan-customer-row em {
-  padding: 2px 5px;
+  padding: 3px 6px;
   border-radius: 4px;
   background: var(--app-primary-soft);
   color: var(--app-primary-900);
-  font-size: 8px;
+  font-size: 11px;
   font-style: normal;
   white-space: nowrap;
 }
@@ -9523,29 +9530,29 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 7px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 .app-phone-screen .collection-plan-amount-grid > div {
-  padding: 7px 8px;
+  padding: 10px;
   border-radius: 7px;
   background: var(--app-primary-soft);
 }
 .app-phone-screen .collection-plan-amount-grid span {
   display: block;
   color: var(--app-text-regular);
-  font-size: 8px;
+  font-size: 11px;
 }
 .app-phone-screen .collection-plan-amount-grid strong {
   display: block;
   margin-top: 4px;
   color: var(--app-primary-900);
-  font-size: 15px;
+  font-size: 22px;
   font-variant-numeric: tabular-nums;
 }
 .app-phone-screen .collection-plan-amount-grid small {
   margin-left: 2px;
   color: var(--app-text-regular);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 500;
 }
 .app-phone-screen .collection-plan-amount-grid .is-risk {
@@ -9556,10 +9563,11 @@
 }
 .app-phone-screen .collection-plan-project-meta {
   display: grid;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 7px;
+  margin-top: 10px;
   color: var(--app-text-regular);
-  font-size: 8px;
+  font-size: 11px;
+  line-height: 16px;
 }
 .app-phone-screen .collection-plan-project-meta > span {
   display: flex;
@@ -9571,8 +9579,8 @@
   font-weight: 650;
 }
 .app-phone-screen .collection-plan-aging {
-  margin-top: 8px;
-  padding: 7px;
+  margin-top: 10px;
+  padding: 9px;
   border-radius: 7px;
   background: var(--app-fill-soft);
 }
@@ -9580,42 +9588,42 @@
   display: block;
   margin-bottom: 5px;
   color: var(--app-text-secondary);
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 650;
 }
 .app-phone-screen .collection-plan-aging > div {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 3px;
+  gap: 4px;
 }
 .app-phone-screen .collection-plan-aging > div > span {
   display: flex;
   min-width: 0;
   align-items: center;
   flex-direction: column;
-  gap: 2px;
-  padding: 4px 2px;
+  gap: 3px;
+  padding: 6px 2px;
   border: 1px solid rgb(0 80 142 / 6%);
   border-radius: 5px;
   background: var(--app-white);
 }
 .app-phone-screen .collection-plan-aging small {
   color: var(--app-text-regular);
-  font-size: 7px;
+  font-size: 10px;
   white-space: nowrap;
 }
 .app-phone-screen .collection-plan-aging b {
   color: var(--app-primary-900);
-  font-size: 9px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 .app-phone-screen .collection-plan-risk-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding-top: 8px;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--app-divider);
 }
 .app-phone-screen .collection-plan-risk-row .is-low {
@@ -9631,12 +9639,11 @@
   color: var(--app-danger);
 }
 .app-phone-screen .collection-plan-risk-row p {
-  overflow: hidden;
   margin: 0;
   color: var(--app-text-secondary);
-  font-size: 8px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 11px;
+  line-height: 16px;
+  white-space: normal;
 }
 .app-phone-screen .collection-plan-risk-row p b {
   color: var(--app-text-secondary);
@@ -9645,6 +9652,6 @@
 .app-phone-screen .collection-plan-risk-row em {
   grid-column: 1 / -1;
   color: var(--app-danger);
-  font-size: 8px;
+  font-size: 11px;
   font-style: normal;
 }
