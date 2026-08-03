@@ -9293,34 +9293,11 @@
   color: var(--app-text-secondary);
   font-size: 9px;
 }
-.app-phone-screen .biz-collection-overview-grid .is-success small {
+.app-phone-screen .biz-collection-overview-grid small.is-up {
   color: var(--app-success-900);
 }
-.app-phone-screen .biz-collection-overview-progress {
-  display: flex;
-  min-height: 32px;
-  align-items: center;
-  gap: 6px;
-  margin: 0 9px 9px;
-  padding: 7px 9px;
-  border-radius: 8px;
-  background: var(--app-success-soft);
-}
-.app-phone-screen .biz-collection-overview-progress span,
-.app-phone-screen .biz-collection-overview-progress em {
-  color: var(--app-text-secondary);
-  font-size: 9px;
-  font-style: normal;
-}
-.app-phone-screen .biz-collection-overview-progress strong {
-  color: var(--app-success-900);
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-}
-.app-phone-screen .biz-collection-overview-progress em {
-  margin-left: auto;
-  color: var(--app-success-900);
-  white-space: nowrap;
+.app-phone-screen .biz-collection-overview-grid small.is-down {
+  color: var(--app-danger);
 }
 
 .app-phone-screen .collection-plan-summary,
@@ -9405,6 +9382,9 @@
   color: var(--app-success-900);
   font-style: normal;
   font-weight: 700;
+}
+.app-phone-screen .collection-plan-progress-meta.is-behind em {
+  color: var(--app-warning-900);
 }
 .app-phone-screen .collection-plan-summary-stats {
   display: grid;
@@ -9517,10 +9497,14 @@
 .app-phone-screen .collection-plan-customer-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
   margin-top: 8px;
   color: var(--app-text-regular);
   font-size: 9px;
+}
+.app-phone-screen .collection-plan-customer-row > span {
+  flex: 1 0 100%;
 }
 .app-phone-screen .collection-plan-customer-row b {
   color: var(--app-text-secondary);
@@ -9571,16 +9555,59 @@
   color: var(--app-danger);
 }
 .app-phone-screen .collection-plan-project-meta {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
   gap: 8px;
   margin-top: 8px;
   color: var(--app-text-regular);
   font-size: 8px;
 }
+.app-phone-screen .collection-plan-project-meta > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
 .app-phone-screen .collection-plan-project-meta b {
   color: var(--app-text-secondary);
   font-weight: 650;
+}
+.app-phone-screen .collection-plan-aging {
+  margin-top: 8px;
+  padding: 7px;
+  border-radius: 7px;
+  background: var(--app-fill-soft);
+}
+.app-phone-screen .collection-plan-aging > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--app-text-secondary);
+  font-size: 8px;
+  font-weight: 650;
+}
+.app-phone-screen .collection-plan-aging > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+}
+.app-phone-screen .collection-plan-aging > div > span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 2px;
+  border: 1px solid rgb(0 80 142 / 6%);
+  border-radius: 5px;
+  background: var(--app-white);
+}
+.app-phone-screen .collection-plan-aging small {
+  color: var(--app-text-regular);
+  font-size: 7px;
+  white-space: nowrap;
+}
+.app-phone-screen .collection-plan-aging b {
+  color: var(--app-primary-900);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
 }
 .app-phone-screen .collection-plan-risk-row {
   display: grid;
@@ -9610,6 +9637,10 @@
   font-size: 8px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.app-phone-screen .collection-plan-risk-row p b {
+  color: var(--app-text-secondary);
+  font-weight: 700;
 }
 .app-phone-screen .collection-plan-risk-row em {
   grid-column: 1 / -1;

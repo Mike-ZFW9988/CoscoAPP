@@ -2316,19 +2316,16 @@ function PageBiz() {
         </div>
         <div className="biz-collection-overview-grid">
           {[
-            { label: "本年计划收款", value: "200,809.58", meta: "计划基准", tone: "primary" },
-            { label: "本年实收金额", value: "234,514.33", meta: "达成率 116.8%", tone: "success" },
-            { label: "7月实收总额", value: "18,920.40", meta: "同比 ↑ 8.6%", tone: "primary" },
+            { label: "本年计划收款", value: "186,500.00", meta: "同比 ↓ 4.8%", tone: "primary", trend: "down" },
+            { label: "本年实收金额", value: "172,360.00", meta: "同比 ↑ 9.6%", tone: "success", trend: "up" },
+            { label: "7月实收总额", value: "21,680.00", meta: "同比 ↑ 5.4%", tone: "primary", trend: "up" },
           ].map((metric) => (
             <article key={metric.label} className={metric.tone === "success" ? "is-success" : ""}>
               <span>{metric.label}</span>
               <div><strong>{metric.value}</strong><em>万元</em></div>
-              <small>{metric.meta}</small>
+              <small className={`is-${metric.trend}`}>{metric.meta}</small>
             </article>
           ))}
-        </div>
-        <div className="biz-collection-overview-progress">
-          <span>年度计划达成率</span><strong>116.8%</strong><em>超计划 33,704.75万元</em>
         </div>
       </section>
       ) : (
@@ -2646,22 +2643,22 @@ function PageBizCollectionPlan() {
     {
       code: "N1234", name: "深海能源平台建造", status: "待收", customer: "中海油能源",
       importance: "战略客户", credit: "AAA", balance: "28,600", dueDate: "2026-08-20",
-      overdue: "0", monthNew: "0", aging: "未逾期", risk: "低风险", reason: "按合同节点正常推进",
+      overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "按合同节点正常推进",
     },
     {
       code: "N1235", name: "海上风电安装平台", status: "逾期", customer: "国家能源集团",
       importance: "重点客户", credit: "AA", balance: "19,850", dueDate: "2026-07-31",
-      overdue: "1,680", monthNew: "1,680", aging: "3个月以内", risk: "中风险", reason: "验收资料补充中，预计本月回款",
+      overdue: "1,680", monthNew: "1,680", aging: { under3: 1680, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "中风险", reason: "验收资料补充中，预计本月回款",
     },
     {
       code: "N1236", name: "FPSO模块建造项目", status: "逾期", customer: "中海油服",
       importance: "战略客户", credit: "AAA", balance: "32,500", dueDate: "2026-06-30",
-      overdue: "5,620", monthNew: "1,250", aging: "3–6个月", risk: "高风险", reason: "变更签证尚未完成客户确认",
+      overdue: "5,620", monthNew: "1,250", aging: { under3: 0, m3to6: 3200, m6to12: 1420, y1to2: 1000, y2to3: 0, over3: 0 }, risk: "高风险", reason: "变更签证尚未完成客户确认",
     },
     {
       code: "N1237", name: "海工改装升级项目", status: "已收", customer: "招商海工",
       importance: "重点客户", credit: "AA+", balance: "0", dueDate: "2026-07-18",
-      overdue: "0", monthNew: "0", aging: "已结清", risk: "低风险", reason: "已按计划完成收款",
+      overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "已按计划完成收款",
     },
   ] as const;
   const visibleProjects = projects.filter((project) => filter === "全部" || (filter === "待收" ? project.status === "待收" : project.status === "逾期"));
@@ -2677,11 +2674,11 @@ function PageBizCollectionPlan() {
           <span>年度收款计划执行</span><small>单位：万元</small>
         </div>
         <div className="collection-plan-summary-values">
-          <div><span>本年计划收款</span><strong>200,809.58</strong></div>
-          <div className="is-success"><span>本年实收金额</span><strong>234,514.33</strong></div>
+          <div><span>本年计划收款</span><strong>186,500.00</strong></div>
+          <div className="is-success"><span>本年实收金额</span><strong>172,360.00</strong></div>
         </div>
-        <div className="collection-plan-progress" aria-label="年度计划达成率116.8%"><i style={{ width: "100%" }} /></div>
-        <div className="collection-plan-progress-meta"><span>年度计划达成率 <b>116.8%</b></span><em>超计划 33,704.75万元</em></div>
+        <div className="collection-plan-progress" aria-label="年度计划达成率92.4%"><i style={{ width: "92.4%" }} /></div>
+        <div className="collection-plan-progress-meta is-behind"><span>年度计划达成率 <b>92.4%</b></span><em>距计划 14,140.00万元</em></div>
         <div className="collection-plan-summary-stats">
           <div><strong>12</strong><span>计划项目</span></div>
           <div><strong>7</strong><span>待收项目</span></div>
@@ -2707,20 +2704,34 @@ function PageBizCollectionPlan() {
                 <span className={`is-${project.status === "逾期" ? "overdue" : project.status === "已收" ? "received" : "pending"}`}>{project.status}</span>
               </div>
               <div className="collection-plan-customer-row">
-                <span>客户 <b>{project.customer}</b></span><em>{project.importance}</em><em>信用 {project.credit}</em>
+                <span>客户名称 <b>{project.customer}</b></span><em>客户重要性 {project.importance}</em><em>客户资信情况 {project.credit}</em>
               </div>
               <div className="collection-plan-amount-grid">
                 <div><span>期末账面余额</span><strong>{project.balance}<small>万元</small></strong></div>
-                <div className={project.overdue !== "0" ? "is-risk" : ""}><span>逾期应收合计</span><strong>{project.overdue}<small>万元</small></strong></div>
+                <div className={project.overdue !== "0" ? "is-risk" : ""}><span>逾期应收账款合计</span><strong>{project.overdue}<small>万元</small></strong></div>
               </div>
               <div className="collection-plan-project-meta">
-                <span>计划收款日 <b>{project.dueDate}</b></span>
-                <span>账龄 <b>{project.aging}</b></span>
+                <span>合同约定付款日 <b>{project.dueDate}</b></span>
+                <span>其中：本月新增逾期应收账款 <b>{project.monthNew}万元</b></span>
+              </div>
+              <div className="collection-plan-aging">
+                <span>应收账款账龄</span>
+                <div>
+                  {[
+                    ["3个月以内", project.aging.under3],
+                    ["3–6个月", project.aging.m3to6],
+                    ["6–12个月", project.aging.m6to12],
+                    ["1–2年", project.aging.y1to2],
+                    ["2–3年", project.aging.y2to3],
+                    ["3年以上", project.aging.over3],
+                  ].map(([label, value]) => (
+                    <span key={String(label)}><small>{label}</small><b>{Number(value).toLocaleString()}</b></span>
+                  ))}
+                </div>
               </div>
               <div className="collection-plan-risk-row">
-                <span className={`is-${project.risk === "高风险" ? "high" : project.risk === "中风险" ? "medium" : "low"}`}>{project.risk}</span>
-                <p>{project.reason}</p>
-                {project.monthNew !== "0" && <em>本月新增逾期 {project.monthNew}万</em>}
+                <span className={`is-${project.risk === "高风险" ? "high" : project.risk === "中风险" ? "medium" : "low"}`}>回收风险评级：{project.risk}</span>
+                <p><b>风险评级依据：</b>{project.reason}</p>
               </div>
             </article>
           ))}
