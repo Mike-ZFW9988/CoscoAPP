@@ -3788,6 +3788,196 @@
   color: #fff;
   box-shadow: 0 4px 10px rgb(31 87 149 / 20%);
 }
+
+.app-phone-screen .repair-core-metrics {
+  margin: 10px 10px 8px;
+  overflow: hidden;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--app-shadow-card);
+}
+
+.app-phone-screen .repair-core-metrics-head {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--app-divider);
+}
+
+.app-phone-screen .repair-core-metrics-head > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.app-phone-screen .repair-core-metrics-head > div > span {
+  color: var(--app-text-primary);
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.app-phone-screen .repair-core-metrics-head small {
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.app-phone-screen .repair-core-metrics-head small b {
+  color: var(--app-primary);
+  font-weight: 700;
+}
+
+.app-phone-screen .repair-core-financial-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  padding: 9px 9px 7px;
+}
+
+.app-phone-screen .repair-core-financial-card {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 11px;
+  background: linear-gradient(180deg, #fff, #f2f7fd);
+}
+
+.app-phone-screen .repair-core-financial-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.app-phone-screen .repair-core-financial-title > span {
+  color: var(--app-text-primary);
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.app-phone-screen .repair-core-financial-title em {
+  color: var(--app-text-secondary);
+  font-size: 9px;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.app-phone-screen .repair-core-financial-title em b {
+  color: var(--app-success-900);
+  font-weight: 700;
+}
+
+.app-phone-screen .repair-core-financial-value {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  margin: 8px 0 7px;
+}
+
+.app-phone-screen .repair-core-financial-value strong {
+  color: var(--app-primary);
+  font-size: 24px;
+  font-weight: var(--app-weight-data);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.app-phone-screen .repair-core-financial-value span {
+  padding-bottom: 2px;
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.app-phone-screen .repair-core-financial-meta {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 7px;
+}
+
+.app-phone-screen .repair-core-financial-meta > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  line-height: 13px;
+  white-space: nowrap;
+}
+
+.app-phone-screen .repair-core-financial-meta b {
+  color: var(--app-text-primary);
+  font-weight: 700;
+}
+
+.app-phone-screen .repair-core-progress {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dfeaf7;
+}
+
+.app-phone-screen .repair-core-progress > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #245b98, #6eaaf0);
+}
+
+.app-phone-screen .repair-core-fleet-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  margin: 0 9px 9px;
+  padding: 10px 0;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 11px;
+  background: linear-gradient(100deg, #eef6ff, #fff);
+}
+
+.app-phone-screen .repair-core-fleet-stat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.app-phone-screen .repair-core-fleet-stat + .repair-core-fleet-stat {
+  border-left: 1px solid var(--app-divider);
+}
+
+.app-phone-screen .repair-core-fleet-stat > span {
+  color: var(--app-text-secondary);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.app-phone-screen .repair-core-fleet-stat > div {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.app-phone-screen .repair-core-fleet-stat strong {
+  color: var(--app-primary);
+  font-size: 25px;
+  font-weight: var(--app-weight-data);
+  line-height: 1;
+}
+
+.app-phone-screen .repair-core-fleet-stat em {
+  margin-left: 2px;
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 600;
+}
 .app-phone-screen .steel-month-range {
   display: flex;
   min-height: 36px;

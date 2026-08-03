@@ -1145,6 +1145,50 @@ function BizKpiProgressCard() {
   );
 }
 
+function RepairCoreMetricsCard() {
+  const financialMetrics = [
+    { label: "完工产值", actual: "72.36", target: "108.00", rate: 67.00, yoy: "6.42" },
+    { label: "接单金额", actual: "56.80", target: "120.00", rate: 47.33, yoy: "12.75" },
+  ];
+
+  return (
+    <section className="repair-core-metrics" aria-labelledby="repair-core-metrics-title">
+      <div className="repair-core-metrics-head">
+        <div><CardIcon /><span id="repair-core-metrics-title">修船核心指标</span></div>
+        <small><b>模拟数据</b> · 年度累计</small>
+      </div>
+      <div className="repair-core-financial-grid">
+        {financialMetrics.map((metric) => (
+          <article key={metric.label} className="repair-core-financial-card">
+            <div className="repair-core-financial-title">
+              <span>{metric.label}</span>
+              <em>同比 <b>↑ {metric.yoy}%</b></em>
+            </div>
+            <div className="repair-core-financial-value"><strong>{metric.actual}</strong><span>亿元</span></div>
+            <div className="repair-core-financial-meta">
+              <span>总体目标 <b>{metric.target}亿</b></span>
+              <span>完成率 <b>{metric.rate.toFixed(2)}%</b></span>
+            </div>
+            <div className="repair-core-progress" aria-label={`${metric.label}完成率${metric.rate.toFixed(2)}%`}>
+              <i style={{ width: `${metric.rate}%` }} />
+            </div>
+          </article>
+        ))}
+      </div>
+      <article className="repair-core-fleet-card">
+        <div className="repair-core-fleet-stat">
+          <span>在厂艘数</span>
+          <div><strong>82</strong><em>艘</em></div>
+        </div>
+        <div className="repair-core-fleet-stat">
+          <span>完工艘数</span>
+          <div><strong>914</strong><em>艘</em></div>
+        </div>
+      </article>
+    </section>
+  );
+}
+
 function MetricPair({ a, b }: { a: { label: string; value: string; target: string }; b: { label: string; value: string; target: string } }) {
   return (
     <div className="flex gap-2">
@@ -1715,11 +1759,11 @@ function PageBiz() {
         // 环形图数据
         const donutData = isRepair
           ? [
-              { label: "散货船", n: "16艘", pct: 33, color: C.chart[0] },
-              { label: "集装箱", n: "12艘", pct: 25, color: C.chart[1] },
-              { label: "油船",   n: "8艘",  pct: 17, color: C.chart[2] },
-              { label: "海工船", n: "6艘",  pct: 13, color: C.chart[3] },
-              { label: "其他",   n: "6艘",  pct: 12, color: C.chart[4] },
+              { label: "散货船", n: "27艘", pct: 33, color: C.chart[0] },
+              { label: "集装箱", n: "21艘", pct: 25, color: C.chart[1] },
+              { label: "油船",   n: "14艘", pct: 17, color: C.chart[2] },
+              { label: "海工船", n: "11艘", pct: 13, color: C.chart[3] },
+              { label: "其他",   n: "9艘",  pct: 12, color: C.chart[4] },
             ]
           : [
               { label: "散货船", n: "14艘", pct: 39, color: C.chart[0] },
@@ -1727,7 +1771,7 @@ function PageBiz() {
               { label: "油船",   n: "7艘",  pct: 19, color: C.chart[2] },
               { label: "海工船", n: "5艘",  pct: 14, color: C.chart[3] },
             ];
-        const totalShips = isRepair ? "48艘" : "36艘";
+        const totalShips = isRepair ? "82艘" : "36艘";
         // 面积折线图数据点 (归一化至 viewBox 0 0 160 72)
         const pts: [number, number][] = [[0,62],[26,52],[52,46],[78,36],[104,22],[130,10],[160,6]];
         const lineD = pts.map(([x,y], i) => `${i===0?"M":"L"}${x} ${y}`).join(" ");
@@ -1764,10 +1808,10 @@ function PageBiz() {
               <span style={{ fontSize: 9, color: C.t3, flexShrink: 0 }}>截至7.10</span>
             </div>
 
-            <BizKpiProgressCard />
+            {isRepair ? <RepairCoreMetricsCard /> : <BizKpiProgressCard />}
 
             {/* ── 一行三个等宽指标卡 ── */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, padding: "9px 12px 0" }}>
+            {!isRepair && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, padding: "9px 12px 0" }}>
               {/* 卡1：今日在厂/在建 */}
               <div style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(236,245,255,0.58))", borderRadius: 10, border: "1px solid rgba(0,80,142,0.08)", padding: "8px 8px 7px" }}>
                 <div style={{ fontSize: 10, color: C.t2, fontWeight: 500, marginBottom: 4, lineHeight: "13px" }}>
@@ -1809,7 +1853,7 @@ function PageBiz() {
                   {insight.thirdMeta}
                 </span>
               </div>
-            </div>
+            </div>}
 
             {/* ── 趋势分析区 ── */}
             <div style={{ borderTop: `1px solid ${C.divider}`, margin: "9px 0 0" }}>
