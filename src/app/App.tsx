@@ -1777,7 +1777,7 @@ function PageBiz() {
           造船: {
             firstLabel: "在建船舶", firstValue: "36", firstUnit: "艘", firstMeta: "较上月 +1 ▲",
             secondLabel: "本月交付", secondValue: "12", secondUnit: "艘", secondMeta: "较上月 +1 ▲",
-            thirdLabel: "本月累计产值", thirdValue: "8.2", thirdUnit: "亿", thirdMeta: "较上月 +0.8亿 ▲",
+            thirdLabel: "本月累计交付订单", thirdValue: "8.2", thirdUnit: "亿", thirdMeta: "较上月 +0.8亿 ▲",
           },
           海工: {
             firstLabel: "在手海工项目", firstValue: "18", firstUnit: "项", firstMeta: "较上月 +2 ▲",
