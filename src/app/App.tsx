@@ -1155,7 +1155,7 @@ function RepairCoreMetricsCard() {
     <section className="repair-core-metrics" aria-labelledby="repair-core-metrics-title">
       <div className="repair-core-metrics-head">
         <div><CardIcon /><span id="repair-core-metrics-title">修船核心指标</span></div>
-        <small><b>模拟数据</b> · 年度累计</small>
+        <small>年度累计</small>
       </div>
       <div className="repair-core-financial-grid">
         {financialMetrics.map((metric) => (
@@ -1805,7 +1805,7 @@ function PageBiz() {
                   ))}
                 </div>
               </div>
-              <span style={{ fontSize: 9, color: C.t3, flexShrink: 0 }}>截至7.10</span>
+              <span style={{ fontSize: 9, color: C.t3, flexShrink: 0 }}>截至2026.07</span>
             </div>
 
             {isRepair ? <RepairCoreMetricsCard /> : <BizKpiProgressCard />}

@@ -3825,11 +3825,6 @@
   font-weight: 600;
 }
 
-.app-phone-screen .repair-core-metrics-head small b {
-  color: var(--app-primary);
-  font-weight: 700;
-}
-
 .app-phone-screen .repair-core-financial-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
