@@ -4054,6 +4054,184 @@
 .app-phone-screen .shipbuilding-core-table-row > div > span.is-dwt {
   font-size: 9px;
 }
+
+.app-phone-screen .offshore-core-order-card {
+  margin: 9px 9px 7px;
+  padding: 10px;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 11px;
+  background: linear-gradient(180deg, #fff, #f2f7fd);
+}
+
+.app-phone-screen .offshore-core-card-title,
+.app-phone-screen .offshore-core-secondary-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.app-phone-screen .offshore-core-card-title > span,
+.app-phone-screen .offshore-core-secondary-title > span {
+  color: var(--app-text-primary);
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.app-phone-screen .offshore-core-card-title em {
+  color: var(--app-text-secondary);
+  font-size: 9px;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.app-phone-screen .offshore-core-card-title em b,
+.app-phone-screen .offshore-core-secondary-meta em {
+  color: var(--app-success-900);
+  font-weight: 700;
+}
+
+.app-phone-screen .offshore-core-total-value {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  margin: 7px 0 8px;
+}
+
+.app-phone-screen .offshore-core-total-value strong {
+  color: var(--app-primary);
+  font-size: 26px;
+  font-weight: var(--app-weight-data);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.app-phone-screen .offshore-core-total-value span,
+.app-phone-screen .offshore-core-secondary-value span {
+  padding-bottom: 2px;
+  color: var(--app-text-secondary);
+  font-size: 10px;
+}
+
+.app-phone-screen .offshore-core-composition {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.app-phone-screen .offshore-core-composition > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  padding: 7px;
+  border-radius: 9px;
+  background: #edf5fe;
+  box-shadow: inset 0 0 0 1px rgb(0 80 142 / 6%);
+}
+
+.app-phone-screen .offshore-core-composition span {
+  overflow: hidden;
+  color: var(--app-text-secondary);
+  font-size: 9px;
+  line-height: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-phone-screen .offshore-core-composition strong {
+  color: var(--app-primary);
+  font-size: 16px;
+  font-weight: var(--app-weight-data);
+  line-height: 1;
+}
+
+.app-phone-screen .offshore-core-composition strong em {
+  margin-left: 2px;
+  color: var(--app-text-secondary);
+  font-size: 9px;
+  font-style: normal;
+}
+
+.app-phone-screen .offshore-core-composition small {
+  color: var(--app-text-primary);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.app-phone-screen .offshore-core-target-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.app-phone-screen .offshore-core-target-row span {
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.app-phone-screen .offshore-core-target-row b {
+  color: var(--app-text-primary);
+  font-weight: 700;
+}
+
+.app-phone-screen .offshore-core-secondary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  padding: 0 9px 9px;
+}
+
+.app-phone-screen .offshore-core-secondary-grid > article {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 11px;
+  background: linear-gradient(180deg, #fff, #f2f7fd);
+}
+
+.app-phone-screen .offshore-core-secondary-title small {
+  color: var(--app-text-secondary);
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.app-phone-screen .offshore-core-secondary-value {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  margin: 8px 0 7px;
+}
+
+.app-phone-screen .offshore-core-secondary-value strong {
+  color: var(--app-primary);
+  font-size: 21px;
+  font-weight: var(--app-weight-data);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.app-phone-screen .offshore-core-secondary-meta {
+  display: grid;
+  gap: 3px;
+}
+
+.app-phone-screen .offshore-core-secondary-meta span,
+.app-phone-screen .offshore-core-secondary-meta em {
+  font-size: 9px;
+  font-style: normal;
+  line-height: 11px;
+  white-space: nowrap;
+}
+
+.app-phone-screen .offshore-core-secondary-meta span {
+  color: var(--app-text-primary);
+  font-weight: 650;
+}
 .app-phone-screen .steel-month-range {
   display: flex;
   min-height: 36px;

@@ -1179,6 +1179,61 @@ function ShipbuildingCoreMetricsCard() {
   );
 }
 
+function OffshoreCoreMetricsCard() {
+  const constructionOrders = 68.40;
+  const conversionOutput = 9.60;
+  const annualTarget = 96;
+  const totalOrders = constructionOrders + conversionOutput;
+  const completionRate = (totalOrders / annualTarget) * 100;
+
+  return (
+    <section className="repair-core-metrics offshore-core-metrics" aria-labelledby="offshore-core-metrics-title">
+      <div className="repair-core-metrics-head">
+        <div><CardIcon /><span id="offshore-core-metrics-title">海工核心指标</span></div>
+        <small>年度累计</small>
+      </div>
+      <article className="offshore-core-order-card">
+        <div className="offshore-core-card-title">
+          <span>海工接单金额</span>
+          <em>同比 <b>↑ 10.80%</b></em>
+        </div>
+        <div className="offshore-core-total-value"><strong>{totalOrders.toFixed(2)}</strong><span>亿元</span></div>
+        <div className="offshore-core-composition">
+          <div>
+            <span>海工建造接单金额</span>
+            <strong>{constructionOrders.toFixed(2)}<em>亿</em></strong>
+            <small>6个项目</small>
+          </div>
+          <div>
+            <span>海工改装进度产值</span>
+            <strong>{conversionOutput.toFixed(2)}<em>亿</em></strong>
+            <small>3个项目</small>
+          </div>
+        </div>
+        <div className="offshore-core-target-row">
+          <span>年度目标 <b>{annualTarget.toFixed(2)}亿</b></span>
+          <span>完成率 <b>{completionRate.toFixed(2)}%</b></span>
+        </div>
+        <div className="repair-core-progress" aria-label={`海工接单金额完成率${completionRate.toFixed(2)}%`}>
+          <i style={{ width: `${completionRate}%` }} />
+        </div>
+      </article>
+      <div className="offshore-core-secondary-grid">
+        <article>
+          <div className="offshore-core-secondary-title"><span>累计交付订单</span><small>本年累计</small></div>
+          <div className="offshore-core-secondary-value"><strong>13.20</strong><span>亿元</span></div>
+          <div className="offshore-core-secondary-meta"><span>3个项目</span><em>同比 ↑ 18.60%</em></div>
+        </article>
+        <article>
+          <div className="offshore-core-secondary-title"><span>手持订单</span><small>截至当前</small></div>
+          <div className="offshore-core-secondary-value"><strong>168.50</strong><span>亿元</span></div>
+          <div className="offshore-core-secondary-meta"><span>20个项目</span><em>同比 ↑ 7.80%</em></div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
 function RepairCoreMetricsCard() {
   const financialMetrics = [
     { label: "完工产值", actual: "72.36", target: "108.00", rate: 67.00, yoy: "6.42" },
@@ -1842,10 +1897,10 @@ function PageBiz() {
               <span style={{ fontSize: 9, color: C.t3, flexShrink: 0 }}>截至2026.07</span>
             </div>
 
-            {isRepair ? <RepairCoreMetricsCard /> : bizTab === "造船" ? <ShipbuildingCoreMetricsCard /> : <BizKpiProgressCard />}
+            {isRepair ? <RepairCoreMetricsCard /> : bizTab === "造船" ? <ShipbuildingCoreMetricsCard /> : bizTab === "海工" ? <OffshoreCoreMetricsCard /> : <BizKpiProgressCard />}
 
             {/* ── 一行三个等宽指标卡 ── */}
-            {!isRepair && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, padding: "9px 12px 0" }}>
+            {!isRepair && bizTab !== "海工" && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, padding: "9px 12px 0" }}>
               {/* 卡1：今日在厂/在建 */}
               <div style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(236,245,255,0.58))", borderRadius: 10, border: "1px solid rgba(0,80,142,0.08)", padding: "8px 8px 7px" }}>
                 <div style={{ fontSize: 10, color: C.t2, fontWeight: 500, marginBottom: 4, lineHeight: "13px" }}>
