@@ -1786,6 +1786,8 @@ type CollectionPlanProject = {
   name: string;
   status: "已结账未收款" | "已完成收款";
   customer: string;
+  customerImportance?: string;
+  customerCredit?: string;
   balance: string;
   dueDate: string;
   overdue: string;
@@ -1796,50 +1798,63 @@ type CollectionPlanProject = {
 };
 
 const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
-  overviewMetrics: Array<{ label: string; value: string; meta: string; tone: "primary" | "success"; trend: "up" | "down" }>;
-  annualPlan: string;
-  annualReceived: string;
-  completionRate: string;
-  progressWidth: string;
-  varianceText: string;
-  stats: { planned: number; pending: number; overdue: number };
+  title: "经营计划收款" | "经营逾期收款";
+  flow: "plan" | "overdue";
+  overviewMetrics: Array<{ label: string; value: string; unit: "万元" | "%" | "家"; meta: string; tone: "primary" | "success" | "danger"; trend: "up" | "down" | "good" }>;
+  summary: {
+    heading: string;
+    primary: { label: string; value: string };
+    secondary: { label: string; value: string; tone: "success" | "danger" };
+    progress: { label: string; value: string; width: string; meta: string; tone: "behind" | "risk" };
+    stats: Array<{ label: string; value: number; tone?: "risk" }>;
+  };
   detailRoute: string;
   returnRoute: string;
   projects: CollectionPlanProject[];
 }> = {
   修船: {
+    title: "经营逾期收款",
+    flow: "overdue",
     overviewMetrics: [
-      { label: "本年计划收款", value: "128,400.00", meta: "同比 ↓ 3.6%", tone: "primary", trend: "down" },
-      { label: "本年实收金额", value: "116,850.00", meta: "同比 ↑ 8.2%", tone: "success", trend: "up" },
-      { label: "7月实收总额", value: "14,260.00", meta: "同比 ↑ 4.7%", tone: "primary", trend: "up" },
+      { label: "应收账款总额", value: "118,260.00", unit: "万元", meta: "较上月 ↓ 1.8%", tone: "primary", trend: "good" },
+      { label: "逾期账款总额", value: "4,360.00", unit: "万元", meta: "较上月 ↓ 6.2%", tone: "danger", trend: "good" },
+      { label: "逾期账款占比", value: "3.69", unit: "%", meta: "较上月 ↓ 0.18pct", tone: "success", trend: "good" },
     ],
-    annualPlan: "128,400.00",
-    annualReceived: "116,850.00",
-    completionRate: "91.0%",
-    progressWidth: "91%",
-    varianceText: "距计划 11,550.00万元",
-    stats: { planned: 18, pending: 9, overdue: 2 },
+    summary: {
+      heading: "应收账款风险概览",
+      primary: { label: "应收账款总额", value: "118,260.00" },
+      secondary: { label: "逾期账款总额", value: "4,360.00", tone: "danger" },
+      progress: { label: "逾期账款占比", value: "3.69%", width: "3.69%", meta: "较上月下降 0.18pct", tone: "risk" },
+      stats: [
+        { label: "应收项目", value: 18 },
+        { label: "待收项目", value: 9 },
+        { label: "逾期项目", value: 2, tone: "risk" },
+      ],
+    },
     detailRoute: "biz-collection-plan-repair",
     returnRoute: "biz-repair",
     projects: [
-      { code: "R26001", name: "大型集装箱船坞修", status: "已结账未收款", customer: "华远航运", balance: "12,600", dueDate: "2026-08-18", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "按合同节点正常推进" },
-      { code: "R26002", name: "LNG运输船修理改装", status: "已结账未收款", customer: "东海能源航运", balance: "8,800", dueDate: "2026-07-28", overdue: "960", monthNew: "960", aging: { under3: 960, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "中风险", reason: "验收单据补充中，预计本月回款" },
-      { code: "R26003", name: "特种工程船改装", status: "已结账未收款", customer: "远洋工程船务", balance: "15,500", dueDate: "2026-06-25", overdue: "3,280", monthNew: "680", aging: { under3: 0, m3to6: 2000, m6to12: 1280, y1to2: 0, y2to3: 0, over3: 0 }, risk: "高风险", reason: "增补工程量尚待客户确认" },
-      { code: "R26004", name: "散货船常规修理", status: "已完成收款", customer: "蓝海船舶管理", balance: "0", dueDate: "2026-07-16", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "已按计划完成收款" },
+      { code: "R26001", name: "大型集装箱船坞修", status: "已结账未收款", customer: "华远航运", customerImportance: "重点客户", customerCredit: "信用良好", balance: "12,600", dueDate: "2026-08-18", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "按合同节点正常推进" },
+      { code: "R26002", name: "LNG运输船修理改装", status: "已结账未收款", customer: "东海能源航运", customerImportance: "重点客户", customerCredit: "信用一般", balance: "8,800", dueDate: "2026-07-28", overdue: "960", monthNew: "960", aging: { under3: 960, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "中风险", reason: "验收单据补充中，预计本月回款" },
+      { code: "R26003", name: "特种工程船改装", status: "已结账未收款", customer: "远洋工程船务", customerImportance: "一般客户", customerCredit: "信用关注", balance: "15,500", dueDate: "2026-06-25", overdue: "3,400", monthNew: "720", aging: { under3: 0, m3to6: 2100, m6to12: 1300, y1to2: 0, y2to3: 0, over3: 0 }, risk: "高风险", reason: "增补工程量尚待客户确认" },
+      { code: "R26004", name: "散货船常规修理", status: "已完成收款", customer: "蓝海船舶管理", customerImportance: "重点客户", customerCredit: "信用良好", balance: "0", dueDate: "2026-07-16", overdue: "0", monthNew: "0", aging: { under3: 0, m3to6: 0, m6to12: 0, y1to2: 0, y2to3: 0, over3: 0 }, risk: "低风险", reason: "已按计划完成收款" },
     ],
   },
   造船: {
+    title: "经营计划收款",
+    flow: "plan",
     overviewMetrics: [
-      { label: "本年计划收款", value: "245,000.00", meta: "同比 ↓ 2.8%", tone: "primary", trend: "down" },
-      { label: "本年实收金额", value: "216,800.00", meta: "同比 ↑ 7.6%", tone: "success", trend: "up" },
-      { label: "7月实收总额", value: "26,400.00", meta: "同比 ↑ 5.1%", tone: "primary", trend: "up" },
+      { label: "本年计划收款", value: "245,000.00", unit: "万元", meta: "同比 ↓ 2.8%", tone: "primary", trend: "down" },
+      { label: "本年实收金额", value: "216,800.00", unit: "万元", meta: "同比 ↑ 7.6%", tone: "success", trend: "up" },
+      { label: "7月实收总额", value: "26,400.00", unit: "万元", meta: "同比 ↑ 5.1%", tone: "primary", trend: "up" },
     ],
-    annualPlan: "245,000.00",
-    annualReceived: "216,800.00",
-    completionRate: "88.5%",
-    progressWidth: "88.5%",
-    varianceText: "距计划 28,200.00万元",
-    stats: { planned: 24, pending: 13, overdue: 2 },
+    summary: {
+      heading: "年度收款计划执行",
+      primary: { label: "本年计划收款", value: "245,000.00" },
+      secondary: { label: "本年实收金额", value: "216,800.00", tone: "success" },
+      progress: { label: "年度计划达成率", value: "88.5%", width: "88.5%", meta: "距计划 28,200.00万元", tone: "behind" },
+      stats: [{ label: "计划项目", value: 24 }, { label: "待收项目", value: 13 }, { label: "逾期项目", value: 2, tone: "risk" }],
+    },
     detailRoute: "biz-collection-plan-shipbuilding",
     returnRoute: "biz-shipbuilding",
     projects: [
@@ -1850,17 +1865,20 @@ const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
     ],
   },
   海工: {
+    title: "经营计划收款",
+    flow: "plan",
     overviewMetrics: [
-      { label: "本年计划收款", value: "186,500.00", meta: "同比 ↓ 4.8%", tone: "primary", trend: "down" },
-      { label: "本年实收金额", value: "172,360.00", meta: "同比 ↑ 9.6%", tone: "success", trend: "up" },
-      { label: "7月实收总额", value: "21,680.00", meta: "同比 ↑ 5.4%", tone: "primary", trend: "up" },
+      { label: "本年计划收款", value: "186,500.00", unit: "万元", meta: "同比 ↓ 4.8%", tone: "primary", trend: "down" },
+      { label: "本年实收金额", value: "172,360.00", unit: "万元", meta: "同比 ↑ 9.6%", tone: "success", trend: "up" },
+      { label: "7月实收总额", value: "21,680.00", unit: "万元", meta: "同比 ↑ 5.4%", tone: "primary", trend: "up" },
     ],
-    annualPlan: "186,500.00",
-    annualReceived: "172,360.00",
-    completionRate: "92.4%",
-    progressWidth: "92.4%",
-    varianceText: "距计划 14,140.00万元",
-    stats: { planned: 12, pending: 7, overdue: 2 },
+    summary: {
+      heading: "年度收款计划执行",
+      primary: { label: "本年计划收款", value: "186,500.00" },
+      secondary: { label: "本年实收金额", value: "172,360.00", tone: "success" },
+      progress: { label: "年度计划达成率", value: "92.4%", width: "92.4%", meta: "距计划 14,140.00万元", tone: "behind" },
+      stats: [{ label: "计划项目", value: 12 }, { label: "待收项目", value: 7 }, { label: "逾期项目", value: 2, tone: "risk" }],
+    },
     detailRoute: "biz-collection-plan",
     returnRoute: "biz-offshore",
     projects: [
@@ -1875,16 +1893,16 @@ const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
 function CollectionPlanOverviewCard({ business }: { business: CollectionPlanBusiness }) {
   const config = COLLECTION_PLAN_CONFIG[business];
   return (
-    <section className="biz-collection-overview" aria-label={`${business}经营计划收款`}>
+    <section className="biz-collection-overview" aria-label={`${business}${config.title}`}>
       <div className="biz-collection-overview-head">
-        <div><CircleDollarSign aria-hidden="true" /><span>经营计划收款</span></div>
+        <div><CircleDollarSign aria-hidden="true" /><span>{config.title}</span></div>
         <button type="button" className="app-drilldown-link" onClick={() => nav(config.detailRoute)}>查看全部 <ChevronRight size={13} strokeWidth={2.3} /></button>
       </div>
       <div className="biz-collection-overview-grid">
         {config.overviewMetrics.map((metric) => (
-          <article key={metric.label} className={metric.tone === "success" ? "is-success" : ""}>
+          <article key={metric.label} className={metric.tone === "success" ? "is-success" : metric.tone === "danger" ? "is-risk" : ""}>
             <span>{metric.label}</span>
-            <div><strong>{metric.value}</strong><em>万元</em></div>
+            <div><strong>{metric.value}</strong><em>{metric.unit}</em></div>
             <small className={`is-${metric.trend}`}>{metric.meta}</small>
           </article>
         ))}
@@ -2735,6 +2753,7 @@ function PageBizKpiProgress() {
 function PageBizCollectionPlan({ business }: { business: CollectionPlanBusiness }) {
   const [filter, setFilter] = useState<"全部" | "待收" | "逾期">("全部");
   const config = COLLECTION_PLAN_CONFIG[business];
+  const summary = config.summary;
   const projects = config.projects;
   const parseCollectionAmount = (value: string | number) => {
     const parsed = Number(String(value).replace(/,/g, ""));
@@ -2749,29 +2768,27 @@ function PageBizCollectionPlan({ business }: { business: CollectionPlanBusiness 
   return (
     <>
       <StatusBar />
-      <NavBar title={`${business}经营计划收款`} subtitle={`${business}·经营口径`} backLabel={`返回${business}经营洞察`} backPage={config.returnRoute} />
-      <BreadcrumbBar crumbs={["首页", "经营主题", `${business}经营计划收款`]} period="截至2026.07" />
+      <NavBar title={`${business}${config.title}`} subtitle={`${business}·经营口径`} backLabel={`返回${business}经营洞察`} backPage={config.returnRoute} />
+      <BreadcrumbBar crumbs={["首页", "经营主题", `${business}${config.title}`]} period="截至2026.07" />
 
-      <section className="collection-plan-summary" aria-label="经营计划收款概览">
+      <section className="collection-plan-summary" aria-label={`${config.title}概览`}>
         <div className="collection-plan-summary-head">
-          <span>年度收款计划执行</span><small>单位：万元</small>
+          <span>{summary.heading}</span><small>单位：万元</small>
         </div>
         <div className="collection-plan-summary-values">
-          <div><span>本年计划收款</span><strong>{config.annualPlan}</strong></div>
-          <div className="is-success"><span>本年实收金额</span><strong>{config.annualReceived}</strong></div>
+          <div><span>{summary.primary.label}</span><strong>{summary.primary.value}</strong></div>
+          <div className={summary.secondary.tone === "danger" ? "is-risk" : "is-success"}><span>{summary.secondary.label}</span><strong>{summary.secondary.value}</strong></div>
         </div>
-        <div className="collection-plan-progress" aria-label={`年度计划达成率${config.completionRate}`}><i style={{ width: config.progressWidth }} /></div>
-        <div className="collection-plan-progress-meta is-behind"><span>年度计划达成率 <b>{config.completionRate}</b></span><em>{config.varianceText}</em></div>
+        <div className={`collection-plan-progress is-${summary.progress.tone}`} aria-label={`${summary.progress.label}${summary.progress.value}`}><i style={{ width: summary.progress.width }} /></div>
+        <div className={`collection-plan-progress-meta is-${summary.progress.tone}`}><span>{summary.progress.label} <b>{summary.progress.value}</b></span><em>{summary.progress.meta}</em></div>
         <div className="collection-plan-summary-stats">
-          <div><strong>{config.stats.planned}</strong><span>计划项目</span></div>
-          <div><strong>{config.stats.pending}</strong><span>待收项目</span></div>
-          <div className="is-risk"><strong>{config.stats.overdue}</strong><span>逾期项目</span></div>
+          {summary.stats.map((stat) => <div key={stat.label} className={stat.tone === "risk" ? "is-risk" : ""}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}
         </div>
       </section>
 
       <section className="collection-plan-detail" aria-labelledby="collection-plan-detail-title">
         <div className="collection-plan-detail-head">
-          <div><ClipboardList aria-hidden="true" /><span id="collection-plan-detail-title">项目收款计划明细</span></div>
+          <div><ClipboardList aria-hidden="true" /><span id="collection-plan-detail-title">{config.flow === "overdue" ? "项目逾期收款明细" : "项目收款计划明细"}</span></div>
           <small>共 {visibleProjects.length} 项</small>
         </div>
         <div className="collection-plan-filters" role="tablist" aria-label="收款状态筛选">
@@ -2798,6 +2815,8 @@ function PageBizCollectionPlan({ business }: { business: CollectionPlanBusiness 
               </div>
               <div className="collection-plan-customer-row">
                 <span>客户名称 <b>{project.customer}</b></span>
+                {project.customerImportance && <em>客户重要性 {project.customerImportance}</em>}
+                {project.customerCredit && <em>客户资信 {project.customerCredit}</em>}
               </div>
               <div className="collection-plan-amount-grid">
                 <div><span>期末账面余额</span><strong>{project.balance}<small>万元</small></strong></div>
@@ -2827,7 +2846,7 @@ function PageBizCollectionPlan({ business }: { business: CollectionPlanBusiness 
           })}
         </div>
       </section>
-      <Footer text={`经营计划收款 · ${business}经营口径 · 模拟数据`} />
+      <Footer text={`${config.title} · ${business}经营口径 · 模拟数据`} />
     </>
   );
 }

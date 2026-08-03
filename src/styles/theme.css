@@ -9283,6 +9283,9 @@
 .app-phone-screen .biz-collection-overview-grid .is-success strong {
   color: var(--app-success-900);
 }
+.app-phone-screen .biz-collection-overview-grid .is-risk strong {
+  color: var(--app-danger);
+}
 .app-phone-screen .biz-collection-overview-grid em {
   padding-bottom: 1px;
   color: var(--app-text-regular);
@@ -9298,6 +9301,9 @@
 }
 .app-phone-screen .biz-collection-overview-grid small.is-down {
   color: var(--app-danger);
+}
+.app-phone-screen .biz-collection-overview-grid small.is-good {
+  color: var(--app-success-900);
 }
 
 .app-phone-screen .collection-plan-summary,
@@ -9363,6 +9369,9 @@
 .app-phone-screen .collection-plan-summary-values .is-success strong {
   color: var(--app-success-900);
 }
+.app-phone-screen .collection-plan-summary-values .is-risk strong {
+  color: var(--app-danger);
+}
 .app-phone-screen .collection-plan-progress {
   height: 6px;
   margin-top: 10px;
@@ -9375,6 +9384,10 @@
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--app-primary), var(--app-success));
+}
+.app-phone-screen .collection-plan-progress.is-risk > i {
+  min-width: 12px;
+  background: var(--app-danger);
 }
 .app-phone-screen .collection-plan-progress-meta {
   display: flex;
@@ -9392,6 +9405,9 @@
 }
 .app-phone-screen .collection-plan-progress-meta.is-behind em {
   color: var(--app-warning-900);
+}
+.app-phone-screen .collection-plan-progress-meta.is-risk em {
+  color: var(--app-success-900);
 }
 .app-phone-screen .collection-plan-summary-stats {
   display: grid;
