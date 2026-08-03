@@ -3975,28 +3975,27 @@
 }
 
 .app-phone-screen .shipbuilding-core-metrics {
-  cursor: pointer;
+  cursor: default;
 }
 
 .app-phone-screen .shipbuilding-core-table {
-  overflow: hidden;
-  margin: 9px;
-  border: 1px solid rgb(0 80 142 / 8%);
-  border-radius: 11px;
-  background: linear-gradient(180deg, #fff, #f4f8fd);
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 9px;
 }
 
 .app-phone-screen .shipbuilding-core-table-head,
 .app-phone-screen .shipbuilding-core-table-row {
   display: grid;
-  grid-template-columns: 52px 1fr 1fr 1fr;
+  grid-template-columns: 58px minmax(0, 0.9fr) minmax(0, 1.3fr) minmax(0, 0.9fr);
   align-items: center;
+  column-gap: 2px;
 }
 
 .app-phone-screen .shipbuilding-core-table-head {
   min-height: 32px;
   padding: 0 8px;
-  border-bottom: 1px solid var(--app-divider);
 }
 
 .app-phone-screen .shipbuilding-core-table-head > span {
@@ -4008,30 +4007,48 @@
 }
 
 .app-phone-screen .shipbuilding-core-table-row {
-  min-height: 48px;
-  padding: 0 8px;
+  min-height: 50px;
+  padding: 0 9px;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 11px;
+  background: linear-gradient(180deg, #fff, #f2f7fd);
 }
 
 .app-phone-screen .shipbuilding-core-table-row + .shipbuilding-core-table-row {
-  border-top: 1px solid var(--app-divider);
+  border-top: 1px solid rgb(0 80 142 / 8%);
 }
 
 .app-phone-screen .shipbuilding-core-table-row > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
   text-align: center;
   white-space: nowrap;
 }
 
-.app-phone-screen .shipbuilding-core-table-row strong {
+.app-phone-screen .shipbuilding-core-row-label {
   color: var(--app-text-primary);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.app-phone-screen .shipbuilding-core-table-row strong {
+  color: var(--app-primary);
   font-size: 18px;
   font-weight: var(--app-weight-data);
   font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
 .app-phone-screen .shipbuilding-core-table-row > div > span {
-  margin-left: 1px;
+  margin-left: 0;
   color: var(--app-text-secondary);
   font-size: 10px;
+  line-height: 1;
 }
 
 .app-phone-screen .shipbuilding-core-table-row > div > span.is-dwt {

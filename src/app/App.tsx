@@ -1156,7 +1156,6 @@ function ShipbuildingCoreMetricsCard() {
     <section
       className="repair-core-metrics shipbuilding-core-metrics"
       aria-labelledby="shipbuilding-core-metrics-title"
-      onClick={() => nav("biz-kpi-progress")}
     >
       <div className="repair-core-metrics-head">
         <div><CardIcon /><span id="shipbuilding-core-metrics-title">造船核心指标</span></div>
@@ -1169,9 +1168,7 @@ function ShipbuildingCoreMetricsCard() {
         </div>
         {rows.map((row) => (
           <div key={row.label} className="shipbuilding-core-table-row">
-            <button type="button" className="home-progress-link" onClick={(event) => { event.stopPropagation(); nav("biz-kpi-progress"); }}>
-              {row.label}<ChevronRight size={12} strokeWidth={2.4} />
-            </button>
+            <span className="shipbuilding-core-row-label">{row.label}</span>
             <div><strong>{row.n}</strong><span>{row.nu}</span></div>
             <div><strong>{row.dwt}</strong><span className="is-dwt">{row.dwtu}</span></div>
             <div><strong>{row.amt}</strong><span>{row.amtu}</span></div>
