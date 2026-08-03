@@ -4232,6 +4232,66 @@
   color: var(--app-text-primary);
   font-weight: 650;
 }
+
+.app-phone-screen .support-core-secondary-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 9px 9px;
+  border: 1px solid rgb(0 80 142 / 8%);
+  border-radius: 11px;
+  background: linear-gradient(100deg, #eef6ff, #fff);
+}
+
+.app-phone-screen .support-core-secondary-card > article {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  padding: 10px;
+}
+
+.app-phone-screen .support-core-secondary-card > article + article {
+  border-left: 1px solid var(--app-divider);
+}
+
+.app-phone-screen .support-core-secondary-card > article > span {
+  overflow: hidden;
+  color: var(--app-text-primary);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-phone-screen .support-core-secondary-card > article > div {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  margin: 3px 0 2px;
+}
+
+.app-phone-screen .support-core-secondary-card strong {
+  color: var(--app-primary);
+  font-size: 22px;
+  font-weight: var(--app-weight-data);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.app-phone-screen .support-core-secondary-card em {
+  padding-bottom: 2px;
+  color: var(--app-text-secondary);
+  font-size: 9px;
+  font-style: normal;
+}
+
+.app-phone-screen .support-core-secondary-card small {
+  color: var(--app-success-900);
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 11px;
+  white-space: nowrap;
+}
 .app-phone-screen .steel-month-range {
   display: flex;
   min-height: 36px;

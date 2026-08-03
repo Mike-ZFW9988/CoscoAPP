@@ -1234,6 +1234,54 @@ function OffshoreCoreMetricsCard() {
   );
 }
 
+function SupportCoreMetricsCard() {
+  const financialMetrics = [
+    { label: "完工产值", actual: "24.60", target: "50.00", rate: 49.20, yoy: "5.10" },
+    { label: "接单金额", actual: "49.80", target: "68.00", rate: 73.24, yoy: "26.80" },
+  ];
+  const secondaryMetrics = [
+    { label: "新能源接单金额", value: "5.20", yoy: "32.60", mom: "9.40" },
+    { label: "重工内协同金额", value: "26.40", yoy: "21.50", mom: "7.30" },
+  ];
+
+  return (
+    <section className="repair-core-metrics support-core-metrics" aria-labelledby="support-core-metrics-title">
+      <div className="repair-core-metrics-head">
+        <div><CardIcon /><span id="support-core-metrics-title">配套核心指标</span></div>
+        <small>年度累计</small>
+      </div>
+      <div className="repair-core-financial-grid">
+        {financialMetrics.map((metric) => (
+          <article key={metric.label} className="repair-core-financial-card">
+            <div className="repair-core-financial-title">
+              <span>{metric.label}</span>
+              <em>同比 <b>↑ {metric.yoy}%</b></em>
+            </div>
+            <div className="repair-core-financial-value"><strong>{metric.actual}</strong><span>亿元</span></div>
+            <div className="repair-core-financial-meta">
+              <span>总体目标 <b>{metric.target}亿</b></span>
+              <span>完成率 <b>{metric.rate.toFixed(2)}%</b></span>
+            </div>
+            <div className="repair-core-progress" aria-label={`${metric.label}完成率${metric.rate.toFixed(2)}%`}>
+              <i style={{ width: `${metric.rate}%` }} />
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="support-core-secondary-card">
+        {secondaryMetrics.map((metric) => (
+          <article key={metric.label}>
+            <span>{metric.label}</span>
+            <div><strong>{metric.value}</strong><em>亿元</em></div>
+            <small>同比 ↑ {metric.yoy}%</small>
+            <small>环比 ↑ {metric.mom}%</small>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function RepairCoreMetricsCard() {
   const financialMetrics = [
     { label: "完工产值", actual: "72.36", target: "108.00", rate: 67.00, yoy: "6.42" },
@@ -1897,10 +1945,10 @@ function PageBiz() {
               <span style={{ fontSize: 9, color: C.t3, flexShrink: 0 }}>截至2026.07</span>
             </div>
 
-            {isRepair ? <RepairCoreMetricsCard /> : bizTab === "造船" ? <ShipbuildingCoreMetricsCard /> : bizTab === "海工" ? <OffshoreCoreMetricsCard /> : <BizKpiProgressCard />}
+            {isRepair ? <RepairCoreMetricsCard /> : bizTab === "造船" ? <ShipbuildingCoreMetricsCard /> : bizTab === "海工" ? <OffshoreCoreMetricsCard /> : <SupportCoreMetricsCard />}
 
             {/* ── 一行三个等宽指标卡 ── */}
-            {!isRepair && bizTab !== "海工" && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, padding: "9px 12px 0" }}>
+            {bizTab === "造船" && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, padding: "9px 12px 0" }}>
               {/* 卡1：今日在厂/在建 */}
               <div style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(236,245,255,0.58))", borderRadius: 10, border: "1px solid rgba(0,80,142,0.08)", padding: "8px 8px 7px" }}>
                 <div style={{ fontSize: 10, color: C.t2, fontWeight: 500, marginBottom: 4, lineHeight: "13px" }}>
