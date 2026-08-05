@@ -2121,7 +2121,7 @@ function SupportRevenueAnalysis({ detail = false }: { detail?: boolean } = {}) {
           <div className="biz-support-stage-chart" style={{ "--support-stage-count": projectStages.length } as React.CSSProperties}>
             {projectStages.map((stage, index) => (
               <button key={stage.label} type="button" className={selectedStageIndex === index ? "is-selected" : ""} onClick={() => setSelectedStageIndex(index)} aria-label={`${stage.label}节点${stage.value}项`}>
-                <span><b style={{ height: `${Math.max(14, stage.value / stageMax * 100)}%` }}><strong>{stage.value}</strong></b></span><em>{stage.label}</em>
+                <span><b style={{ height: `${Math.max(14, stage.value / stageMax * 82)}%` }}><strong>{stage.value}</strong></b></span><em>{stage.label}</em>
               </button>
             ))}
           </div>
