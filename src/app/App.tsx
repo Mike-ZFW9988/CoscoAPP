@@ -4321,7 +4321,6 @@ function PageFinance() {
       {/* L7 业务分区 — 各卡可点击下钻 */}
       {[
         { title: "营业收入", v: "567,882.34", prev: "5,678.82", pct: "1.48%", budget: "5,678.82", rate: "56.78%", page: "finance-revenue" },
-        { title: "营业毛利", v: "567,882.34", prev: "5,678.82", pct: "1.48%", budget: "567.88",   rate: "56.78%", page: "finance-revenue" },
         { title: "利润总额", v: "567,882.34", prev: "567.88",   pct: "7.48%", budget: "567.88",   rate: "56.78%", page: "finance-revenue" },
       ].map((it) => (
         <Card key={it.title} title={it.title} tag="1-7月累计" extra="趋势分析" onExtra={() => nav(it.page)}>
@@ -4518,6 +4517,7 @@ function PageFinanceRate() {
 
 function PageFinanceRevenue() {
   const [tip, setTip] = useState<number | null>(null);
+  const [companyTip, setCompanyTip] = useState<number | null>(null);
 
   const months  = ["2023-11","2023-12","2024-01","2024-02","2024-03","2024-04","2024-05","2024-06","2024-07","2024-08","2024-09","2024-10"];
   const revenue = [68000, 82000, 45000, 52000, 71000, 75000, 78000, 82000, 79000, 85000, 88000, 91000];
@@ -4558,6 +4558,33 @@ function PageFinanceRevenue() {
   const BLUE  = C.brand;
   const LIGHT_BLUE = "#79BBFF";
   const GREEN  = "#39BB82";
+  const ORANGE = "#E6A23C";
+  const companyRevenueData = [
+    { company: "南通川崎", revenue: 98500, profit: 13790, margin: 14.0, revenueMom: 8.6 },
+    { company: "大连川崎", revenue: 86200, profit: 11120, margin: 12.9, revenueMom: 5.2 },
+    { company: "扬州重工", revenue: 77800, profit: 8940,  margin: 11.5, revenueMom: -2.1 },
+    { company: "舟山重工", revenue: 71600, profit: 9380,  margin: 13.1, revenueMom: 6.8 },
+    { company: "上海重工", revenue: 65400, profit: 7520,  margin: 11.5, revenueMom: -1.4 },
+    { company: "广东重工", revenue: 59800, profit: 7410,  margin: 12.4, revenueMom: 4.3 },
+  ];
+  const ECW = 470, ECH = 176, EPAD_L = 34, EPAD_R = 32, EPAD_T = 16, EPAD_B = 32;
+  const ePlotW = ECW - EPAD_L - EPAD_R;
+  const ePlotH = ECH - EPAD_T - EPAD_B;
+  const eSlotW = ePlotW / companyRevenueData.length;
+  const eAmountMax = 120000;
+  const eRateMin = -10;
+  const eRateMax = 20;
+  const eToX = (index: number) => EPAD_L + eSlotW * index + eSlotW / 2;
+  const eToAmountY = (value: number) => EPAD_T + ePlotH - (value / eAmountMax) * ePlotH;
+  const eToRateY = (value: number) => EPAD_T + ePlotH - ((value - eRateMin) / (eRateMax - eRateMin)) * ePlotH;
+  const companyMarginPoints = companyRevenueData.map((item, index) => [eToX(index), eToRateY(item.margin)] as [number, number]);
+  const companyMomPoints = companyRevenueData.map((item, index) => [eToX(index), eToRateY(item.revenueMom)] as [number, number]);
+  const toSmoothPath = (points: Array<[number, number]>) => points.reduce((path, [x, y], index) => {
+    if (index === 0) return `M${x},${y}`;
+    const [previousX, previousY] = points[index - 1];
+    const controlX = (previousX + x) / 2;
+    return `${path} C${controlX},${previousY} ${controlX},${y} ${x},${y}`;
+  }, "");
 
   return (
     <>
@@ -4568,7 +4595,7 @@ function PageFinanceRevenue() {
       <div style={{ background: C.card, borderRadius: 12, margin: "8px 10px 8px", padding: "10px 10px 8px", boxShadow: "var(--app-shadow-card)" }}>
         {/* 标题行 */}
         <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>近12个月收入毛利月度趋势</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: C.t1 }}>近12个月营业收入月度趋势</span>
           <span style={{ fontSize: 9, color: C.t3 }}>指标趋势分析为总部合并口径</span>
         </div>
 
@@ -4723,7 +4750,56 @@ function PageFinanceRevenue() {
         <div style={{ marginTop: 6, fontSize: 9, color: C.t3 }}>点击月份查看当月明细 · 左轴：金额（万元）· 右轴：毛利率（%）</div>
       </div>
 
-      <Footer text="总部合并口径 · 收入毛利月度趋势 · 2023-11~2024-10" />
+      <Card title="各企业营业收入与盈利趋势" tag="企业对比" className="finance-revenue-company-card">
+        <div className="finance-revenue-company-legend">
+          <span><i style={{ background: BLUE }} />营业收入</span>
+          <span><i style={{ background: LIGHT_BLUE }} />营业毛利</span>
+          <span><i className="is-line" style={{ background: GREEN }} />毛利率</span>
+          <span><i className="is-line" style={{ background: ORANGE }} />收入环比</span>
+        </div>
+        <div className="finance-revenue-company-axis"><span>万元</span><span>%</span></div>
+        <div className="finance-revenue-company-scroll">
+          <svg width={ECW} height={ECH} aria-label="各企业营业收入、营业毛利、毛利率和收入环比趋势">
+            {[0, 30000, 60000, 90000, 120000].map(value => <g key={value}>
+              <line x1={EPAD_L} y1={eToAmountY(value)} x2={ECW - EPAD_R} y2={eToAmountY(value)} stroke="#F0F0F0" strokeWidth="1" />
+              <text x={EPAD_L - 4} y={eToAmountY(value) + 3} textAnchor="end" fontSize="8" fill={C.t3}>{value === 0 ? "0" : `${value / 10000}w`}</text>
+            </g>)}
+            {[eRateMin, 0, 10, eRateMax].map(value => <text key={value} x={ECW - EPAD_R + 4} y={eToRateY(value) + 3} fontSize="8" fill={value < 0 ? C.danger : C.t3}>{value}%</text>)}
+            {companyRevenueData.map((item, index) => {
+              const x = eToX(index);
+              const active = companyTip === index;
+              const revenueHeight = ePlotH - (eToAmountY(item.revenue) - EPAD_T);
+              const profitHeight = ePlotH - (eToAmountY(item.profit) - EPAD_T);
+              return <g key={item.company}>
+                <rect x={x - 17} y={eToAmountY(item.revenue)} width="15" height={revenueHeight} rx="3" fill={BLUE} opacity={active ? 1 : .85} />
+                <rect x={x + 2} y={eToAmountY(item.profit)} width="15" height={profitHeight} rx="3" fill={LIGHT_BLUE} opacity={active ? 1 : .85} />
+                <rect x={x - eSlotW / 2} y={EPAD_T} width={eSlotW} height={ePlotH + EPAD_B} fill="transparent" role="button" tabIndex={0} aria-label={`${item.company}，营业收入${item.revenue}万元，营业毛利${item.profit}万元，毛利率${item.margin}%，收入环比${item.revenueMom}%`} onPointerEnter={event => { if (event.pointerType === "mouse") setCompanyTip(index); }} onPointerLeave={event => { if (event.pointerType === "mouse") setCompanyTip(null); }} onPointerDown={event => { if (event.pointerType !== "mouse") setCompanyTip(index); }} onClick={() => setCompanyTip(index)} onFocus={() => setCompanyTip(index)} onBlur={() => setCompanyTip(null)} />
+                <text x={x} y={ECH - 8} textAnchor="middle" fontSize="9" fill={C.t3}>{item.company}</text>
+              </g>;
+            })}
+            <path d={toSmoothPath(companyMarginPoints)} fill="none" stroke={GREEN} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d={toSmoothPath(companyMomPoints)} fill="none" stroke={ORANGE} strokeWidth="1.8" strokeDasharray="4 3" strokeLinecap="round" strokeLinejoin="round" />
+            {companyRevenueData.map((item, index) => <g key={`rate-${item.company}`}>
+              <circle cx={eToX(index)} cy={eToRateY(item.margin)} r={companyTip === index ? 4 : 2.6} fill="#fff" stroke={GREEN} strokeWidth="1.6" />
+              <circle cx={eToX(index)} cy={eToRateY(item.revenueMom)} r={companyTip === index ? 4 : 2.6} fill="#fff" stroke={ORANGE} strokeWidth="1.6" />
+            </g>)}
+          </svg>
+          {companyTip !== null && (() => {
+            const item = companyRevenueData[companyTip];
+            const left = Math.max(8, Math.min(eToX(companyTip) - 46, ECW - 152));
+            return <div className="finance-revenue-company-tooltip" style={{ left }}>
+              <strong>{item.company}</strong>
+              <span>营业收入 <b>{item.revenue.toLocaleString()}万</b></span>
+              <span>营业毛利 <b>{item.profit.toLocaleString()}万</b></span>
+              <span>毛利率 <b className="is-good">{item.margin}%</b></span>
+              <span>收入环比 <b className={item.revenueMom >= 0 ? "is-good" : "is-risk"}>{item.revenueMom >= 0 ? "+" : ""}{item.revenueMom}%</b></span>
+            </div>;
+          })()}
+        </div>
+        <div className="finance-revenue-company-note">点击或触摸企业查看四项经营指标 · 左轴：金额（万元）· 右轴：比率（%）</div>
+      </Card>
+
+      <Footer text="总部合并口径 · 营业收入趋势与企业经营对比 · 2023-11~2024-10" />
     </>
   );
 }

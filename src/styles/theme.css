@@ -2738,6 +2738,97 @@
   font-weight: 500;
 }
 
+.app-phone-screen .finance-revenue-company-card .app-card-body {
+  padding: 10px;
+}
+
+.app-phone-screen .finance-revenue-company-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  color: var(--app-text-secondary);
+  font-size: 9px;
+}
+
+.app-phone-screen .finance-revenue-company-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.app-phone-screen .finance-revenue-company-legend i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+
+.app-phone-screen .finance-revenue-company-legend i.is-line {
+  width: 13px;
+  height: 2px;
+  border-radius: 999px;
+}
+
+.app-phone-screen .finance-revenue-company-axis {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 27px 1px 30px;
+  color: var(--app-text-regular);
+  font-size: 9px;
+}
+
+.app-phone-screen .finance-revenue-company-scroll {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-phone-screen .finance-revenue-company-scroll::-webkit-scrollbar { display: none; }
+.app-phone-screen .finance-revenue-company-scroll svg { display: block; }
+
+.app-phone-screen .finance-revenue-company-tooltip {
+  position: absolute;
+  top: 18px;
+  z-index: 5;
+  display: grid;
+  width: 144px;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgb(31 51 72 / 96%);
+  color: #fff;
+  font-size: 9px;
+  pointer-events: none;
+  box-shadow: 0 5px 16px rgb(15 38 62 / 28%);
+}
+
+.app-phone-screen .finance-revenue-company-tooltip > strong {
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgb(255 255 255 / 14%);
+  font-size: 11px;
+}
+
+.app-phone-screen .finance-revenue-company-tooltip > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: rgb(255 255 255 / 68%);
+}
+
+.app-phone-screen .finance-revenue-company-tooltip b { color: #fff; }
+.app-phone-screen .finance-revenue-company-tooltip b.is-good { color: #6ee7b7; }
+.app-phone-screen .finance-revenue-company-tooltip b.is-risk { color: #fca5a5; }
+
+.app-phone-screen .finance-revenue-company-note {
+  margin-top: 5px;
+  color: var(--app-text-regular);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
 .home-freshness-sheet {
   position: absolute !important;
   right: 0 !important;
