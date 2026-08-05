@@ -5355,11 +5355,11 @@ function PageQuality() {
   const visibleQualityRows = (qualityView === "attention"
     ? qualityRows.filter(row => row.delta < 0).sort((a, b) => a.delta - b.delta)
     : qualityRows.sort((a, b) => b.actual - a.actual)).slice(0, qualityView === "attention" ? 6 : qualityRows.length);
+  const centralQcOverview = `${awardYear}年9月8日至11日，央企QC小组成果交流活动在广州举办。集团选送的2项模拟成果从多项参赛成果中脱颖而出，分别获得一等奖和二等奖。本次获奖集中体现了船舶绿色建造与精益质量改进成效，并形成可在相关企业推广的经验做法。`;
   const awardGroups: Array<{ key: "central" | "heavy" | "theme"; label: string; items: QualityActivity[] }> = [
     { key: "central" as const, label: "央企QC成果", items: [
-      { level: "一等奖", company: "大连重工", title: "船舶建造精度提升QC成果", summary: "优化关键工序质量控制方法", date: "2026年9月8日—11日", participants: "16家单位 · 126人", overview: "本次成果交流围绕船舶建造精度控制开展，通过优化分段测量、合拢定位和过程复核方法，形成一套可复制的关键工序质量控制方案。成果经现场评审后获得一等奖，并纳入集团质量改进案例库。" },
-      { level: "二等奖", company: "舟山重工", title: "焊接一次合格率提升成果", summary: "降低返修率并缩短检验周期", date: "2026年8月18日", participants: "9家单位 · 68人", overview: "项目聚焦重点船型焊接返修问题，对焊前确认、过程巡检和无损检测反馈进行闭环优化。试点工序一次合格率稳步提升，返修等待时间明显缩短。" },
-      { level: "三等奖", company: "扬州重工", title: "涂装质量过程改进成果", summary: "提升涂层质量稳定性", date: "2026年7月22日", participants: "7家单位 · 52人", overview: "活动针对涂装环境波动与膜厚一致性问题，统一环境确认、施工记录和抽检标准，提升了重点区域涂层质量的稳定性。" },
+      { level: "一等奖", company: "南通川崎", title: "甲醇双燃料船锅炉蒸发量提升方法", summary: "绿色船舶关键设备质量改进", date: `${awardYear}年9月8日—11日`, participants: "2项成果 · 代表16人", overview: centralQcOverview },
+      { level: "二等奖", company: "大连川崎", title: "LNG双燃料大型油船钢材重量优化", summary: "大型船舶轻量化质量改善", date: `${awardYear}年9月8日—11日`, participants: "2项成果 · 代表16人", overview: centralQcOverview },
     ]},
     { key: "heavy" as const, label: "重工QC评审", items: [
       { level: "特等奖", company: "启东海工", title: "海工装备质量风险前置管控", summary: "建立重点工序预警机制", date: "2026年9月16日", participants: "评审专家12人", overview: "围绕海工装备建造周期长、重点工序风险高的特点，建立风险分级、节点预警和责任闭环机制，实现质量问题由事后处置向事前预防转变。" },
@@ -5418,7 +5418,27 @@ function PageQuality() {
 
       <Sheet open={selectedQualityActivity !== null} onOpenChange={(open) => { if (!open) setSelectedQualityActivity(null); }}>
         <SheetContent side="bottom" className="quality-activity-sheet" container={qualitySheetContainer}>
-          {selectedQualityActivity && <>
+          {selectedQualityActivity && activeAwards.key === "central" ? <>
+            <SheetHeader className="quality-activity-sheet-head quality-qc-group-head">
+              <div className="quality-activity-sheet-kicker"><ClipboardList size={15} aria-hidden="true" /><span>成果下钻详情</span></div>
+              <SheetTitle>央企QC小组成果发表赛</SheetTitle>
+              <SheetDescription>{awardYear}年 · 共2项获奖成果</SheetDescription>
+            </SheetHeader>
+            <div className="quality-activity-sheet-body quality-qc-group-body">
+              <section className="quality-qc-award-table" aria-label="央企QC获奖成果">
+                <div className="quality-qc-award-head"><span>获奖等级</span><span>获奖企业</span><span>成果名称</span></div>
+                {activeAwards.items.map((item, index) => <div className="quality-qc-award-row" key={`${item.level}-${item.company}`}>
+                  <span className={`quality-award-rank is-${index + 1}`}>{item.level}</span>
+                  <strong>{item.company}</strong>
+                  <p>{item.title}</p>
+                </div>)}
+              </section>
+              <section className="quality-activity-overview quality-qc-shared-overview">
+                <h3><ClipboardList size={16} aria-hidden="true" />情况简述</h3>
+                <p>{centralQcOverview}</p>
+              </section>
+            </div>
+          </> : selectedQualityActivity && <>
             <SheetHeader className="quality-activity-sheet-head">
               <div className="quality-activity-sheet-kicker"><ClipboardList size={15} aria-hidden="true" /><span>活动下钻详情</span></div>
               <SheetTitle>{selectedQualityActivity.title}</SheetTitle>

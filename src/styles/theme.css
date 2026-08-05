@@ -7294,6 +7294,64 @@
     padding: 14px 18px 18px;
   }
 
+  .app-phone-screen .quality-qc-group-body { gap: 14px; }
+
+  .app-phone-screen .quality-qc-award-table {
+    overflow: hidden;
+    border: 1px solid var(--app-primary-100);
+    border-radius: 11px;
+    background: #fff;
+  }
+
+  .app-phone-screen .quality-qc-award-head,
+  .app-phone-screen .quality-qc-award-row {
+    display: grid;
+    grid-template-columns: 66px 72px minmax(0, 1fr);
+    align-items: center;
+    gap: 7px;
+    padding: 8px 10px;
+  }
+
+  .app-phone-screen .quality-qc-award-head {
+    background: var(--app-primary-100);
+    color: var(--app-text-secondary);
+    font-size: 10px;
+    font-weight: 650;
+  }
+
+  .app-phone-screen .quality-qc-award-row {
+    min-height: 62px;
+    color: var(--app-text-secondary);
+  }
+
+  .app-phone-screen .quality-qc-award-row + .quality-qc-award-row {
+    border-top: 1px solid var(--app-divider);
+    background: var(--app-fill-lighter);
+  }
+
+  .app-phone-screen .quality-qc-award-row .quality-award-rank {
+    min-width: 58px;
+    padding: 0 6px;
+  }
+
+  .app-phone-screen .quality-qc-award-row strong {
+    color: var(--app-text-primary);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .app-phone-screen .quality-qc-award-row p {
+    margin: 0;
+    color: var(--app-text-secondary);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .app-phone-screen .quality-qc-shared-overview {
+    border-color: var(--app-primary-200);
+    box-shadow: inset 0 3px 0 var(--app-primary-300);
+  }
+
   .app-phone-screen .quality-activity-meta {
     display: grid;
     grid-template-columns: 1fr 1fr;
