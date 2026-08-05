@@ -7131,10 +7131,26 @@
 
   .app-phone-screen .quality-award-item {
     display: grid;
+    width: 100%;
     min-height: 54px;
     grid-template-columns: 48px minmax(0, 1fr) 14px;
     align-items: center;
     gap: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .app-phone-screen .quality-award-item:active { background: var(--app-primary-soft); }
+  .app-phone-screen .quality-award-item:focus-visible {
+    position: relative;
+    z-index: 1;
+    outline: 2px solid var(--app-primary-300);
+    outline-offset: -2px;
   }
 
   .app-phone-screen .quality-awards-more {
@@ -7213,6 +7229,139 @@
   .app-phone-screen .quality-award-item > svg {
     color: var(--app-text-placeholder);
   }
+
+  .app-phone-screen .quality-activity-sheet {
+    position: absolute !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-width: 375px !important;
+    max-height: calc(100% - 52px);
+    gap: 0 !important;
+    transform: none !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid rgb(0 80 142 / 12%) !important;
+    border-radius: 20px 20px 0 0 !important;
+    background: linear-gradient(180deg, #fff 0%, #f6faff 100%) !important;
+    box-shadow: 0 -14px 36px rgb(18 58 99 / 20%) !important;
+  }
+
+  .app-phone-screen .quality-activity-sheet-head {
+    gap: 4px !important;
+    padding: 17px 48px 13px 18px !important;
+    border-bottom: 1px solid var(--app-divider);
+  }
+
+  .app-phone-screen .quality-activity-sheet-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--app-primary);
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .app-phone-screen .quality-activity-sheet-head [data-slot="sheet-title"] {
+    color: var(--app-text-primary);
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  .app-phone-screen .quality-activity-sheet-head [data-slot="sheet-description"] {
+    color: var(--app-text-secondary);
+    font-size: 11px;
+  }
+
+  .app-phone-screen .quality-activity-sheet [data-slot="sheet-close"] {
+    top: 15px !important;
+    right: 15px !important;
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    background: var(--app-fill-soft) !important;
+    color: var(--app-text-secondary);
+    opacity: 1 !important;
+  }
+
+  .app-phone-screen .quality-activity-sheet-body {
+    display: grid;
+    gap: 12px;
+    padding: 14px 18px 18px;
+  }
+
+  .app-phone-screen .quality-activity-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .app-phone-screen .quality-activity-meta > div {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid var(--app-primary-100);
+    border-radius: 9px;
+    background: var(--app-primary-soft);
+  }
+
+  .app-phone-screen .quality-activity-meta > div:first-child { grid-column: 1 / -1; }
+  .app-phone-screen .quality-activity-meta span {
+    color: var(--app-text-regular);
+    font-size: 10px;
+  }
+  .app-phone-screen .quality-activity-meta strong {
+    overflow-wrap: anywhere;
+    color: var(--app-primary-900);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .app-phone-screen .quality-activity-overview {
+    overflow: hidden;
+    border: 1px solid var(--app-primary-100);
+    border-radius: 11px;
+    background: #fff;
+  }
+
+  .app-phone-screen .quality-activity-overview h3 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 9px 11px;
+    border-bottom: 1px solid var(--app-divider);
+    background: linear-gradient(90deg, var(--app-primary-soft), #fff);
+    color: var(--app-text-primary);
+    font-size: 13px;
+  }
+
+  .app-phone-screen .quality-activity-overview h3 svg { color: var(--app-primary); }
+  .app-phone-screen .quality-activity-overview p {
+    margin: 0;
+    padding: 11px;
+    color: var(--app-text-secondary);
+    font-size: 12px;
+    line-height: 1.75;
+    text-align: justify;
+  }
+
+  .app-phone-screen .quality-activity-result {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 9px;
+    background: var(--app-success-soft);
+  }
+  .app-phone-screen .quality-activity-result span { color: var(--app-success); font-size: 10px; }
+  .app-phone-screen .quality-activity-result strong { color: var(--app-text-primary); font-size: 11px; }
 
   .biz-order-summary {
     display: grid;

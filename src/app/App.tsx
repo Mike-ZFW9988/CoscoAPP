@@ -5296,11 +5296,26 @@ function PagePurchaseGroupRate() {
 }
 
 function PageQuality() {
+  type QualityActivity = {
+    level: string;
+    company: string;
+    title: string;
+    summary: string;
+    date: string;
+    participants: string;
+    overview: string;
+  };
   const [activeMetric, setActiveMetric] = useState<"报验" | "RT">("RT");
   const [qualityView, setQualityView] = useState<"ranking" | "attention">("ranking");
   const [activeAwardGroup, setActiveAwardGroup] = useState<"central" | "heavy" | "theme">("central");
   const [awardYear, setAwardYear] = useState("2026");
   const [showAllQualityActivities, setShowAllQualityActivities] = useState(false);
+  const [selectedQualityActivity, setSelectedQualityActivity] = useState<QualityActivity | null>(null);
+  const [qualitySheetContainer, setQualitySheetContainer] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setQualitySheetContainer(document.querySelector<HTMLElement>(".app-phone-screen"));
+  }, []);
 
   const baoyansData = [
     ["南通川崎", "造船", "98.8%", "99.8%", "99.7%"],
@@ -5340,21 +5355,21 @@ function PageQuality() {
   const visibleQualityRows = (qualityView === "attention"
     ? qualityRows.filter(row => row.delta < 0).sort((a, b) => a.delta - b.delta)
     : qualityRows.sort((a, b) => b.actual - a.actual)).slice(0, qualityView === "attention" ? 6 : qualityRows.length);
-  const awardGroups = [
+  const awardGroups: Array<{ key: "central" | "heavy" | "theme"; label: string; items: QualityActivity[] }> = [
     { key: "central" as const, label: "央企QC成果", items: [
-      { level: "一等奖", company: "大连重工", title: "船舶建造精度提升QC成果", summary: "优化关键工序质量控制方法" },
-      { level: "二等奖", company: "舟山重工", title: "焊接一次合格率提升成果", summary: "降低返修率并缩短检验周期" },
-      { level: "三等奖", company: "扬州重工", title: "涂装质量过程改进成果", summary: "提升涂层质量稳定性" },
+      { level: "一等奖", company: "大连重工", title: "船舶建造精度提升QC成果", summary: "优化关键工序质量控制方法", date: "2026年9月8日—11日", participants: "16家单位 · 126人", overview: "本次成果交流围绕船舶建造精度控制开展，通过优化分段测量、合拢定位和过程复核方法，形成一套可复制的关键工序质量控制方案。成果经现场评审后获得一等奖，并纳入集团质量改进案例库。" },
+      { level: "二等奖", company: "舟山重工", title: "焊接一次合格率提升成果", summary: "降低返修率并缩短检验周期", date: "2026年8月18日", participants: "9家单位 · 68人", overview: "项目聚焦重点船型焊接返修问题，对焊前确认、过程巡检和无损检测反馈进行闭环优化。试点工序一次合格率稳步提升，返修等待时间明显缩短。" },
+      { level: "三等奖", company: "扬州重工", title: "涂装质量过程改进成果", summary: "提升涂层质量稳定性", date: "2026年7月22日", participants: "7家单位 · 52人", overview: "活动针对涂装环境波动与膜厚一致性问题，统一环境确认、施工记录和抽检标准，提升了重点区域涂层质量的稳定性。" },
     ]},
     { key: "heavy" as const, label: "重工QC评审", items: [
-      { level: "特等奖", company: "启东海工", title: "海工装备质量风险前置管控", summary: "建立重点工序预警机制" },
-      { level: "一等奖", company: "南通船务", title: "修船关键节点质量提升", summary: "提升重点项目交付质量" },
-      { level: "二等奖", company: "广东重工", title: "检测流程标准化改善", summary: "统一检验标准与闭环流程" },
+      { level: "特等奖", company: "启东海工", title: "海工装备质量风险前置管控", summary: "建立重点工序预警机制", date: "2026年9月16日", participants: "评审专家12人", overview: "围绕海工装备建造周期长、重点工序风险高的特点，建立风险分级、节点预警和责任闭环机制，实现质量问题由事后处置向事前预防转变。" },
+      { level: "一等奖", company: "南通船务", title: "修船关键节点质量提升", summary: "提升重点项目交付质量", date: "2026年8月26日", participants: "8个项目团队 · 74人", overview: "活动梳理修船进坞、坞修、试航和交付等关键节点的质量控制要求，明确跨专业确认清单，减少重复检验和交付阶段问题。" },
+      { level: "二等奖", company: "广东重工", title: "检测流程标准化改善", summary: "统一检验标准与闭环流程", date: "2026年7月15日", participants: "6个专业组 · 43人", overview: "通过统一报验资料、检测记录和问题关闭标准，建立从申请、检验到整改复验的完整闭环，提高检测协同效率。" },
     ]},
     { key: "theme" as const, label: "质量月活动", items: [
-      { level: "03月11–12", company: "大连重工", title: "QC 小组活动专题培训班", summary: "112人参与 · 报告待上传" },
-      { level: "03月10日", company: "上海环境 + 线上", title: "《碳达峰行动方案》编制工作部署会", summary: "69人参与 · 查看报告" },
-      { level: "03月13日", company: "能源公司", title: "能碳管理专题交流", summary: "10人参与 · 查看报告" },
+      { level: "03月11–12", company: "大连重工", title: "QC 小组活动专题培训班", summary: "112人参与 · 培训完成", date: "2026年3月11日—12日", participants: "112人", overview: "培训围绕QC课题选择、现状调查、原因分析和成果发表方法展开，通过案例讲解与分组演练，帮助基层质量骨干掌握规范的改进工具和成果表达方式。" },
+      { level: "03月10日", company: "上海环境 + 线上", title: "质量管理年度重点工作部署会", summary: "69人参与 · 形成任务清单", date: "2026年3月10日", participants: "现场及线上69人", overview: "会议部署年度质量管理重点任务，明确结构质量、报验一次合规率和重点项目质量风险管控要求，形成责任单位、完成时限和跟踪机制。" },
+      { level: "03月13日", company: "质量管理部", title: "质量风险管控专题交流", summary: "10人参与 · 完成经验交流", date: "2026年3月13日", participants: "10名质量负责人", overview: "专题交流聚焦重点项目质量风险识别与闭环管理，各单位分享典型案例和预防措施，并形成后续推广事项。" },
     ]},
   ];
   const activeAwards = awardGroups.find(group => group.key === activeAwardGroup) ?? awardGroups[0];
@@ -5392,14 +5407,38 @@ function PageQuality() {
           {awardGroups.map(group => <button key={group.key} type="button" role="tab" aria-selected={activeAwardGroup === group.key} className={activeAwardGroup === group.key ? "is-active" : ""} onClick={() => { setActiveAwardGroup(group.key); setShowAllQualityActivities(false); }}>{group.label}</button>)}
         </div>
         <div className="quality-awards-list">
-          {activeAwards.items.slice(0, showAllQualityActivities ? activeAwards.items.length : 2).map((item, index) => <div className="quality-award-item" key={`${activeAwards.key}-${item.level}-${item.company}`}>
+          {activeAwards.items.slice(0, showAllQualityActivities ? activeAwards.items.length : 2).map((item, index) => <button type="button" className="quality-award-item" key={`${activeAwards.key}-${item.level}-${item.company}`} onClick={() => setSelectedQualityActivity(item)} aria-label={`查看${item.title}详情`}>
             <span className={`quality-award-rank is-${index + 1}`}>{item.level}</span>
             <div className="quality-award-copy"><strong>{item.title}</strong><span>{item.company} · {item.summary}</span></div>
             <ChevronRight size={14} strokeWidth={2.2} aria-hidden="true" />
-          </div>)}
+          </button>)}
         </div>
         {activeAwards.items.length > 2 && <button type="button" className="quality-awards-more" onClick={() => setShowAllQualityActivities(value => !value)}>{showAllQualityActivities ? "收起" : "查看更多"}<ChevronRight size={13}/></button>}
       </Card>
+
+      <Sheet open={selectedQualityActivity !== null} onOpenChange={(open) => { if (!open) setSelectedQualityActivity(null); }}>
+        <SheetContent side="bottom" className="quality-activity-sheet" container={qualitySheetContainer}>
+          {selectedQualityActivity && <>
+            <SheetHeader className="quality-activity-sheet-head">
+              <div className="quality-activity-sheet-kicker"><ClipboardList size={15} aria-hidden="true" /><span>活动下钻详情</span></div>
+              <SheetTitle>{selectedQualityActivity.title}</SheetTitle>
+              <SheetDescription>{activeAwards.label} · {awardYear}年</SheetDescription>
+            </SheetHeader>
+            <div className="quality-activity-sheet-body">
+              <div className="quality-activity-meta">
+                <div><span>活动时间</span><strong>{selectedQualityActivity.date}</strong></div>
+                <div><span>组织单位</span><strong>{selectedQualityActivity.company}</strong></div>
+                <div><span>参与规模</span><strong>{selectedQualityActivity.participants}</strong></div>
+              </div>
+              <section className="quality-activity-overview">
+                <h3><ClipboardList size={16} aria-hidden="true" />情况简述</h3>
+                <p>{selectedQualityActivity.overview}</p>
+              </section>
+              <div className="quality-activity-result"><span>成果摘要</span><strong>{selectedQualityActivity.summary}</strong></div>
+            </div>
+          </>}
+        </SheetContent>
+      </Sheet>
 
       <Footer text="质量主题 · 一次合格率含造船/修船/海工分类口径" />
     </>
