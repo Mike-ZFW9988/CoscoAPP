@@ -10389,3 +10389,57 @@
   font-size: 11px;
   font-style: normal;
 }
+
+/* Finance · enterprise performance assessment */
+.app-phone-screen .finance-assessment-overview-card .app-card-body { padding-top: 8px; }
+.app-phone-screen .finance-assessment-segments { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 3px; padding: 3px; border: 1px solid var(--app-border); border-radius: 11px; background: var(--app-primary-soft); }
+.app-phone-screen .finance-assessment-segments button { min-height: 30px; border: 0; border-radius: 8px; background: transparent; color: var(--app-primary-900); font-size: 12px; font-weight: 650; }
+.app-phone-screen .finance-assessment-segments button.is-active { background: var(--app-primary); box-shadow: 0 2px 6px rgb(0 80 142/.18); color: #fff; }
+.app-phone-screen .finance-assessment-summary { display: grid; grid-template-columns: 1fr 1fr .88fr; margin-top: 9px; overflow: hidden; border: 1px solid var(--app-border-lighter); border-radius: 11px; background: linear-gradient(180deg,#f8fbff 0%,var(--app-primary-soft) 100%); }
+.app-phone-screen .finance-assessment-summary article { min-width: 0; padding: 10px 7px; text-align: center; }
+.app-phone-screen .finance-assessment-summary article + article { border-left: 1px solid var(--app-border); }
+.app-phone-screen .finance-assessment-summary span,.app-phone-screen .finance-assessment-summary small,.app-phone-screen .finance-assessment-summary em { display: block; }
+.app-phone-screen .finance-assessment-summary span { color: var(--app-text-regular); font-size: 10px; white-space: nowrap; }
+.app-phone-screen .finance-assessment-summary strong { display: block; margin-top: 3px; color: var(--app-primary-900); font-size: 20px; font-weight: 760; font-variant-numeric: tabular-nums; line-height: 25px; white-space: nowrap; }
+.app-phone-screen .finance-assessment-summary strong small { display: inline; margin-left: 2px; font-size: 10px; }
+.app-phone-screen .finance-assessment-summary article > small,.app-phone-screen .finance-assessment-summary em { overflow: hidden; margin-top: 2px; color: var(--app-text-secondary); font-size: 9px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
+.app-phone-screen .finance-assessment-summary .is-count em { color: var(--app-warning-900); }
+.app-phone-screen .finance-assessment-company-card header > em { justify-self: end; padding: 3px 6px; border-radius: 999px; font-size: 9px; font-weight: 650; white-space: nowrap; }
+.app-phone-screen .finance-assessment-company-card header > em.is-good { background: var(--app-success-soft); color: var(--app-success-900); }
+.app-phone-screen .finance-assessment-company-card header > em.is-watch { background: var(--app-danger-soft); color: var(--app-danger-900); }
+.app-phone-screen .finance-assessment-page { padding: 10px 10px 22px; }
+.app-phone-screen .finance-assessment-detail-head { display: flex; min-height: 54px; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 11px; border: 1px solid var(--app-border-lighter); border-radius: 13px; background: #fff; }
+.app-phone-screen .finance-assessment-detail-head > div,.app-phone-screen .finance-assessment-detail-head > div > span { display: flex; min-width: 0; }
+.app-phone-screen .finance-assessment-detail-head > div { align-items: center; gap: 8px; }
+.app-phone-screen .finance-assessment-detail-head svg { width: 25px; height: 25px; padding: 5px; border-radius: 8px; background: var(--app-primary-soft); color: var(--app-primary); }
+.app-phone-screen .finance-assessment-detail-head > div > span { flex-direction: column; }
+.app-phone-screen .finance-assessment-detail-head strong { color: var(--foreground); font-size: 15px; line-height: 20px; }
+.app-phone-screen .finance-assessment-detail-head small,.app-phone-screen .finance-assessment-detail-head em { color: var(--app-text-secondary); font-size: 10px; font-style: normal; white-space: nowrap; }
+.app-phone-screen .finance-assessment-detail-head em { padding: 4px 7px; border-radius: 999px; background: var(--app-primary-soft); color: var(--app-primary-900); font-weight: 650; }
+.app-phone-screen .finance-assessment-segments.is-detail { margin-top: 8px; }
+.app-phone-screen .finance-assessment-detail-summary { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); margin-top: 8px; overflow: hidden; border: 1px solid var(--app-border-lighter); border-radius: 13px; background: linear-gradient(180deg,#fff 0%,#f5f9ff 100%); }
+.app-phone-screen .finance-assessment-detail-summary article { min-width: 0; padding: 10px 5px; text-align: center; }
+.app-phone-screen .finance-assessment-detail-summary article + article { border-left: 1px solid var(--app-border); }
+.app-phone-screen .finance-assessment-detail-summary span,.app-phone-screen .finance-assessment-detail-summary article > small { display: block; overflow: hidden; color: var(--app-text-secondary); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.app-phone-screen .finance-assessment-detail-summary strong { display: block; margin: 3px 0 2px; color: var(--app-primary-900); font-size: 20px; font-variant-numeric: tabular-nums; line-height: 25px; }
+.app-phone-screen .finance-assessment-detail-summary strong small { color: var(--app-text-secondary); font-size: 9px; }
+.app-phone-screen .finance-assessment-legend { display: flex; justify-content: flex-end; gap: 12px; padding: 9px 2px 6px; color: var(--app-text-secondary); font-size: 10px; }
+.app-phone-screen .finance-assessment-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.app-phone-screen .finance-assessment-legend i { width: 7px; height: 7px; border-radius: 50%; }
+.app-phone-screen .finance-assessment-legend i.is-good { background: var(--app-success); }.app-phone-screen .finance-assessment-legend i.is-watch { background: var(--app-danger); }
+.app-phone-screen .finance-assessment-company-list { display: grid; gap: 8px; }
+.app-phone-screen .finance-assessment-company-card { padding: 11px; border: 1px solid var(--app-border-lighter); border-radius: 13px; background: #fff; box-shadow: 0 3px 10px rgb(0 80 142/.05); }
+.app-phone-screen .finance-assessment-company-card header { display: flex; min-height: 24px; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--app-border-extra-light); }
+.app-phone-screen .finance-assessment-company-card header > span { display: flex; min-width: 0; align-items: center; gap: 8px; }
+.app-phone-screen .finance-assessment-company-card header b { color: var(--app-primary); font-size: 11px; font-variant-numeric: tabular-nums; }
+.app-phone-screen .finance-assessment-company-card header strong { overflow: hidden; color: var(--foreground); font-size: 14px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.app-phone-screen .finance-assessment-metric { padding-top: 9px; }
+.app-phone-screen .finance-assessment-metric + .finance-assessment-metric { margin-top: 8px; border-top: 1px dashed var(--app-border); }
+.app-phone-screen .finance-assessment-metric-head,.app-phone-screen .finance-assessment-metric-value { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.app-phone-screen .finance-assessment-metric-head strong { color: var(--app-text-regular); font-size: 11px; font-weight: 650; }.app-phone-screen .finance-assessment-metric-head span { color: var(--app-text-secondary); font-size: 10px; font-variant-numeric: tabular-nums; }
+.app-phone-screen .finance-assessment-metric-value { justify-content: flex-start; margin-top: 3px; }.app-phone-screen .finance-assessment-metric-value b { color: var(--app-primary-900); font-size: 21px; font-weight: 760; font-variant-numeric: tabular-nums; line-height: 26px; }
+.app-phone-screen .finance-assessment-metric-value small { color: var(--app-text-secondary); font-size: 9px; }.app-phone-screen .finance-assessment-metric-value em { margin-left: auto; color: var(--app-primary-900); font-size: 13px; font-style: normal; font-weight: 720; font-variant-numeric: tabular-nums; }
+.app-phone-screen .finance-assessment-progress { position: relative; height: 7px; margin-top: 5px; overflow: hidden; border-radius: 999px; background: var(--app-primary-100); }
+.app-phone-screen .finance-assessment-progress i { display: block; height: 100%; border-radius: inherit; }.app-phone-screen .finance-assessment-progress i.is-good { background: linear-gradient(90deg,var(--app-success-900),var(--app-success)); }.app-phone-screen .finance-assessment-progress i.is-watch { background: linear-gradient(90deg,var(--app-danger-900),var(--app-danger)); }
+.app-phone-screen .finance-assessment-progress span { position: absolute; top: 0; width: 1px; height: 100%; background: rgb(255 255 255/.88); box-shadow: 0 0 0 1px rgb(0 52 95/.15); }
+.app-phone-screen .finance-assessment-note { margin-top: 9px; padding: 9px 10px; border-radius: 10px; background: var(--app-primary-soft); color: var(--app-text-regular); font-size: 10px; line-height: 16px; }

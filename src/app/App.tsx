@@ -103,6 +103,7 @@ const PAGES = [
   { id: "finance-fund",         label: "4  财务·可用资金" },
   { id: "finance-rate",         label: "4  财务·汇率" },
   { id: "finance-revenue",      label: "4  财务·营业收入" },
+  { id: "finance-assessment",   label: "4  财务·所属企业经营考核" },
   { id: "purchase-steel-dist",  label: "5  钢材·企业分布" },
   { id: "purchase-steel-delivery", label: "5  钢材·锁价交付" },
   { id: "purchase-steel-cost",     label: "5  钢材·成本预算" },
@@ -4268,6 +4269,70 @@ function PageProdShipTrack() {
   );
 }
 
+type FinanceAssessmentSegment = "造修企业" | "配套企业";
+
+type FinanceAssessmentCompany = {
+  id: string;
+  company: string;
+  segment: FinanceAssessmentSegment;
+  revenueTarget: number;
+  revenueActual: number;
+  profitTarget: number;
+  profitActual: number;
+};
+
+// 演示数据与后端字段一一对应；接入接口后仅需替换此数据源。
+const FINANCE_ASSESSMENT_DATA: FinanceAssessmentCompany[] = [
+  { id: "build-01", company: "上海重工", segment: "造修企业", revenueTarget: 126000, revenueActual: 82320, profitTarget: 9200, profitActual: 6164 },
+  { id: "build-02", company: "广东重工", segment: "造修企业", revenueTarget: 118000, revenueActual: 71980, profitTarget: 8600, profitActual: 5590 },
+  { id: "build-03", company: "扬州重工", segment: "造修企业", revenueTarget: 96000, revenueActual: 46940, profitTarget: 7100, profitActual: 3266 },
+  { id: "build-04", company: "舟山重工", segment: "造修企业", revenueTarget: 88000, revenueActual: 56320, profitTarget: 6800, profitActual: 3944 },
+  { id: "build-05", company: "南通川崎", segment: "造修企业", revenueTarget: 102000, revenueActual: 48960, profitTarget: 7800, profitActual: 3666 },
+  { id: "build-06", company: "南通船务", segment: "造修企业", revenueTarget: 84000, revenueActual: 53760, profitTarget: 6200, profitActual: 3596 },
+  { id: "build-07", company: "大连川崎", segment: "造修企业", revenueTarget: 110000, revenueActual: 52800, profitTarget: 8500, profitActual: 4165 },
+  { id: "build-08", company: "大连重工", segment: "造修企业", revenueTarget: 98000, revenueActual: 59780, profitTarget: 7300, profitActual: 3869 },
+  { id: "support-01", company: "南通配套", segment: "配套企业", revenueTarget: 46000, revenueActual: 29440, profitTarget: 3900, profitActual: 2535 },
+  { id: "support-02", company: "威海科技", segment: "配套企业", revenueTarget: 42000, revenueActual: 21840, profitTarget: 3500, profitActual: 1715 },
+  { id: "support-03", company: "大连装备", segment: "配套企业", revenueTarget: 38000, revenueActual: 22420, profitTarget: 3100, profitActual: 1767 },
+  { id: "support-04", company: "南京船配", segment: "配套企业", revenueTarget: 32000, revenueActual: 14560, profitTarget: 2600, profitActual: 1092 },
+];
+
+const FINANCE_ASSESSMENT_TIME_PROGRESS = 50;
+let financeAssessmentPreferredSegment: FinanceAssessmentSegment = "造修企业";
+const assessmentProgress = (actual: number, target: number) => target > 0 ? Math.round(actual / target * 1000) / 10 : 0;
+const assessmentStatus = (row: FinanceAssessmentCompany) =>
+  Math.min(assessmentProgress(row.revenueActual, row.revenueTarget), assessmentProgress(row.profitActual, row.profitTarget)) >= FINANCE_ASSESSMENT_TIME_PROGRESS;
+const formatAssessmentAmount = (value: number) => value.toLocaleString("zh-CN");
+
+function FinanceAssessmentOverviewCard() {
+  const [segment, setSegment] = useState<FinanceAssessmentSegment>("造修企业");
+  const rows = FINANCE_ASSESSMENT_DATA.filter(row => row.segment === segment);
+  const revenueTarget = rows.reduce((sum, row) => sum + row.revenueTarget, 0);
+  const revenueActual = rows.reduce((sum, row) => sum + row.revenueActual, 0);
+  const profitTarget = rows.reduce((sum, row) => sum + row.profitTarget, 0);
+  const profitActual = rows.reduce((sum, row) => sum + row.profitActual, 0);
+  const achievedCount = rows.filter(assessmentStatus).length;
+  const openAssessmentDetail = () => {
+    financeAssessmentPreferredSegment = segment;
+    nav("finance-assessment");
+  };
+
+  return (
+    <Card title="所属企业经营考核" tag="1-6月" extra="查看明细" onExtra={openAssessmentDetail} className="finance-assessment-overview-card">
+      <div className="finance-assessment-segments" aria-label="企业类型筛选">
+        {(["造修企业", "配套企业"] as FinanceAssessmentSegment[]).map(item => (
+          <button key={item} type="button" className={segment === item ? "is-active" : ""} aria-pressed={segment === item} onClick={() => setSegment(item)}>{item}</button>
+        ))}
+      </div>
+      <div className="finance-assessment-summary">
+        <article><span>收入达成率</span><strong>{assessmentProgress(revenueActual, revenueTarget)}%</strong><small>累计 {formatAssessmentAmount(revenueActual)}万</small></article>
+        <article><span>利润达成率</span><strong>{assessmentProgress(profitActual, profitTarget)}%</strong><small>累计 {formatAssessmentAmount(profitActual)}万</small></article>
+        <article className="is-count"><span>达时间进度</span><strong>{achievedCount}<small>家</small></strong><em>{rows.length - achievedCount}家待关注</em></article>
+      </div>
+    </Card>
+  );
+}
+
 function PageFinance() {
   return (
     <>
@@ -4346,6 +4411,8 @@ function PageFinance() {
           <div>同比<br /><b style={{ color: C.t1 }}>1.48%</b></div>
         </div>
       </Card>
+
+      <FinanceAssessmentOverviewCard />
 
       <Footer text="财务主题 · 总部合并口径 · 月更（久其到数）" />
     </>
@@ -5577,6 +5644,63 @@ function PageQualityRT() {
   );
 }
 
+function PageFinanceAssessment() {
+  const [segment, setSegment] = useState<FinanceAssessmentSegment>(financeAssessmentPreferredSegment);
+  const rows = FINANCE_ASSESSMENT_DATA.filter(row => row.segment === segment);
+  const revenueTarget = rows.reduce((sum, row) => sum + row.revenueTarget, 0);
+  const revenueActual = rows.reduce((sum, row) => sum + row.revenueActual, 0);
+  const profitTarget = rows.reduce((sum, row) => sum + row.profitTarget, 0);
+  const profitActual = rows.reduce((sum, row) => sum + row.profitActual, 0);
+  const achievedCount = rows.filter(assessmentStatus).length;
+
+  return (
+    <>
+      <StatusBar />
+      <NavBar title="所属企业经营考核" subtitle="财务·考核口径" backLabel="返回财务主题" backPage="finance" />
+      <BreadcrumbBar crumbs={["首页", "财务主题", "所属企业经营考核"]} period="1-6月累计" />
+      <section className="finance-assessment-page" aria-label="所属企业经营考核明细">
+        <div className="finance-assessment-detail-head">
+          <div><Landmark aria-hidden="true" /><span><strong>经营考核总览</strong><small>收入与利润双指标</small></span></div>
+          <em>时间进度 {FINANCE_ASSESSMENT_TIME_PROGRESS}%</em>
+        </div>
+        <div className="finance-assessment-segments is-detail" aria-label="企业类型筛选">
+          {(["造修企业", "配套企业"] as FinanceAssessmentSegment[]).map(item => (
+            <button key={item} type="button" className={segment === item ? "is-active" : ""} aria-pressed={segment === item} onClick={() => setSegment(item)}>{item}</button>
+          ))}
+        </div>
+        <div className="finance-assessment-detail-summary">
+          <article><span>收入达成率</span><strong>{assessmentProgress(revenueActual, revenueTarget)}%</strong><small>{formatAssessmentAmount(revenueActual)} / {formatAssessmentAmount(revenueTarget)} 万</small></article>
+          <article><span>利润达成率</span><strong>{assessmentProgress(profitActual, profitTarget)}%</strong><small>{formatAssessmentAmount(profitActual)} / {formatAssessmentAmount(profitTarget)} 万</small></article>
+          <article><span>企业状态</span><strong>{achievedCount}<small> / {rows.length}家</small></strong><small>达到时间进度</small></article>
+        </div>
+        <div className="finance-assessment-legend"><span><i className="is-good" />已达时间进度</span><span><i className="is-watch" />未达时间进度</span></div>
+        <div className="finance-assessment-company-list">
+          {rows.map((row, index) => {
+            const revenueRate = assessmentProgress(row.revenueActual, row.revenueTarget);
+            const profitRate = assessmentProgress(row.profitActual, row.profitTarget);
+            const achieved = assessmentStatus(row);
+            return <article className="finance-assessment-company-card" key={row.id}>
+              <header><span><b>{String(index + 1).padStart(2, "0")}</b><strong>{row.company}</strong></span><em className={achieved ? "is-good" : "is-watch"}>{achieved ? "达进度" : "待关注"}</em></header>
+              <div className="finance-assessment-metric">
+                <div className="finance-assessment-metric-head"><strong>营业收入</strong><span>目标 {formatAssessmentAmount(row.revenueTarget)}万</span></div>
+                <div className="finance-assessment-metric-value"><b>{formatAssessmentAmount(row.revenueActual)}</b><small>万元</small><em>{revenueRate}%</em></div>
+                <div className="finance-assessment-progress"><i className={revenueRate >= FINANCE_ASSESSMENT_TIME_PROGRESS ? "is-good" : "is-watch"} style={{ width: `${Math.min(revenueRate, 100)}%` }} /><span style={{ left: `${FINANCE_ASSESSMENT_TIME_PROGRESS}%` }} /></div>
+              </div>
+              <div className="finance-assessment-metric">
+                <div className="finance-assessment-metric-head"><strong>利润总额</strong><span>目标 {formatAssessmentAmount(row.profitTarget)}万</span></div>
+                <div className="finance-assessment-metric-value"><b>{formatAssessmentAmount(row.profitActual)}</b><small>万元</small><em>{profitRate}%</em></div>
+                <div className="finance-assessment-progress"><i className={profitRate >= FINANCE_ASSESSMENT_TIME_PROGRESS ? "is-good" : "is-watch"} style={{ width: `${Math.min(profitRate, 100)}%` }} /><span style={{ left: `${FINANCE_ASSESSMENT_TIME_PROGRESS}%` }} /></div>
+              </div>
+            </article>;
+          })}
+        </div>
+        <div className="finance-assessment-note">判定规则：收入进度与利润进度均达到当期时间进度，企业状态记为“达进度”；任一指标未达到则记为“待关注”。</div>
+      </section>
+      <Footer text="财务主题 · 所属企业经营考核 · 模拟数据" />
+    </>
+  );
+}
+
 function PageQualityInspection() {
   const rows = [
     ["南通川崎", "造船", "98.8%", "99.8%", "99.7%"],
@@ -5936,6 +6060,7 @@ function renderPage(id: string) {
     case "finance-fund":      return <PageFinanceFund />;
     case "finance-rate":      return <PageFinanceRate />;
     case "finance-revenue":   return <PageFinanceRevenue />;
+    case "finance-assessment": return <PageFinanceAssessment />;
     case "purchase-steel-dist": return <PagePurchaseSteelDist />;
     case "purchase-steel-delivery": return <PagePurchaseSteelDelivery />;
     case "purchase-steel-cost": return <PagePurchaseSteelCost />;
