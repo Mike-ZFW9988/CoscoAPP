@@ -89,6 +89,7 @@ const PAGES = [
   { id: "biz-progress",         label: "2  经营·本周进展" },
   { id: "biz-overdue",          label: "2  经营·逾期应收" },
   { id: "biz-collection-plan",  label: "2  经营·计划收款" },
+  { id: "biz-support-revenue-detail", label: "2  配套·营业收入分析" },
   { id: "biz-kpi-progress",     label: "2  经营·指标进度" },
   { id: "prod-repair",          label: "3  生产·修船主题" },
   { id: "prod-repair-ships",      label: "3  修船·在厂艘数" },
@@ -2058,7 +2059,7 @@ function BusinessValueMarginChart({
   );
 }
 
-function SupportRevenueAnalysis() {
+function SupportRevenueAnalysis({ detail = false }: { detail?: boolean } = {}) {
   const businessTypes = [
     { label: "设备", value: 24.8, percentage: 47, color: "#12B886" },
     { label: "工程", value: 15.2, percentage: 29, color: "#3B8FD9" },
@@ -2094,7 +2095,15 @@ function SupportRevenueAnalysis() {
         <article><span>本年接单金额</span><div><strong>52.80</strong><em>亿元</em></div><small>目标完成率 78.8%</small></article>
       </div>
 
-      <section className="biz-support-section" aria-label="接单业务类型分布">
+      {!detail && (
+        <div className="biz-support-overview-strip" aria-label="配套营业收入分析摘要">
+          <span>设备占比 <strong>47%</strong></span>
+          <span>完工节点 <strong>68项</strong></span>
+          <span>重点企业 <strong>3家</strong></span>
+        </div>
+      )}
+
+      {detail && <section className="biz-support-section" aria-label="接单业务类型分布">
         <header><strong>接单业务类型分布</strong><span>金额口径</span></header>
         <div className="biz-support-type-layout">
           <div className="biz-support-donut" style={{ background: donutBackground }} aria-label="接单金额52.80亿元">
@@ -2104,9 +2113,9 @@ function SupportRevenueAnalysis() {
             {businessTypes.map(item => <div key={item.label}><i style={{ background: item.color }} /><span>{item.label}</span><strong>{item.value.toFixed(1)}亿</strong><em>{item.percentage}%</em></div>)}
           </div>
         </div>
-      </section>
+      </section>}
 
-      <section className="biz-support-section" aria-label="项目节点完成情况">
+      {detail && <section className="biz-support-section" aria-label="项目节点完成情况">
         <header><strong>项目节点完成情况</strong><span>项目数 · 左右滑动</span></header>
         <div className="biz-support-stage-scroll">
           <div className="biz-support-stage-chart" style={{ "--support-stage-count": projectStages.length } as React.CSSProperties}>
@@ -2118,13 +2127,13 @@ function SupportRevenueAnalysis() {
           </div>
         </div>
         <div className="biz-support-stage-detail"><strong>{selectedStage.label}节点</strong><span>{selectedStage.value}项</span><em>占全部项目 {(selectedStage.value / projectStages[0].value * 100).toFixed(0)}%</em></div>
-      </section>
+      </section>}
 
-      <section className="biz-support-section biz-support-company-section" aria-label="重点企业项目节点明细">
+      {detail && <section className="biz-support-section biz-support-company-section" aria-label="重点企业项目节点明细">
         <header><strong>重点企业节点明细</strong><span>核心节点</span></header>
         <div className="biz-support-company-head"><span>企业</span><span>完工</span><span>结算</span><span>开票</span><span>关闭</span></div>
         {companyRows.map(row => <div className="biz-support-company-row" key={row.name}><strong>{row.name}</strong><span>{row.finish}</span><span>{row.settlement}</span><span>{row.invoice}</span><span>{row.close}</span></div>)}
-      </section>
+      </section>}
     </div>
   );
 }
@@ -2365,6 +2374,7 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
                         </button>
                       ))}
                     </div>}
+                    {bizTab === "配套" && <button type="button" data-testid="support-revenue-detail-entry" className="app-drilldown-link" onClick={() => nav("biz-support-revenue-detail")}>查看全部 <ChevronRight size={13} strokeWidth={2.3} /></button>}
                   </>
                 )}
               </div>
@@ -3135,6 +3145,21 @@ function PageBizCollectionPlan({ business }: { business: CollectionPlanBusiness 
         </div>
       </section>
       <Footer text={`${config.title} · ${business}经营口径 · 模拟数据`} />
+    </>
+  );
+}
+
+function PageBizSupportRevenueDetail() {
+  return (
+    <>
+      <StatusBar />
+      <NavBar title="配套营业收入分析" subtitle="配套·经营口径" backLabel="返回配套经营洞察" backPage="biz-support" />
+      <BreadcrumbBar crumbs={["首页", "经营主题", "配套营业收入分析"]} period="截至2026.07" />
+      <section className="biz-support-detail-page" aria-label="配套营业收入分析详情">
+        <div className="biz-support-detail-head"><CircleDollarSign aria-hidden="true" /><div><strong>配套营业收入分析</strong><span>接单结构、项目节点与重点企业完成情况</span></div></div>
+        <SupportRevenueAnalysis detail />
+      </section>
+      <Footer text="配套营业收入分析 · 配套经营口径 · 截至2026.07" />
     </>
   );
 }
@@ -5762,6 +5787,7 @@ function renderPage(id: string) {
     case "biz-collection-plan-repair": return <PageBizCollectionPlan business="修船" />;
     case "biz-collection-plan-shipbuilding": return <PageBizCollectionPlan business="造船" />;
     case "biz-collection-overdue-support": return <PageBizCollectionPlan business="配套" />;
+    case "biz-support-revenue-detail": return <PageBizSupportRevenueDetail />;
     case "biz-kpi-progress":  return <PageBizKpiProgress />;
     case "prod-repair":       return <PageProdRepair />;
     case "prod-repair-ships":      return <PageProdRepairShips />;
@@ -5801,12 +5827,17 @@ function nav(pageId: string) {
 /* ─── Root App ─── */
 export default function App() {
   const [activePage, setActivePage] = useState("home");
+  const pageScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handler = (e: Event) => setActivePage((e as CustomEvent<string>).detail);
     window.addEventListener("navigate", handler);
     return () => window.removeEventListener("navigate", handler);
   }, []);
+
+  useEffect(() => {
+    pageScrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, [activePage]);
 
   return (
     <div className="flex min-h-[100dvh]" style={{ fontFamily: "var(--font-ui, 'Noto Sans SC', 'PingFang SC', -apple-system, sans-serif)", background: "#1A2A3A" }}>
@@ -5854,7 +5885,7 @@ export default function App() {
             {/* Screen */}
             <div className="app-phone-screen w-[375px] h-[812px] rounded-[32px] overflow-hidden flex flex-col relative" style={{ background: "linear-gradient(180deg, #F8FBFF 0%, #F1F8FF 14%, #E8F3FC 34%, #EEF5FC 58%, #F4F8FC 100%)" }}>
               {/* Scrollable page content */}
-              <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
+              <div ref={pageScrollRef} className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
                 {renderPage(activePage)}
               </div>
             </div>

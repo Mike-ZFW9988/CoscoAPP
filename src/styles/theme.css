@@ -9109,6 +9109,57 @@
   font-size: 9px;
 }
 .app-phone-screen .biz-support-kpis small.is-up { color: var(--app-success); }
+.app-phone-screen .biz-support-overview-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--app-primary-soft), rgb(255 255 255 / 90%));
+  color: var(--app-text-secondary);
+  font-size: 9px;
+  text-align: center;
+}
+.app-phone-screen .biz-support-overview-strip span + span { border-left: 1px solid var(--app-divider); }
+.app-phone-screen .biz-support-overview-strip strong {
+  margin-left: 2px;
+  color: var(--app-primary-900);
+  font-size: 11px;
+}
+.app-phone-screen .biz-support-detail-page {
+  margin: 8px 8px 10px;
+  overflow: hidden;
+  border: 1px solid var(--app-primary-100);
+  border-radius: 13px;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+  box-shadow: 0 4px 12px rgb(20 76 128 / 7%);
+}
+.app-phone-screen .biz-support-detail-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid var(--app-divider);
+  background: linear-gradient(90deg, var(--app-primary-soft), #fff);
+}
+.app-phone-screen .biz-support-detail-head > svg {
+  width: 20px;
+  height: 20px;
+  padding: 3px;
+  border-radius: 7px;
+  background: #fff;
+  color: var(--app-primary-900);
+}
+.app-phone-screen .biz-support-detail-head > div { display: grid; gap: 2px; }
+.app-phone-screen .biz-support-detail-head strong { color: var(--app-text-primary); font-size: 14px; }
+.app-phone-screen .biz-support-detail-head span { color: var(--app-text-regular); font-size: 10px; }
+.app-phone-screen .biz-support-detail-page .biz-support-analysis { padding: 10px; }
+.app-phone-screen .biz-support-detail-page .biz-support-section > header strong { font-size: 13px; }
+.app-phone-screen .biz-support-detail-page .biz-support-section > header span { font-size: 10px; }
+.app-phone-screen .biz-support-detail-page .biz-support-company-head,
+.app-phone-screen .biz-support-detail-page .biz-support-company-row { min-height: 34px; }
+.app-phone-screen .biz-support-detail-page .biz-support-company-row,
+.app-phone-screen .biz-support-detail-page .biz-support-company-row strong { font-size: 11px; }
 .app-phone-screen .biz-support-section {
   overflow: hidden;
   border: 1px solid var(--app-primary-100);
