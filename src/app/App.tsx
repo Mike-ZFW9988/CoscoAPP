@@ -5716,7 +5716,6 @@ function PageEnergy() {
   type TrendMode = "total" | "intensity" | "carbon";
   const [seg, setSeg] = useState<Seg>("整体");
   const [trendMode, setTrendMode] = useState<TrendMode>("total");
-  const [rankView, setRankView] = useState<"ranking" | "attention">("ranking");
   const data: Record<Seg, { feeRatio:string; feeTarget:string; feeTrend:string; totalEnergy:string; perVal:string; perTarget:string; carbon:string; carbonTarget:string; ranking:[string,string,string,string][] }> = {
     整体:{ feeRatio:"2.08",feeTarget:"3.5",feeTrend:"同比 3.9%",totalEnergy:"13,526.83",perVal:"0.0345",perTarget:"0.0345",carbon:"0.48",carbonTarget:"0.45",ranking:[["1","威海重工科技","0.0028","+1"],["2","南通远洋配套","0.0069","+1"],["3","启东海工","0.0163","+1"],["4","南通船务","0.0191","+1"],["5","大连川崎","0.0195","+1"],["6","南通川崎","0.0225","+1"],["7","舟山重工","0.0237","+1"],["8","大连重工","0.0248","+1"],["9","扬州重工","0.0277","+1"],["10","广东重工","0.0438","+1"],["11","上海重工","0.0462","+1"],["12","南通重工装备","—",""],["13","大连迪施","—",""],["14","市一万度力","—",""]]},
     造船:{ feeRatio:"1.92",feeTarget:"3.2",feeTrend:"同比 2.8%",totalEnergy:"8,312.40",perVal:"0.0298",perTarget:"0.0310",carbon:"0.42",carbonTarget:"0.45",ranking:[["1","南通川崎","18,720","+2"],["2","大连川崎","19,340","-1"],["3","扬州重工","20,180","+1"],["4","大连重工","21,050","-1"],["5","舟山重工","22,610","+3"],["6","上海重工","24,390","-2"],["7","广东重工","25,810","-1"]]},
@@ -5740,7 +5739,7 @@ function PageEnergy() {
   const months=["9月","10月","11月","12月","1月","2月","3月","4月","5月","6月","7月","8月"];
   const target = trendMode === "intensity" ? Number(d.perTarget) : trendMode === "carbon" ? Number(d.carbonTarget) : null;
   const targetY = target === null ? null : y(Math.max(min,Math.min(max,target)));
-  const ranking = rankView === "attention" ? d.ranking.slice(Math.ceil(d.ranking.length/2)) : d.ranking;
+  const ranking = d.ranking;
   return <>
     <StatusBar/><NavBar title="能源主题" backLabel="返回首页" backPage="home"/><BreadcrumbBar crumbs={["首页","能源主题"]}/>
     <div className="energy-mode-shell"><EnergyModeTabs value={seg} onValueChange={setSeg}/>
@@ -5762,8 +5761,8 @@ function PageEnergy() {
       <div className="energy-trend-summary">本月{mode.label} <strong>{values.at(-1)?.toLocaleString()}</strong><span>，较上月 {values.at(-1)!>=values.at(-2)!?"上升":"下降"} {Math.abs((values.at(-1)!/values.at(-2)!-1)*100).toFixed(1)}%</span></div>
       <svg className="energy-line-chart" viewBox={`0 0 ${W} ${H}`}><defs><linearGradient id="energyArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#79BBFF" stopOpacity=".35"/><stop offset="100%" stopColor="#ECF5FF" stopOpacity=".04"/></linearGradient></defs>{[0,.5,1].map((ratio,i)=>{const gy=pT+ratio*(H-pT-pB);return <line key={i} x1={pL} y1={gy} x2={W-pR} y2={gy} stroke={C.divider}/>})}<polygon points={`${x(0)},${H-pB} ${points} ${x(values.length-1)},${H-pB}`} fill="url(#energyArea)"/><polyline points={points} fill="none" stroke={C.brand} strokeWidth="2.4"/>{targetY!==null&&<line x1={pL} y1={targetY} x2={W-pR} y2={targetY} stroke={C.success} strokeWidth="1.2" strokeDasharray="5 4"/>}{values.map((v,i)=><g key={i}><circle cx={x(i)} cy={y(v)} r={i===values.length-1||v===max?3.5:2} fill={C.brand}/>{(i===values.length-1||v===max)&&<text x={x(i)} y={y(v)-7} textAnchor="middle" className="energy-chart-value">{trendMode==="total"?v.toLocaleString():v.toFixed(trendMode==="intensity"?4:2)}</text>}{i%2===0&&<text x={x(i)} y={H-7} textAnchor="middle" className="energy-chart-axis">{months[i]}</text>}</g>)}</svg>
     </Card>
-    <Card title="年累计万元产值综合能耗排名" className="energy-ranking-card" extra={<div className="energy-rank-switch"><button type="button" className={rankView==="ranking"?"is-active":""} onClick={()=>setRankView("ranking")}>能耗排名</button><button type="button" className={rankView==="attention"?"is-active":""} onClick={()=>setRankView("attention")}>待改善</button></div>}>
-      <div className="energy-ranking-head"><span>排名</span><span>企业名称</span><span>年累计能耗</span><span>排名变化</span></div><div className="energy-ranking-list">{ranking.map((row,index)=>{const displayRank=rankView==="ranking"?Number(row[0]):index+1;return <div key={`${seg}-${row[1]}`}>{displayRank<=3?<EnergyRankMedal rank={displayRank as 1|2|3}/>:<span className="energy-rank-index">{String(displayRank).padStart(2,"0")}</span>}<strong>{row[1]}</strong><b className={row[2]==="—"?"is-empty":""}>{row[2]}</b><em className={!row[3]?"is-flat":row[3].startsWith("+")?"is-up":"is-down"}>{row[3]&&<>{row[3].replace(/[+-]/,"")}<span>{row[3].startsWith("+")?"▲":"▼"}</span></>}</em></div>})}</div>
+    <Card title="年累计万元产值综合能耗排名" className="energy-ranking-card">
+      <div className="energy-ranking-head"><span>排名</span><span>企业名称</span><span>年累计能耗</span><span>排名变化</span></div><div className="energy-ranking-list">{ranking.map(row=>{const displayRank=Number(row[0]);return <div key={`${seg}-${row[1]}`}>{displayRank<=3?<EnergyRankMedal rank={displayRank as 1|2|3}/>:<span className="energy-rank-index">{String(displayRank).padStart(2,"0")}</span>}<strong>{row[1]}</strong><b className={row[2]==="—"?"is-empty":""}>{row[2]}</b><em className={!row[3]?"is-flat":row[3].startsWith("+")?"is-up":"is-down"}>{row[3]&&<>{row[3].replace(/[+-]/,"")}<span>{row[3].startsWith("+")?"▲":"▼"}</span></>}</em></div>})}</div>
     </Card>
     <Footer text={`能源主题 · ${seg}口径 · 综合能耗/万元产值能耗`}/>
   </>;
