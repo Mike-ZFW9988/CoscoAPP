@@ -9466,6 +9466,31 @@
   gap: 10px;
   padding: 0 10px 11px;
 }
+.app-phone-screen .collection-plan-empty {
+  display: flex;
+  min-height: 132px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px dashed var(--app-border);
+  border-radius: 10px;
+  background: var(--app-primary-soft);
+  color: var(--app-text-secondary);
+  text-align: center;
+}
+.app-phone-screen .collection-plan-empty svg {
+  width: 22px;
+  height: 22px;
+  color: var(--app-primary);
+}
+.app-phone-screen .collection-plan-empty strong {
+  color: var(--app-text-primary);
+  font-size: 14px;
+}
+.app-phone-screen .collection-plan-empty span {
+  font-size: 11px;
+}
 .app-phone-screen .collection-plan-project {
   padding: 12px;
   border: 1px solid rgb(0 80 142 / 9%);
