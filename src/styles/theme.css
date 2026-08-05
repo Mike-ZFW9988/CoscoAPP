@@ -8686,6 +8686,30 @@
   font-style: normal;
   white-space: nowrap;
 }
+.app-phone-screen .biz-market-scroll-actions {
+  display: inline-flex !important;
+  gap: 3px !important;
+}
+.app-phone-screen .biz-market-scroll-actions button {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--app-primary-200);
+  border-radius: 6px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary-900);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.app-phone-screen .biz-market-scroll-actions button:active {
+  background: var(--app-primary-100);
+  transform: translateY(1px);
+}
 .app-phone-screen .biz-market-chart-shell {
   position: relative;
   height: 144px;
@@ -8719,18 +8743,34 @@
   margin-left: 27px;
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
+  cursor: grab;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   mask-image: linear-gradient(90deg, #000 0%, #000 91%, transparent 100%);
+}
+.app-phone-screen .biz-market-scroll.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
 }
 .app-phone-screen .biz-market-scroll::-webkit-scrollbar { display: none; }
 .app-phone-screen .biz-market-grid {
   display: grid;
   width: max-content;
+  min-width: 100%;
   height: 100%;
-  grid-template-columns: repeat(8, 68px);
+  grid-template-columns: repeat(var(--market-column-count, 8), minmax(72px, 72px));
   background: repeating-linear-gradient(to bottom, transparent 0 35px, var(--app-divider) 35px 36px);
+}
+.app-phone-screen .biz-market-empty {
+  display: grid;
+  height: 116px;
+  place-items: center;
+  color: var(--app-text-regular);
+  font-size: 10px;
 }
 .app-phone-screen .biz-market-column {
   display: grid;

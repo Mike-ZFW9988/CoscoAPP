@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PageDesignTokens, PageAtomicComponents, PageDashboardComponents, PageStateCoverage } from "./DesignSystemPages";
 import { cn } from "./components/ui/utils";
 import { Button } from "./components/ui/button";
@@ -1975,7 +1975,12 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
   const [bizTab, setBizTab] = useState<BizInsightTab>(initialTab);
   const [trendTab, setTrendTab] = useState<"月度趋势" | "区域分布">("月度趋势");
   const [repairChartTooltipIndex, setRepairChartTooltipIndex] = useState<number | null>(null);
+  const [shipbuildingChartTooltipIndex, setShipbuildingChartTooltipIndex] = useState<number | null>(null);
   const [selectedMarketRegion, setSelectedMarketRegion] = useState(0);
+  const [isMarketDragging, setIsMarketDragging] = useState(false);
+  const marketScrollRef = useRef<HTMLDivElement | null>(null);
+  const marketDragRef = useRef({ active: false, startX: 0, startScrollLeft: 0, moved: false });
+  const marketSuppressClickRef = useRef(false);
   const [showDonut, setShowDonut] = useState(false);
   const [includeKawasaki, setIncludeKawasaki] = useState(false);
   const repairChartData = [
@@ -1984,6 +1989,14 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
     { x: 166, label: "舟山重工", actual: 380, target: 780,  marginRate: 82 },
     { x: 228, label: "上海重工", actual: 430, target: 1280, marginRate: 43 },
     { x: 290, label: "广东重工", actual: 280, target: 1250, marginRate: 76 },
+  ];
+  const shipbuildingChartData = [
+    { x: 44, label: "南通川崎", actual: 470, target: 750, marginRate: 82 },
+    { x: 92, label: "大连川崎", actual: 450, target: 750, marginRate: 70 },
+    { x: 140, label: "扬州重工", actual: 360, target: 780, marginRate: 88 },
+    { x: 188, label: "大连重工", actual: 280, target: 1280, marginRate: 64 },
+    { x: 236, label: "舟山重工", actual: 420, target: 1250, marginRate: 72 },
+    { x: 284, label: "广东重工", actual: 325, target: 1250, marginRate: 80 },
   ];
   const marketRegions = [
     { short: "希腊区", full: "希腊区", target: 9.5, actual: 11.2 },
@@ -1997,7 +2010,42 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
   ];
   const marketTargetTotal = marketRegions.reduce((sum, item) => sum + item.target, 0);
   const marketActualTotal = marketRegions.reduce((sum, item) => sum + item.actual, 0);
-  const selectedMarket = marketRegions[selectedMarketRegion];
+  const marketAxisMax = Math.max(10, Math.ceil(Math.max(...marketRegions.flatMap(item => [item.target, item.actual]), 0) / 10) * 10);
+  const marketAxisTicks = [marketAxisMax, marketAxisMax * 2 / 3, marketAxisMax / 3, 0];
+  const emptyMarketRegion = { short: "暂无", full: "暂无区域数据", target: 0, actual: 0 };
+  const highestMarketRegion = marketRegions.reduce((highest, item) => item.actual > highest.actual ? item : highest, marketRegions[0] ?? emptyMarketRegion);
+  const safeSelectedMarketRegion = Math.min(selectedMarketRegion, Math.max(0, marketRegions.length - 1));
+  const selectedMarket = marketRegions[safeSelectedMarketRegion] ?? emptyMarketRegion;
+  const scrollMarketRegions = (direction: -1 | 1) => {
+    marketScrollRef.current?.scrollBy({ left: direction * 176, behavior: "smooth" });
+  };
+  const handleMarketPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "mouse" || event.button !== 0) return;
+    marketDragRef.current = {
+      active: true,
+      startX: event.clientX,
+      startScrollLeft: event.currentTarget.scrollLeft,
+      moved: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setIsMarketDragging(true);
+  };
+  const handleMarketPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = marketDragRef.current;
+    if (!drag.active) return;
+    const distance = event.clientX - drag.startX;
+    if (Math.abs(distance) > 4) drag.moved = true;
+    event.currentTarget.scrollLeft = drag.startScrollLeft - distance;
+  };
+  const finishMarketPointerDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!marketDragRef.current.active) return;
+    marketSuppressClickRef.current = marketDragRef.current.moved;
+    marketDragRef.current.active = false;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setIsMarketDragging(false);
+  };
   const orderOverview = includeKawasaki
     ? {
         summary: { target: "720.00", actual: "214.70", rate: "29.82" },
@@ -2133,15 +2181,15 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
 
             {/* ── 趋势分析区 ── */}
             <div style={{ borderTop: `1px solid ${C.divider}`, margin: "9px 0 0" }}>
-              <div style={{ padding: bizTab === "修船" ? "10px 10px 0" : 0, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                {bizTab === "修船" && (
+              <div style={{ padding: bizTab === "修船" || bizTab === "造船" ? "10px 10px 0" : 0, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                {(bizTab === "修船" || bizTab === "造船") && (
                   <>
                     <div style={{ display: "flex", minWidth: 0, alignItems: "center" }}>
                       <span style={{ overflow: "hidden", color: C.t1, fontSize: 13, fontWeight: 700, lineHeight: 1, textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {trendTab === "区域分布" ? "产值市场区域分布" : "修理改装产值及边贡"}
+                        {bizTab === "造船" ? "船舶建造产值及边贡" : trendTab === "区域分布" ? "产值市场区域分布" : "修理改装产值及边贡"}
                       </span>
                     </div>
-                    <div className="app-unified-segmented biz-insight-segmented biz-market-segmented" role="tablist" aria-label="经营数据视图切换">
+                    {bizTab === "修船" && <div className="app-unified-segmented biz-insight-segmented biz-market-segmented" role="tablist" aria-label="经营数据视图切换">
                       {[
                         { value: "月度趋势", label: "企业" },
                         { value: "区域分布", label: "市场区域" },
@@ -2154,7 +2202,7 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
                           <span style={{ fontSize: 10, fontWeight: 600, color: trendTab === tab.value ? "#fff" : C.brand }}>{tab.label}</span>
                         </button>
                       ))}
-                    </div>
+                    </div>}
                   </>
                 )}
               </div>
@@ -2318,10 +2366,6 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
               {/* 造船：产值及边贡组合图 */}
               {bizTab === "造船" && (
                 <div style={{ padding: "10px 10px 14px" }}>
-                  <div style={{ display: "flex", alignItems: "center", marginBottom: 10 }}>
-                    <span style={{ color: C.t1, fontSize: 13, fontWeight: 700, lineHeight: 1 }}>船舶建造产值及边贡</span>
-                  </div>
-
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 10 }}>
                     {[
                       { label: "总产值", value: "67.41", unit: "万元" },
@@ -2341,7 +2385,7 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
                       实际产值
                     </span>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: C.t2, fontSize: 10 }}>
-                      <i style={{ width: 9, height: 9, borderRadius: 2, background: "#CDD6E2", display: "inline-block" }} />
+                      <i style={{ width: 9, height: 9, border: "1px solid #7897B2", borderRadius: 2, background: "#AFC4D6", display: "inline-block" }} />
                       目标产值
                     </span>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: C.t2, fontSize: 10 }}>
@@ -2361,44 +2405,49 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
                         <stop offset="100%" stopColor={C.brand} />
                       </linearGradient>
                       <linearGradient id="shipbuildingTargetBar" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#DDE5EE" />
-                        <stop offset="100%" stopColor="#C9D4DF" />
+                        <stop offset="0%" stopColor="#B9CDDE" />
+                        <stop offset="100%" stopColor="#91AAC0" />
                       </linearGradient>
+                      <filter id="shipbuildingTooltipShadow" x="-20%" y="-20%" width="140%" height="150%">
+                        <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#10263A" floodOpacity="0.24" />
+                      </filter>
                     </defs>
 
-                    <text x="0" y="16" fontSize="10" fill={C.t3}>万元</text>
-                    <text x="309" y="16" fontSize="10" fill={C.t3}>%</text>
+                    <text x="4" y="16" fontSize="10" fill={C.t3}>万元</text>
+                    <text x="300" y="16" fontSize="10" fill={C.t3}>%</text>
                     {[0, 1, 2, 3, 4].map(i => {
                       const y = 34 + i * 32;
                       const left = 800 - i * 200;
                       const right = 100 - i * 20;
                       return (
                         <g key={i}>
-                          <line x1="24" y1={y} x2="292" y2={y} stroke={C.divider} strokeWidth="0.8" />
-                          <text x="17" y={y + 4} textAnchor="end" fontSize="10" fill={C.t3}>{left}</text>
-                          <text x="304" y={y + 4} fontSize="10" fill={C.t3}>{right}</text>
+                          <line x1="28" y1={y} x2="288" y2={y} stroke={C.divider} strokeWidth="0.8" />
+                          <text x="22" y={y + 4} textAnchor="end" fontSize="10" fill={C.t3}>{left}</text>
+                          <text x="294" y={y + 4} fontSize="10" fill={C.t3}>{right}</text>
                         </g>
                       );
                     })}
 
-                    <path d="M38 62 C55 36 67 37 84 72 C100 101 118 38 146 44 C171 49 185 78 200 95 C221 120 236 102 252 85 C268 69 282 95 296 74 L296 162 L38 162 Z" fill="url(#shipbuildingMarginArea)" />
-                    <path d="M38 62 C55 36 67 37 84 72 C100 101 118 38 146 44 C171 49 185 78 200 95 C221 120 236 102 252 85 C268 69 282 95 296 74" fill="none" stroke={C.success} strokeWidth="2" strokeLinecap="round" />
-
-                    {[
-                      { x: 44, label: "南通川崎", actual: 470, target: 750, mark: "750" },
-                      { x: 92, label: "大连川崎", actual: 450, target: 750, mark: "750" },
-                      { x: 140, label: "扬州重工", actual: 360, target: 780, mark: "780" },
-                      { x: 188, label: "大连重工", actual: 280, target: 1280, mark: "1280" },
-                      { x: 236, label: "舟山重工", actual: 420, target: 1250, mark: "1250" },
-                      { x: 284, label: "广东重工", actual: 325, target: 1250, mark: "1250" },
-                    ].map(item => {
+                    {shipbuildingChartData.map(item => {
                       const targetH = Math.max(34, Math.min(116, item.target / 1250 * 116));
                       const actualH = Math.max(30, Math.min(110, item.actual / 800 * 110));
                       return (
                         <g key={item.label}>
-                          <rect x={item.x - 7} y={162 - targetH} width="14" height={targetH} rx="7" fill="url(#shipbuildingTargetBar)" />
+                          <rect x={item.x - 7} y={162 - targetH} width="14" height={targetH} rx="7" fill="url(#shipbuildingTargetBar)" stroke="#7897B2" strokeWidth="0.9" />
                           <rect x={item.x - 7} y={162 - actualH} width="14" height={actualH} rx="7" fill="url(#shipbuildingActualBar)" />
-                          <text x={item.x} y={154 - targetH} textAnchor="middle" fontSize="10" fill={C.t2}>{item.mark}</text>
+                        </g>
+                      );
+                    })}
+
+                    {/* 与修船图一致：面积与趋势线覆盖在柱体之上。 */}
+                    <path d="M44 62 C58 36 72 37 92 72 C107 101 121 38 140 44 C160 49 176 78 188 95 C207 120 221 102 236 85 C252 69 270 95 284 74 L284 162 L44 162 Z" fill="url(#shipbuildingMarginArea)" pointerEvents="none" />
+                    <path d="M44 62 C58 36 72 37 92 72 C107 101 121 38 140 44 C160 49 176 78 188 95 C207 120 221 102 236 85 C252 69 270 95 284 74" fill="none" stroke={C.success} strokeWidth="2.2" strokeLinecap="round" pointerEvents="none" />
+
+                    {shipbuildingChartData.map(item => {
+                      const targetH = Math.max(34, Math.min(116, item.target / 1250 * 116));
+                      return (
+                        <g key={`${item.label}-labels`} pointerEvents="none">
+                          <text x={item.x} y={154 - targetH} textAnchor="middle" fontSize="10" fill={C.t2}>{item.target}</text>
                           <text x={item.x} y="184" textAnchor="middle" fontSize="10" fill={C.t2}>{item.label}</text>
                         </g>
                       );
@@ -2407,6 +2456,64 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
                     <text x="17" y="166" textAnchor="end" fontSize="10" fill={C.t3}>0</text>
                     <text x="304" y="166" fontSize="10" fill={C.t3}>20</text>
                     <line x1="24" y1="162" x2="292" y2="162" stroke={C.divider} strokeWidth="0.8" />
+
+                    {shipbuildingChartData.map((item, index) => (
+                      <rect
+                        key={`${item.label}-touch`}
+                        x={Math.max(24, item.x - 23)}
+                        y="26"
+                        width={item.x === 284 ? 31 : 46}
+                        height="166"
+                        fill="transparent"
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${item.label}，实际产值${item.actual}万元，目标产值${item.target}万元，预计边贡率${item.marginRate}%`}
+                        style={{ cursor: "pointer", outline: "none", touchAction: "pan-y" }}
+                        onPointerEnter={(event) => {
+                          if (event.pointerType === "mouse") setShipbuildingChartTooltipIndex(index);
+                        }}
+                        onPointerLeave={(event) => {
+                          if (event.pointerType === "mouse") setShipbuildingChartTooltipIndex(null);
+                        }}
+                        onPointerDown={(event) => {
+                          if (event.pointerType !== "mouse") setShipbuildingChartTooltipIndex(index);
+                        }}
+                        onClick={() => setShipbuildingChartTooltipIndex(index)}
+                        onFocus={() => setShipbuildingChartTooltipIndex(index)}
+                        onBlur={() => setShipbuildingChartTooltipIndex(null)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setShipbuildingChartTooltipIndex(index);
+                          }
+                        }}
+                      />
+                    ))}
+
+                    {shipbuildingChartTooltipIndex !== null && (() => {
+                      const item = shipbuildingChartData[shipbuildingChartTooltipIndex];
+                      const tooltipX = Math.max(6, Math.min(186, item.x - 62));
+                      const marginY = 162 - ((item.marginRate - 20) / 80) * 128;
+                      return (
+                        <g pointerEvents="none">
+                          <line x1={item.x} y1="28" x2={item.x} y2="162" stroke="#7897B2" strokeWidth="1" strokeDasharray="3 3" opacity="0.72" />
+                          <circle cx={item.x} cy={marginY} r="4" fill="#FFFFFF" stroke={C.success} strokeWidth="2" />
+                          <g filter="url(#shipbuildingTooltipShadow)">
+                            <rect x={tooltipX} y="28" width="128" height="76" rx="7" fill="#26384A" fillOpacity="0.97" />
+                            <text x={tooltipX + 10} y="44" fontSize="10" fontWeight="700" fill="#FFFFFF">{item.label}</text>
+                            <circle cx={tooltipX + 11} cy="57" r="3" fill={C.brand} />
+                            <text x={tooltipX + 19} y="60" fontSize="9" fill="#DCE8F2">实际产值</text>
+                            <text x={tooltipX + 118} y="60" textAnchor="end" fontSize="9" fontWeight="700" fill="#FFFFFF">{item.actual} 万元</text>
+                            <circle cx={tooltipX + 11} cy="73" r="3" fill="#AFC4D6" stroke="#7897B2" strokeWidth="0.8" />
+                            <text x={tooltipX + 19} y="76" fontSize="9" fill="#DCE8F2">目标产值</text>
+                            <text x={tooltipX + 118} y="76" textAnchor="end" fontSize="9" fontWeight="700" fill="#FFFFFF">{item.target} 万元</text>
+                            <line x1={tooltipX + 8} y1="89" x2={tooltipX + 14} y2="89" stroke={C.success} strokeWidth="2" strokeLinecap="round" />
+                            <text x={tooltipX + 19} y="92" fontSize="9" fill="#DCE8F2">预计边贡率</text>
+                            <text x={tooltipX + 118} y="92" textAnchor="end" fontSize="9" fontWeight="700" fill="#FFFFFF">{item.marginRate}%</text>
+                          </g>
+                        </g>
+                      );
+                    })()}
                   </svg>
                 </div>
               )}
@@ -2444,31 +2551,54 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
                 <div className="biz-market-panel">
                   <div className="biz-market-summary">
                     <span>实际金额 <strong>{marketActualTotal.toFixed(1)}</strong><small>亿</small></span>
-                    <span>达成率 <strong>{(marketActualTotal / marketTargetTotal * 100).toFixed(0)}</strong><small>%</small></span>
-                    <span>最高区域 <strong>中国北方</strong></span>
+                    <span>达成率 <strong>{marketTargetTotal > 0 ? (marketActualTotal / marketTargetTotal * 100).toFixed(0) : "—"}</strong><small>%</small></span>
+                    <span>最高区域 <strong>{highestMarketRegion.short}</strong></span>
                   </div>
                   <div className="biz-market-legend">
                     <span><i className="is-actual" />实际金额</span>
                     <span><i className="is-target" />目标金额</span>
-                    <em>左右滑动查看更多</em>
+                    <em>左右滑动或拖拽</em>
+                    <span className="biz-market-scroll-actions" aria-label="区域图横向浏览">
+                      <button type="button" onClick={() => scrollMarketRegions(-1)} aria-label="向左查看区域">‹</button>
+                      <button type="button" onClick={() => scrollMarketRegions(1)} aria-label="向右查看区域">›</button>
+                    </span>
                   </div>
                   <div className="biz-market-chart-shell">
                     <div className="biz-market-axis" aria-hidden="true">
-                      <span>30</span><span>20</span><span>10</span><span>0</span>
+                      {marketAxisTicks.map((tick, index) => <span key={index}>{Number.isInteger(tick) ? tick : tick.toFixed(1)}</span>)}
                       <small>亿元</small>
                     </div>
-                    <div className="biz-market-scroll">
-                      <div className="biz-market-grid">
+                    <div
+                      ref={marketScrollRef}
+                      className={`biz-market-scroll ${isMarketDragging ? "is-dragging" : ""}`}
+                      onPointerDown={handleMarketPointerDown}
+                      onPointerMove={handleMarketPointerMove}
+                      onPointerUp={finishMarketPointerDrag}
+                      onPointerCancel={finishMarketPointerDrag}
+                      onWheel={(event) => {
+                        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+                        event.currentTarget.scrollLeft += event.deltaY;
+                        event.preventDefault();
+                      }}
+                    >
+                      <div className="biz-market-grid" style={{ "--market-column-count": Math.max(marketRegions.length, 1) } as React.CSSProperties}>
+                        {marketRegions.length === 0 && <div className="biz-market-empty">暂无市场区域数据</div>}
                         {marketRegions.map((item, index) => {
-                          const actualHeight = Math.max(10, item.actual / 30 * 100);
-                          const targetPosition = Math.max(8, item.target / 30 * 100);
+                          const actualHeight = Math.max(10, item.actual / marketAxisMax * 100);
+                          const targetPosition = Math.max(8, item.target / marketAxisMax * 100);
                           const achieved = item.actual >= item.target;
                           return (
                             <button
                               type="button"
-                              className={`biz-market-column ${selectedMarketRegion === index ? "is-selected" : ""}`}
+                              className={`biz-market-column ${safeSelectedMarketRegion === index ? "is-selected" : ""}`}
                               key={item.full}
-                              onClick={() => setSelectedMarketRegion(index)}
+                              onClick={() => {
+                                if (marketSuppressClickRef.current) {
+                                  marketSuppressClickRef.current = false;
+                                  return;
+                                }
+                                setSelectedMarketRegion(index);
+                              }}
                               aria-label={`${item.full}，目标${item.target}亿元，实际${item.actual}亿元`}
                             >
                               <span className="biz-market-plot">
@@ -2484,12 +2614,12 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
                       </div>
                     </div>
                   </div>
-                  <div className={`biz-market-detail ${selectedMarket.actual >= selectedMarket.target ? "is-achieved" : "is-behind"}`}>
+                  {marketRegions.length > 0 && <div className={`biz-market-detail ${selectedMarket.actual >= selectedMarket.target ? "is-achieved" : "is-behind"}`}>
                     <strong>{selectedMarket.full}</strong>
                     <span>目标 {selectedMarket.target.toFixed(1)}亿</span>
                     <span>实际 {selectedMarket.actual.toFixed(1)}亿</span>
                     <em>{selectedMarket.actual >= selectedMarket.target ? "超目标" : "距目标"} {Math.abs(selectedMarket.actual - selectedMarket.target).toFixed(1)}亿</em>
-                  </div>
+                  </div>}
                 </div>
               )}
 
