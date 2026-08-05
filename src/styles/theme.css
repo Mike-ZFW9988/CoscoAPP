@@ -2742,6 +2742,12 @@
   padding: 10px;
 }
 
+.app-phone-screen .finance-revenue-company-card .app-card-title {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 19.5px !important;
+}
+
 .app-phone-screen .finance-revenue-company-legend {
   display: flex;
   flex-wrap: wrap;
@@ -2782,11 +2788,22 @@
   position: relative;
   overflow-x: auto;
   overflow-y: hidden;
-  scrollbar-width: none;
+  padding-bottom: 4px;
+  scrollbar-color: var(--app-text-placeholder) var(--app-fill-soft);
+  scrollbar-width: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-.app-phone-screen .finance-revenue-company-scroll::-webkit-scrollbar { display: none; }
+.app-phone-screen .finance-revenue-company-scroll::-webkit-scrollbar { height: 8px; }
+.app-phone-screen .finance-revenue-company-scroll::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: var(--app-fill-soft);
+}
+.app-phone-screen .finance-revenue-company-scroll::-webkit-scrollbar-thumb {
+  border: 2px solid var(--app-fill-soft);
+  border-radius: 999px;
+  background: var(--app-text-placeholder);
+}
 .app-phone-screen .finance-revenue-company-scroll svg { display: block; }
 
 .app-phone-screen .finance-revenue-company-tooltip {
@@ -2798,11 +2815,11 @@
   gap: 4px;
   padding: 8px 10px;
   border-radius: 8px;
-  background: rgb(31 51 72 / 96%);
+  background: var(--app-primary);
   color: #fff;
   font-size: 9px;
   pointer-events: none;
-  box-shadow: 0 5px 16px rgb(15 38 62 / 28%);
+  box-shadow: 0 4px 14px rgb(0 80 142 / 28%);
 }
 
 .app-phone-screen .finance-revenue-company-tooltip > strong {

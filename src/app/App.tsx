@@ -3894,7 +3894,7 @@ function PageProdShip() {
             const bx = (bubbleIdx / 11) * 100;
             const alignRight = bubbleIdx > 8;
             return (
-              <div style={{
+              <div className="finance-revenue-tooltip" style={{
                 position: "absolute",
                 top: toY(pts[bubbleIdx]) - 44,
                 left: alignRight ? "auto" : `calc(${bx}% - 4px)`,
@@ -4519,6 +4519,19 @@ function PageFinanceRevenue() {
   const [tip, setTip] = useState<number | null>(null);
   const [companyTip, setCompanyTip] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (tip === null && companyTip === null) return;
+    const dismissTooltip = (event: PointerEvent) => {
+      const target = event.target as Element | null;
+      if (!target?.closest("[data-finance-tooltip-source]")) {
+        setTip(null);
+        setCompanyTip(null);
+      }
+    };
+    document.addEventListener("pointerdown", dismissTooltip);
+    return () => document.removeEventListener("pointerdown", dismissTooltip);
+  }, [tip, companyTip]);
+
   const months  = ["2023-11","2023-12","2024-01","2024-02","2024-03","2024-04","2024-05","2024-06","2024-07","2024-08","2024-09","2024-10"];
   const revenue = [68000, 82000, 45000, 52000, 71000, 75000, 78000, 82000, 79000, 85000, 88000, 91000];
   const profit  = [ 8160,  9840,  4950,  5720,  8520,  9000,  9360, 10660,  9480, 10200, 10560, 12740];
@@ -4622,7 +4635,7 @@ function PageFinanceRevenue() {
         </div>
 
         {/* 图表横向滚动容器 */}
-        <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", position: "relative" } as React.CSSProperties}>
+        <div onPointerLeave={() => setTip(null)} style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", position: "relative" } as React.CSSProperties}>
           <svg width={CW} height={CH} style={{ display: "block", overflow: "visible" }}>
             {/* 网格线（极淡） */}
             {[0, 0.25, 0.5, 0.75, 1].map(f => (
@@ -4656,7 +4669,7 @@ function PageFinanceRevenue() {
               const proH = (profit[i]  / maxRev) * plotH;
               const isActive = tip === i;
               return (
-                <g key={i} onClick={() => setTip(tip === i ? null : i)} style={{ cursor: "pointer" }}>
+                <g key={i} data-finance-tooltip-source={`month-${i}`} role="button" tabIndex={0} aria-label={`${months[i]}，营业收入${revenue[i]}万元，营业毛利${profit[i]}万元，毛利率${margin[i]}%`} onPointerEnter={event => { if (event.pointerType === "mouse") setTip(i); }} onPointerLeave={event => { if (event.pointerType === "mouse") setTip(null); }} onPointerDown={event => { if (event.pointerType !== "mouse") setTip(i); }} onClick={() => setTip(i)} onFocus={() => setTip(i)} onBlur={() => setTip(null)} style={{ cursor: "pointer" }}>
                   {/* 营业收入柱 */}
                   <rect
                     x={cx - barW - 1} y={toY(revenue[i])}
@@ -4702,7 +4715,7 @@ function PageFinanceRevenue() {
             const mgDelta = prevMargin[i] !== null ? (margin[i] - (prevMargin[i] as number)).toFixed(1) : null;
             const revDelta = prevRevenue[i] !== null ? (((revenue[i] - (prevRevenue[i] as number)) / (prevRevenue[i] as number)) * 100).toFixed(1) : null;
             return (
-              <div style={{
+              <div className="finance-monthly-revenue-tooltip" style={{
                 position: "absolute",
                 top: 20,
                 left: Math.max(8, Math.min(tipX, CW - 128)),
@@ -4758,7 +4771,7 @@ function PageFinanceRevenue() {
           <span><i className="is-line" style={{ background: ORANGE }} />收入环比</span>
         </div>
         <div className="finance-revenue-company-axis"><span>万元</span><span>%</span></div>
-        <div className="finance-revenue-company-scroll">
+        <div className="finance-revenue-company-scroll" onPointerLeave={() => setCompanyTip(null)}>
           <svg width={ECW} height={ECH} aria-label="各企业营业收入、营业毛利、毛利率和收入环比趋势">
             {[0, 30000, 60000, 90000, 120000].map(value => <g key={value}>
               <line x1={EPAD_L} y1={eToAmountY(value)} x2={ECW - EPAD_R} y2={eToAmountY(value)} stroke="#F0F0F0" strokeWidth="1" />
@@ -4773,7 +4786,7 @@ function PageFinanceRevenue() {
               return <g key={item.company}>
                 <rect x={x - 17} y={eToAmountY(item.revenue)} width="15" height={revenueHeight} rx="3" fill={BLUE} opacity={active ? 1 : .85} />
                 <rect x={x + 2} y={eToAmountY(item.profit)} width="15" height={profitHeight} rx="3" fill={LIGHT_BLUE} opacity={active ? 1 : .85} />
-                <rect x={x - eSlotW / 2} y={EPAD_T} width={eSlotW} height={ePlotH + EPAD_B} fill="transparent" role="button" tabIndex={0} aria-label={`${item.company}，营业收入${item.revenue}万元，营业毛利${item.profit}万元，毛利率${item.margin}%，收入环比${item.revenueMom}%`} onPointerEnter={event => { if (event.pointerType === "mouse") setCompanyTip(index); }} onPointerLeave={event => { if (event.pointerType === "mouse") setCompanyTip(null); }} onPointerDown={event => { if (event.pointerType !== "mouse") setCompanyTip(index); }} onClick={() => setCompanyTip(index)} onFocus={() => setCompanyTip(index)} onBlur={() => setCompanyTip(null)} />
+                <rect x={x - eSlotW / 2} y={EPAD_T} width={eSlotW} height={ePlotH + EPAD_B} fill="transparent" role="button" tabIndex={0} data-finance-tooltip-source={`company-${index}`} aria-label={`${item.company}，营业收入${item.revenue}万元，营业毛利${item.profit}万元，毛利率${item.margin}%，收入环比${item.revenueMom}%`} onPointerEnter={event => { if (event.pointerType === "mouse") setCompanyTip(index); }} onPointerDown={event => { if (event.pointerType !== "mouse") setCompanyTip(index); }} onClick={() => setCompanyTip(index)} onFocus={() => setCompanyTip(index)} onBlur={() => setCompanyTip(null)} />
                 <text x={x} y={ECH - 8} textAnchor="middle" fontSize="9" fill={C.t3}>{item.company}</text>
               </g>;
             })}
