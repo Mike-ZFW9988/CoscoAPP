@@ -8868,6 +8868,65 @@
 .app-phone-screen .biz-market-detail.is-achieved em { color: var(--app-success); }
 .app-phone-screen .biz-market-detail.is-behind em { color: var(--app-warning-900); }
 
+/* Shared business value/margin chart: data-driven for backend company lists. */
+.app-phone-screen .biz-value-margin-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.app-phone-screen .biz-value-margin-metrics > div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  background: rgb(217 236 255 / 56%);
+}
+.app-phone-screen .biz-value-margin-metrics span,
+.app-phone-screen .biz-value-margin-metrics em {
+  color: var(--app-text-secondary);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.app-phone-screen .biz-value-margin-metrics strong {
+  color: var(--app-primary-900);
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.app-phone-screen .biz-value-margin-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  margin-bottom: 4px;
+}
+.app-phone-screen .biz-value-margin-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  white-space: nowrap;
+}
+.app-phone-screen .biz-value-margin-legend i { display: inline-block; }
+.app-phone-screen .biz-value-margin-legend i.is-actual { width: 9px; height: 9px; border-radius: 2px; background: var(--app-primary-900); }
+.app-phone-screen .biz-value-margin-legend i.is-target { width: 9px; height: 9px; border: 1px solid #7897b2; border-radius: 2px; background: #afc4d6; }
+.app-phone-screen .biz-value-margin-legend i.is-margin { width: 12px; height: 2px; border-radius: 999px; background: var(--app-success); }
+.app-phone-screen .biz-value-margin-empty {
+  display: grid;
+  height: 210px;
+  place-items: center;
+  color: var(--app-text-regular);
+  font-size: 11px;
+}
+
 .app-phone-screen .biz-insight-segmented-four {
   width: 184px !important;
   flex: 0 0 184px !important;

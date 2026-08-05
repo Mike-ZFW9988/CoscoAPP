@@ -1971,6 +1971,93 @@ function CollectionPlanOverviewCard({ business }: { business: CollectionPlanBusi
   );
 }
 
+type BusinessValueMarginPoint = {
+  id: string;
+  label: string;
+  actual: number;
+  target: number;
+  marginRate: number;
+};
+
+function BusinessValueMarginChart({
+  metrics,
+  points,
+  marginLabel = "预计边贡率",
+}: {
+  metrics: Array<{ label: string; value: string; unit: string }>;
+  points: BusinessValueMarginPoint[];
+  marginLabel?: string;
+}) {
+  const [tooltipIndex, setTooltipIndex] = useState<number | null>(null);
+  const axisMax = Math.max(100, Math.ceil(Math.max(...points.flatMap(item => [item.actual, item.target]), 0) / 100) * 100);
+  const plotBottom = 162;
+  const plotLeft = points.length === 2 ? 94 : 36;
+  const plotRight = points.length === 2 ? 226 : 284;
+  const pointGap = points.length > 1 ? (plotRight - plotLeft) / (points.length - 1) : 0;
+  const chartPoints = points.map((item, index) => ({
+    ...item,
+    x: points.length === 1 ? 160 : plotLeft + pointGap * index,
+    marginY: plotBottom - ((Math.max(20, Math.min(100, item.marginRate)) - 20) / 80) * 128,
+  }));
+  const linePath = chartPoints.length === 2
+    ? `M${chartPoints[0].x} ${chartPoints[0].marginY} C${chartPoints[0].x + 44} ${chartPoints[0].marginY} ${chartPoints[1].x - 44} ${chartPoints[1].marginY} ${chartPoints[1].x} ${chartPoints[1].marginY}`
+    : chartPoints.map((item, index) => `${index === 0 ? "M" : "L"}${item.x} ${item.marginY}`).join(" ");
+  const areaPath = chartPoints.length > 0
+    ? `${linePath} L${chartPoints[chartPoints.length - 1].x} ${plotBottom} L${chartPoints[0].x} ${plotBottom} Z`
+    : "";
+
+  return (
+    <div className="biz-value-margin-chart" style={{ padding: "10px 10px 14px" }}>
+      <div className="biz-value-margin-metrics">
+        {metrics.map(item => (
+          <div key={item.label}>
+            <span>{item.label}</span><strong>{item.value}</strong><em>{item.unit}</em>
+          </div>
+        ))}
+      </div>
+      <div className="biz-value-margin-legend">
+        <span><i className="is-actual" />实际产值</span>
+        <span><i className="is-target" />目标产值</span>
+        <span><i className="is-margin" />{marginLabel}（%）</span>
+      </div>
+
+      {points.length === 0 ? <div className="biz-value-margin-empty">暂无产值及边贡数据</div> : (
+        <svg width="100%" height="210" viewBox="0 0 320 210" preserveAspectRatio="none" style={{ display: "block" }} aria-label="产值及边贡图表">
+          <defs>
+            <linearGradient id="businessMarginArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={C.success} stopOpacity="0.22" /><stop offset="100%" stopColor={C.success} stopOpacity="0.02" /></linearGradient>
+            <linearGradient id="businessActualBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#79BBFF" /><stop offset="100%" stopColor={C.brand} /></linearGradient>
+            <linearGradient id="businessTargetBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#B9CDDE" /><stop offset="100%" stopColor="#91AAC0" /></linearGradient>
+            <filter id="businessTooltipShadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#10263A" floodOpacity="0.24" /></filter>
+          </defs>
+          <text x="4" y="16" fontSize="10" fill={C.t3}>万元</text><text x="300" y="16" fontSize="10" fill={C.t3}>%</text>
+          {[0, 1, 2, 3, 4].map(index => {
+            const y = 34 + index * 32;
+            return <g key={index}><line x1="28" y1={y} x2="288" y2={y} stroke={C.divider} strokeWidth="0.8" /><text x="22" y={y + 4} textAnchor="end" fontSize="10" fill={C.t3}>{axisMax - index * axisMax / 4}</text><text x="294" y={y + 4} fontSize="10" fill={C.t3}>{100 - index * 20}</text></g>;
+          })}
+          {chartPoints.map(item => {
+            const targetHeight = Math.max(20, Math.min(116, item.target / axisMax * 116));
+            const actualHeight = Math.max(18, Math.min(110, item.actual / axisMax * 110));
+            return <g key={item.id}><rect x={item.x - 10} y={plotBottom - targetHeight} width="20" height={targetHeight} rx="9" fill="url(#businessTargetBar)" stroke="#7897B2" strokeWidth="0.9" /><rect x={item.x - 10} y={plotBottom - actualHeight} width="20" height={actualHeight} rx="9" fill="url(#businessActualBar)" /></g>;
+          })}
+          <path d={areaPath} fill="url(#businessMarginArea)" pointerEvents="none" /><path d={linePath} fill="none" stroke={C.success} strokeWidth="2.2" strokeLinecap="round" pointerEvents="none" />
+          {chartPoints.map(item => {
+            const targetHeight = Math.max(20, Math.min(116, item.target / axisMax * 116));
+            return <g key={`${item.id}-label`} pointerEvents="none"><text x={item.x} y={154 - targetHeight} textAnchor="middle" fontSize="10" fill={C.t2}>{item.target}</text><text x={item.x} y="184" textAnchor="middle" fontSize="10" fill={C.t2}>{item.label}</text></g>;
+          })}
+          <text x="17" y="166" textAnchor="end" fontSize="10" fill={C.t3}>0</text><text x="304" y="166" fontSize="10" fill={C.t3}>20</text><line x1="24" y1="162" x2="292" y2="162" stroke={C.divider} strokeWidth="0.8" />
+          {chartPoints.map((item, index) => <rect key={`${item.id}-touch`} x={Math.max(24, item.x - 48)} y="26" width="96" height="166" fill="transparent" role="button" tabIndex={0} aria-label={`${item.label}，实际产值${item.actual}万元，目标产值${item.target}万元，${marginLabel}${item.marginRate}%`} style={{ cursor: "pointer", outline: "none", touchAction: "pan-y" }} onPointerEnter={event => { if (event.pointerType === "mouse") setTooltipIndex(index); }} onPointerLeave={event => { if (event.pointerType === "mouse") setTooltipIndex(null); }} onPointerDown={event => { if (event.pointerType !== "mouse") setTooltipIndex(index); }} onClick={() => setTooltipIndex(index)} onFocus={() => setTooltipIndex(index)} onBlur={() => setTooltipIndex(null)} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setTooltipIndex(index); } }} />)}
+          {tooltipIndex !== null && (() => {
+            const item = chartPoints[tooltipIndex];
+            if (!item) return null;
+            const tooltipX = Math.max(6, Math.min(186, item.x - 62));
+            return <g pointerEvents="none"><line x1={item.x} y1="28" x2={item.x} y2="162" stroke="#7897B2" strokeWidth="1" strokeDasharray="3 3" opacity="0.72" /><circle cx={item.x} cy={item.marginY} r="4" fill="#FFFFFF" stroke={C.success} strokeWidth="2" /><g filter="url(#businessTooltipShadow)"><rect x={tooltipX} y="28" width="128" height="76" rx="7" fill="#26384A" fillOpacity="0.97" /><text x={tooltipX + 10} y="44" fontSize="10" fontWeight="700" fill="#FFFFFF">{item.label}</text><circle cx={tooltipX + 11} cy="57" r="3" fill={C.brand} /><text x={tooltipX + 19} y="60" fontSize="9" fill="#DCE8F2">实际产值</text><text x={tooltipX + 118} y="60" textAnchor="end" fontSize="9" fontWeight="700" fill="#FFFFFF">{item.actual} 万元</text><circle cx={tooltipX + 11} cy="73" r="3" fill="#AFC4D6" stroke="#7897B2" strokeWidth="0.8" /><text x={tooltipX + 19} y="76" fontSize="9" fill="#DCE8F2">目标产值</text><text x={tooltipX + 118} y="76" textAnchor="end" fontSize="9" fontWeight="700" fill="#FFFFFF">{item.target} 万元</text><line x1={tooltipX + 8} y1="89" x2={tooltipX + 14} y2="89" stroke={C.success} strokeWidth="2" strokeLinecap="round" /><text x={tooltipX + 19} y="92" fontSize="9" fill="#DCE8F2">{marginLabel}</text><text x={tooltipX + 118} y="92" textAnchor="end" fontSize="9" fontWeight="700" fill="#FFFFFF">{item.marginRate}%</text></g></g>;
+          })()}
+        </svg>
+      )}
+    </div>
+  );
+}
+
 function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {}) {
   const [bizTab, setBizTab] = useState<BizInsightTab>(initialTab);
   const [trendTab, setTrendTab] = useState<"月度趋势" | "区域分布">("月度趋势");
@@ -1997,6 +2084,10 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
     { x: 188, label: "大连重工", actual: 280, target: 1280, marginRate: 64 },
     { x: 236, label: "舟山重工", actual: 420, target: 1250, marginRate: 72 },
     { x: 284, label: "广东重工", actual: 325, target: 1250, marginRate: 80 },
+  ];
+  const offshoreValueMarginData: BusinessValueMarginPoint[] = [
+    { id: "offshore-zhoushan", label: "舟山重工", actual: 420, target: 680, marginRate: 76 },
+    { id: "offshore-qidong", label: "启东海工", actual: 360, target: 620, marginRate: 72 },
   ];
   const marketRegions = [
     { short: "希腊区", full: "希腊区", target: 9.5, actual: 11.2 },
@@ -2181,12 +2272,12 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
 
             {/* ── 趋势分析区 ── */}
             <div style={{ borderTop: `1px solid ${C.divider}`, margin: "9px 0 0" }}>
-              <div style={{ padding: bizTab === "修船" || bizTab === "造船" ? "10px 10px 0" : 0, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                {(bizTab === "修船" || bizTab === "造船") && (
+              <div style={{ padding: bizTab === "修船" || bizTab === "造船" || bizTab === "海工" ? "10px 10px 0" : 0, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                {(bizTab === "修船" || bizTab === "造船" || bizTab === "海工") && (
                   <>
                     <div style={{ display: "flex", minWidth: 0, alignItems: "center" }}>
                       <span style={{ overflow: "hidden", color: C.t1, fontSize: 13, fontWeight: 700, lineHeight: 1, textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {bizTab === "造船" ? "船舶建造产值及边贡" : trendTab === "区域分布" ? "产值市场区域分布" : "修理改装产值及边贡"}
+                        {bizTab === "造船" ? "船舶建造产值及边贡" : bizTab === "海工" ? "海工建造产值及边贡" : trendTab === "区域分布" ? "产值市场区域分布" : "修理改装产值及边贡"}
                       </span>
                     </div>
                     {bizTab === "修船" && <div className="app-unified-segmented biz-insight-segmented biz-market-segmented" role="tablist" aria-label="经营数据视图切换">
@@ -2516,6 +2607,17 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
                     })()}
                   </svg>
                 </div>
+              )}
+
+              {/* 海工：沿用统一产值及边贡组件，仅展示海工企业模拟数据。 */}
+              {bizTab === "海工" && (
+                <BusinessValueMarginChart
+                  metrics={[
+                    { label: "总产值", value: "780.00", unit: "万元" },
+                    { label: "预计边贡率", value: "74.20", unit: "%" },
+                  ]}
+                  points={offshoreValueMarginData}
+                />
               )}
 
               {/* 配套：仅呈现营业收入，不混入边贡口径 */}
