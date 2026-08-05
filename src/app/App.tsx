@@ -3962,7 +3962,7 @@ function PageProdShip() {
         {/* 柱状图区域 */}
         {(() => {
           const segments = [
-            { name: "新造", progress: 97,  over: 0  },
+            { name: "造船", progress: 97,  over: 0  },
             { name: "海工", progress: 100, over: 5  },
             { name: "模块", progress: 95,  over: 0  },
           ];
