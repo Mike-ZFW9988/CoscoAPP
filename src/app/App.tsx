@@ -2090,10 +2090,10 @@ function SupportRevenueAnalysis({ detail = false }: { detail?: boolean } = {}) {
 
   return (
     <div className="biz-support-analysis">
-      <div className="biz-support-kpis">
+      {!detail && <div className="biz-support-kpis">
         <article><span>本年营业收入</span><div><strong>38.60</strong><em>亿元</em></div><small className="is-up">同比 ↑ 8.4%</small></article>
         <article><span>本年接单金额</span><div><strong>52.80</strong><em>亿元</em></div><small>目标完成率 78.8%</small></article>
-      </div>
+      </div>}
 
       {!detail && (
         <div className="biz-support-overview-strip" aria-label="配套营业收入分析摘要">
@@ -2116,7 +2116,7 @@ function SupportRevenueAnalysis({ detail = false }: { detail?: boolean } = {}) {
       </section>}
 
       {detail && <section className="biz-support-section" aria-label="项目节点完成情况">
-        <header><strong>项目节点完成情况</strong><span>项目数 · 左右滑动</span></header>
+        <header><strong>项目节点完成情况</strong><span>项目数 · 全节点</span></header>
         <div className="biz-support-stage-scroll">
           <div className="biz-support-stage-chart" style={{ "--support-stage-count": projectStages.length } as React.CSSProperties}>
             {projectStages.map((stage, index) => (

@@ -9153,7 +9153,10 @@
 .app-phone-screen .biz-support-detail-head > div { display: grid; gap: 2px; }
 .app-phone-screen .biz-support-detail-head strong { color: var(--app-text-primary); font-size: 14px; }
 .app-phone-screen .biz-support-detail-head span { color: var(--app-text-regular); font-size: 10px; }
-.app-phone-screen .biz-support-detail-page .biz-support-analysis { padding: 10px; }
+.app-phone-screen .biz-support-detail-page .biz-support-analysis {
+  gap: 11px;
+  padding: 10px;
+}
 .app-phone-screen .biz-support-detail-page .biz-support-section > header strong { font-size: 13px; }
 .app-phone-screen .biz-support-detail-page .biz-support-section > header span { font-size: 10px; }
 .app-phone-screen .biz-support-detail-page .biz-support-company-head,
@@ -9253,26 +9256,25 @@
   text-align: right;
 }
 .app-phone-screen .biz-support-stage-scroll {
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: hidden;
-  padding: 8px 8px 2px;
+  padding: 10px 8px 3px;
   scrollbar-width: none;
-  touch-action: pan-x pan-y;
-  -webkit-overflow-scrolling: touch;
 }
 .app-phone-screen .biz-support-stage-scroll::-webkit-scrollbar { display: none; }
 .app-phone-screen .biz-support-stage-chart {
   display: grid;
-  min-width: 392px;
-  height: 118px;
-  grid-template-columns: repeat(var(--support-stage-count, 7), 50px);
-  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
+  height: 124px;
+  grid-template-columns: repeat(var(--support-stage-count, 7), minmax(0, 1fr));
   background: repeating-linear-gradient(to bottom, transparent 0 28px, var(--app-divider) 28px 29px);
 }
 .app-phone-screen .biz-support-stage-chart button {
   display: grid;
-  height: 118px;
-  grid-template-rows: 92px 26px;
+  min-width: 0;
+  height: 124px;
+  grid-template-rows: 96px 28px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -9288,7 +9290,7 @@
 .app-phone-screen .biz-support-stage-chart b {
   position: relative;
   display: block;
-  width: 18px;
+  width: 16px;
   min-height: 14px;
   border-radius: 9px 9px 4px 4px;
   background: linear-gradient(180deg, var(--app-primary-400), var(--app-primary));
@@ -9304,10 +9306,14 @@
   transform: translateX(-50%);
 }
 .app-phone-screen .biz-support-stage-chart button > em {
+  overflow: hidden;
   padding-top: 5px;
   color: var(--app-text-secondary);
   font-size: 9px;
   font-style: normal;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .app-phone-screen .biz-support-stage-chart button.is-selected b { opacity: 1; transform: translateY(-2px); }
 .app-phone-screen .biz-support-stage-chart button.is-selected > em { color: var(--app-primary-900); font-weight: 700; }
