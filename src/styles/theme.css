@@ -7352,34 +7352,6 @@
     box-shadow: inset 0 3px 0 var(--app-primary-300);
   }
 
-  .app-phone-screen .quality-activity-meta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .app-phone-screen .quality-activity-meta > div {
-    display: grid;
-    gap: 3px;
-    min-width: 0;
-    padding: 9px 10px;
-    border: 1px solid var(--app-primary-100);
-    border-radius: 9px;
-    background: var(--app-primary-soft);
-  }
-
-  .app-phone-screen .quality-activity-meta > div:first-child { grid-column: 1 / -1; }
-  .app-phone-screen .quality-activity-meta span {
-    color: var(--app-text-regular);
-    font-size: 10px;
-  }
-  .app-phone-screen .quality-activity-meta strong {
-    overflow-wrap: anywhere;
-    color: var(--app-primary-900);
-    font-size: 12px;
-    line-height: 1.4;
-  }
-
   .app-phone-screen .quality-activity-overview {
     overflow: hidden;
     border: 1px solid var(--app-primary-100);
@@ -7408,18 +7380,6 @@
     line-height: 1.75;
     text-align: justify;
   }
-
-  .app-phone-screen .quality-activity-result {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: 8px;
-    padding: 9px 10px;
-    border-radius: 9px;
-    background: var(--app-success-soft);
-  }
-  .app-phone-screen .quality-activity-result span { color: var(--app-success); font-size: 10px; }
-  .app-phone-screen .quality-activity-result strong { color: var(--app-text-primary); font-size: 11px; }
 
   .biz-order-summary {
     display: grid;
