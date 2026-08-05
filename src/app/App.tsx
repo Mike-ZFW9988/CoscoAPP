@@ -2058,6 +2058,77 @@ function BusinessValueMarginChart({
   );
 }
 
+function SupportRevenueAnalysis() {
+  const businessTypes = [
+    { label: "设备", value: 24.8, percentage: 47, color: "#12B886" },
+    { label: "工程", value: 15.2, percentage: 29, color: "#3B8FD9" },
+    { label: "服务", value: 10.1, percentage: 19, color: "#FFB43A" },
+    { label: "其他", value: 2.7, percentage: 5, color: "#F56C6C" },
+  ];
+  const projectStages = [
+    { label: "报价", value: 96 },
+    { label: "立项", value: 84 },
+    { label: "工程", value: 76 },
+    { label: "完工", value: 68 },
+    { label: "结算", value: 61 },
+    { label: "开票", value: 54 },
+    { label: "关闭", value: 21 },
+  ];
+  const companyRows = [
+    { name: "南通配套", finish: 18, settlement: 16, invoice: 12, close: 5 },
+    { name: "威海科技", finish: 15, settlement: 13, invoice: 11, close: 6 },
+    { name: "大连装备", finish: 12, settlement: 10, invoice: 9, close: 4 },
+  ];
+  const [selectedStageIndex, setSelectedStageIndex] = useState(3);
+  const selectedStage = projectStages[selectedStageIndex] ?? projectStages[0];
+  const stageMax = Math.max(...projectStages.map(item => item.value), 1);
+  const donutBackground = `conic-gradient(${businessTypes.map((item, index) => {
+    const start = businessTypes.slice(0, index).reduce((sum, current) => sum + current.percentage, 0);
+    return `${item.color} ${start}% ${start + item.percentage}%`;
+  }).join(", ")})`;
+
+  return (
+    <div className="biz-support-analysis">
+      <div className="biz-support-kpis">
+        <article><span>本年营业收入</span><div><strong>38.60</strong><em>亿元</em></div><small className="is-up">同比 ↑ 8.4%</small></article>
+        <article><span>本年接单金额</span><div><strong>52.80</strong><em>亿元</em></div><small>目标完成率 78.8%</small></article>
+      </div>
+
+      <section className="biz-support-section" aria-label="接单业务类型分布">
+        <header><strong>接单业务类型分布</strong><span>金额口径</span></header>
+        <div className="biz-support-type-layout">
+          <div className="biz-support-donut" style={{ background: donutBackground }} aria-label="接单金额52.80亿元">
+            <div><span>接单金额</span><strong>52.80</strong><em>亿元</em></div>
+          </div>
+          <div className="biz-support-type-legend">
+            {businessTypes.map(item => <div key={item.label}><i style={{ background: item.color }} /><span>{item.label}</span><strong>{item.value.toFixed(1)}亿</strong><em>{item.percentage}%</em></div>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="biz-support-section" aria-label="项目节点完成情况">
+        <header><strong>项目节点完成情况</strong><span>项目数 · 左右滑动</span></header>
+        <div className="biz-support-stage-scroll">
+          <div className="biz-support-stage-chart" style={{ "--support-stage-count": projectStages.length } as React.CSSProperties}>
+            {projectStages.map((stage, index) => (
+              <button key={stage.label} type="button" className={selectedStageIndex === index ? "is-selected" : ""} onClick={() => setSelectedStageIndex(index)} aria-label={`${stage.label}节点${stage.value}项`}>
+                <span><b style={{ height: `${Math.max(14, stage.value / stageMax * 100)}%` }}><strong>{stage.value}</strong></b></span><em>{stage.label}</em>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="biz-support-stage-detail"><strong>{selectedStage.label}节点</strong><span>{selectedStage.value}项</span><em>占全部项目 {(selectedStage.value / projectStages[0].value * 100).toFixed(0)}%</em></div>
+      </section>
+
+      <section className="biz-support-section biz-support-company-section" aria-label="重点企业项目节点明细">
+        <header><strong>重点企业节点明细</strong><span>核心节点</span></header>
+        <div className="biz-support-company-head"><span>企业</span><span>完工</span><span>结算</span><span>开票</span><span>关闭</span></div>
+        {companyRows.map(row => <div className="biz-support-company-row" key={row.name}><strong>{row.name}</strong><span>{row.finish}</span><span>{row.settlement}</span><span>{row.invoice}</span><span>{row.close}</span></div>)}
+      </section>
+    </div>
+  );
+}
+
 function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {}) {
   const [bizTab, setBizTab] = useState<BizInsightTab>(initialTab);
   const [trendTab, setTrendTab] = useState<"月度趋势" | "区域分布">("月度趋势");
@@ -2272,12 +2343,12 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
 
             {/* ── 趋势分析区 ── */}
             <div style={{ borderTop: `1px solid ${C.divider}`, margin: "9px 0 0" }}>
-              <div style={{ padding: bizTab === "修船" || bizTab === "造船" || bizTab === "海工" ? "10px 10px 0" : 0, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                {(bizTab === "修船" || bizTab === "造船" || bizTab === "海工") && (
+              <div style={{ padding: "10px 10px 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                {(bizTab === "修船" || bizTab === "造船" || bizTab === "海工" || bizTab === "配套") && (
                   <>
                     <div style={{ display: "flex", minWidth: 0, alignItems: "center" }}>
                       <span style={{ overflow: "hidden", color: C.t1, fontSize: 13, fontWeight: 700, lineHeight: 1, textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {bizTab === "造船" ? "船舶建造产值及边贡" : bizTab === "海工" ? "海工建造产值及边贡" : trendTab === "区域分布" ? "产值市场区域分布" : "修理改装产值及边贡"}
+                        {bizTab === "造船" ? "船舶建造产值及边贡" : bizTab === "海工" ? "海工建造产值及边贡" : bizTab === "配套" ? "配套营业收入分析" : trendTab === "区域分布" ? "产值市场区域分布" : "修理改装产值及边贡"}
                       </span>
                     </div>
                     {bizTab === "修船" && <div className="app-unified-segmented biz-insight-segmented biz-market-segmented" role="tablist" aria-label="经营数据视图切换">
@@ -2620,33 +2691,8 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
                 />
               )}
 
-              {/* 配套：仅呈现营业收入，不混入边贡口径 */}
-              {bizTab === "配套" && (() => {
-                const revenueRows = [
-                  { name: "南通配套", value: 12.6 },
-                  { name: "威海科技", value: 9.8 },
-                  { name: "大连装备", value: 7.4 },
-                  { name: "上海重工", value: 4.1 },
-                ];
-                return (
-                  <div className="biz-support-revenue">
-                    <div className="biz-secondary-insight-title">配套营业收入</div>
-                    <div className="biz-support-summary">
-                      <span>本年累计营收最高<strong>南通配套</strong><b>12.6亿</b></span>
-                      <i />
-                      <span>本年累计营收最低<strong>上海重工</strong><b>4.1亿</b></span>
-                    </div>
-                    <div className="biz-support-chart">
-                      {revenueRows.map((row) => (
-                        <div className="biz-support-column" key={row.name}>
-                          <div><b style={{ height: `${row.value / 14 * 100}%` }}><strong>{row.value}</strong></b></div>
-                          <span>{row.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
+              {/* 配套：营业收入、接单结构与项目节点分析。 */}
+              {bizTab === "配套" && <SupportRevenueAnalysis />}
 
               {/* 区域分布（修船）：柱状+折线组合图 */}
               {trendTab === "区域分布" && bizTab === "修船" && (
