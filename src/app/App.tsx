@@ -1395,6 +1395,13 @@ const OVERDUE_RECEIVABLE_OVERVIEW = [
   { key: "ratio", label: "逾期账款占比", value: "3.69", unit: "%", mom: "较上月 ↓0.18pct", tone: "success" },
 ] as const;
 
+// 首页按亿元展示，底层接口仍可统一返回万元；详情及业务配置继续保留万元口径。
+const HOME_OVERDUE_RECEIVABLE_OVERVIEW = OVERDUE_RECEIVABLE_OVERVIEW.map(item => (
+  item.unit === "万元"
+    ? { ...item, value: (Number(item.value.replaceAll(",", "")) / 10_000).toFixed(2), unit: "亿元" }
+    : item
+));
+
 const BIZ_ORDER_PROGRESS_ROWS = [
   { key: "repair", label: "船舶修理", target: 105, actual: 15.69, rate: 14.95, subs: [] as Array<{ name: string; rate: string }> },
   { key: "shipbuilding", label: "船舶建造", target: 452, actual: 162.88, rate: 36.04, subs: [{ name: "本部", rate: "50.23%" }, { name: "川崎", rate: "17.33%" }] },
@@ -1588,12 +1595,12 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
           </div>
         </div>
         <div className="home-overdue-kpi-grid">
-          {OVERDUE_RECEIVABLE_OVERVIEW.map((item, index) => (
+          {HOME_OVERDUE_RECEIVABLE_OVERVIEW.map((item, index) => (
             <article key={item.key} data-tone={item.tone}>
               <span>{item.label}</span>
               <div><strong>{item.value}</strong><small>{item.unit}</small></div>
               <em>{item.mom}</em>
-              {index < OVERDUE_RECEIVABLE_OVERVIEW.length - 1 && <i aria-hidden="true" />}
+              {index < HOME_OVERDUE_RECEIVABLE_OVERVIEW.length - 1 && <i aria-hidden="true" />}
             </article>
           ))}
         </div>
@@ -3152,8 +3159,40 @@ function PageBizOverdue() {
       <BreadcrumbBar crumbs={["首页", "逾期应收"]} period={currentMonth.compact} />
 
       {/* 英雄数字区 */}
-      <div className="biz-overdue-summary-card">
-        {OVERDUE_RECEIVABLE_OVERVIEW.map(item => <article key={item.key} data-tone={item.tone}><span>{item.label}</span><div><strong>{item.value}</strong><small>{item.unit}</small></div><em>{item.mom}</em></article>)}
+      <div style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F8FBFF 100%)", border: "1px solid rgba(0,80,142,0.08)", margin: "8px 10px 0", borderRadius: 12, padding: "10px 10px 10px", boxShadow: "0 4px 10px rgba(20,76,128,0.055)" }}>
+        <div style={{ fontSize: 11, color: C.t2, fontWeight: 500, marginBottom: 4 }}>逾期应收账款总规模（万元）</div>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, marginBottom: 10 }}>
+          <span style={{ fontSize: 36, fontWeight: 700, color: C.brand, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>15,494</span>
+          <span style={{ fontSize: 12, color: C.t3, paddingBottom: 4 }}>万元</span>
+          <span style={{ borderRadius: 999, background: overdueColors.riskSoft, color: overdueColors.risk, fontSize: 9, fontWeight: 700, lineHeight: 1, padding: "3px 6px", marginBottom: 5 }}>风险存量</span>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px", marginBottom: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 8, height: 8, borderRadius: 2, background: overdueColors.external, flexShrink: 0 }} />
+            <span style={{ fontSize: 11, color: C.t2 }}>逾期</span>
+            <span style={{ fontSize: 11, color: C.t3 }}>≥1年</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: overdueColors.external }}>7,465</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 8, height: 8, borderRadius: 2, background: overdueColors.internal, flexShrink: 0 }} />
+            <span style={{ fontSize: 11, color: C.t2 }}>逾期</span>
+            <span style={{ fontSize: 11, color: C.t3 }}>{"<"}1年</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: overdueColors.internal }}>8,029</span>
+          </div>
+        </div>
+        <div style={{ height: 1, background: C.divider, marginBottom: 10 }} />
+        <div style={{ display: "flex", gap: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span style={{ fontSize: 10, color: C.t3 }}>上月新增逾期</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: overdueColors.external }}>+1,931</span>
+            <span style={{ fontSize: 10, color: C.t3 }}>万</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span style={{ fontSize: 10, color: C.t3 }}>收回</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: overdueColors.recovery }}>133</span>
+            <span style={{ fontSize: 10, color: C.t3 }}>万</span>
+          </div>
+        </div>
       </div>
 
       {/* 堆叠横向条形图 */}
