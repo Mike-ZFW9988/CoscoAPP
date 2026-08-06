@@ -43,7 +43,6 @@ import {
   DataTableCard,
   KpiCard,
   HorizontalBar,
-  RiskListItem,
   SectionHeader,
   StatusBadge,
 } from "./components/dashboard/DashboardPrimitives";
@@ -86,7 +85,6 @@ const C = {
 const PAGES = [
   { id: "home",                 label: "1  首页" },
   { id: "biz",                  label: "2  经营主题" },
-  { id: "biz-progress",         label: "2  经营·本周进展" },
   { id: "biz-overdue",          label: "2  经营·逾期应收" },
   { id: "biz-collection-plan",  label: "2  经营·计划收款" },
   { id: "biz-support-revenue-detail", label: "2  配套·营业收入分析" },
@@ -490,11 +488,6 @@ function BarRow({ label, value, maxVal, suffix = "" }: { label: string; value: n
       <span className="text-[12px] font-bold text-foreground w-9 text-right tabular-nums tracking-tight">{value}{suffix}</span>
     </div>
   );
-}
-
-function AlertRow({ cat, text, pri, link, onClick }: { cat: string; text: string; pri: string; link: string; onClick?: () => void }) {
-  const tone = pri === "高优先级" ? "danger" : pri === "中优先级" ? "warning" : "muted";
-  return <RiskListItem category={cat} text={text} priority={pri} tone={tone} onClick={onClick} />;
 }
 
 function MatrixHeader({ cols }: { cols: string[] }) {
@@ -1410,7 +1403,6 @@ const BIZ_ORDER_PROGRESS_ROWS = [
 ] as const;
 
 function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; focusSection?: "overdue" }) {
-  const [alertExpanded, setAlertExpanded] = useState(false);
   const [freshnessOpen, setFreshnessOpen] = useState(false);
   const [freshnessContainer, setFreshnessContainer] = useState<HTMLElement | null>(null);
   const currentMonth = getCurrentMonthLabels();
@@ -1433,15 +1425,6 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
     { module: "完工出厂", date: currentMonth.full, cadence: "按月更新" },
     { module: "逾期应收", date: currentMonth.full, cadence: "按月更新" },
   ];
-
-  const ALERTS = [
-    { cat: "生产", text: "广东重工交付完成率 90%",                 pri: "高优先级", link: "生产",  page: "prod-repair" },
-    { cat: "经营", text: "新接订单完成率 29.8%，低于时间进度 5%", pri: "高优先级", link: "经营",  page: "biz"         },
-    { cat: "财务", text: "逾期账款占比较上月下降 0.18pct",        pri: "高优先级", link: "财务",  page: "finance"     },
-    { cat: "采购", text: "钢材集采率 81.3%，低于目标 85%",         pri: "中优先级", link: "采购",  page: "purchase-group" },
-    { cat: "质量", text: "RT/PAUT一次合规率 96.2%，低于目标 97%", pri: "中优先级", link: "质量",  page: "quality"     },
-  ];
-  const visibleAlerts = alertExpanded ? ALERTS : ALERTS.slice(0, 3);
 
   return (
     <>
@@ -1545,22 +1528,6 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
 
       {/* 频道导航 */}
       <ChannelBar items={["经营", "财务", "生产", "采购", "质量", "能源"]} active="经营" />
-
-      {/* L4 优先关注 */}
-      <div style={{ padding: "7px 10px 0" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-          <span className="home-alert-title"><AlertTriangle size={14} strokeWidth={2.3} />优先关注</span>
-          <span onClick={() => setAlertExpanded(v => !v)}
-            style={{ fontSize: "var(--app-type-meta)", color: C.brand, cursor: "pointer", fontWeight: "var(--app-weight-meta)" }}>
-            查看更多 ›
-          </span>
-        </div>
-      </div>
-      <div className="home-alert-card">
-        {visibleAlerts.map((a, i) => (
-          <AlertRow key={i} cat={a.cat} text={a.text} pri={a.pri} link={a.link} onClick={() => nav(a.page)} />
-        ))}
-      </div>
 
       {/* L5 指标进度：与年度接单指标进度共用四板块数据 */}
       <div className="home-order-progress-card" onClick={() => nav("biz-kpi-progress")}>
@@ -1724,7 +1691,7 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
         </div>
       </div>
 
-      <Footer text="数据口径月更 · 点主题卡下钻至详情" />
+      <Footer text={`数据口径月更 · ${currentMonth.compact}`} />
 
       <Sheet open={freshnessOpen} onOpenChange={setFreshnessOpen}>
         <SheetContent side="bottom" className="home-freshness-sheet" container={freshnessContainer}>
@@ -2757,117 +2724,7 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
       {/* 经营收款：修船/配套为逾期口径，造船/海工为计划口径 */}
       <CollectionPlanOverviewCard business={bizTab} />
 
-      {/* L6 本周重点项目进展 */}
-      <div className="biz-project-entry-card">
-        <div className="biz-project-entry-head">
-          <div className="biz-project-entry-title">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-              <rect x="1" y="1" width="7" height="7" rx="1.5" fill={C.phDark}/>
-              <rect x="10" y="1" width="7" height="7" rx="1.5" fill={C.phDark}/>
-              <rect x="1" y="10" width="7" height="7" rx="1.5" fill={C.phDark}/>
-              <rect x="10" y="10" width="7" height="7" rx="1.5" fill={C.phDark}/>
-            </svg>
-            <span>本周重点项目进展</span>
-          </div>
-          <span className="biz-project-entry-subtitle">按业务板块查看</span>
-        </div>
-        <div className="biz-project-entry-grid">
-          {[
-            { label: "船舶修理", Icon: BusinessRepairIcon, page: "biz-progress-repair" },
-            { label: "船舶建造", Icon: BusinessShipbuildingIcon, page: "biz-progress-shipbuilding" },
-            { label: "海工业务", Icon: BusinessOffshoreIcon, page: "biz-progress-offshore" },
-            { label: "配套服务", Icon: BusinessSupportIcon, page: "biz-progress-support" },
-          ].map(({ label, Icon, page }) => (
-            <button key={label} type="button" className="biz-project-entry-item" onClick={() => nav(page)}>
-              <span className="biz-project-entry-icon"><Icon /></span>
-              <span className="biz-project-entry-name">{label}</span>
-              <span className="biz-project-entry-count">10项 <ChevronRight size={11} strokeWidth={2.4} /></span>
-            </button>
-          ))}
-        </div>
-      </div>
-
       <Footer text="经营主题 · 数据口径随时间切换 · 返回首页保留时间上下文" />
-    </>
-  );
-}
-
-type BizProjectSection = "repair" | "shipbuilding" | "offshore" | "support";
-
-const BIZ_PROJECTS: Record<BizProjectSection, {
-  index: string;
-  name: string;
-  count: string;
-  company: string;
-  owner: string;
-  progress: string;
-}[]> = {
-  repair: [
-    { index: "01", name: "集装箱船节能改装", count: "1艘", company: "南通船务", owner: "中远海运集运", progress: "节能装置方案完成评审，关键设备已进入采购阶段，计划本月底进厂施工。" },
-    { index: "02", name: "VLCC坞修项目", count: "2艘", company: "舟山重工", owner: "中远海运能源", progress: "船东技术澄清已完成，坞期及生产资源完成锁定，重点跟踪长周期物资到货。" },
-  ],
-  shipbuilding: [
-    { index: "01", name: "PANAMAX（带艏装载）", count: "2艘", company: "启东海工", owner: "中远海运能源", progress: "意向书已大签，重工已过会。跟踪能源董事会上会进展（预计4月中旬）。" },
-    { index: "02", name: "13kTEU集装箱船", count: "12艘", company: "扬州重工", owner: "中远海运集运", progress: "常规燃料和 LNG 双燃料方案详规均已提供，技术沟通谈判预计延迟至3月末或4月初。" },
-  ],
-  offshore: [
-    { index: "01", name: "FPSO模块建造项目", count: "1座", company: "启东海工", owner: "海洋石油工程", progress: "详细设计按计划推进，首批结构件已开工，当前重点协调核心设备接口资料。" },
-    { index: "02", name: "海上风电安装平台", count: "1座", company: "大连重工", owner: "中远海运特运", progress: "主船体分段进入连续建造阶段，关键节点总体受控，计划下月完成阶段性验收。" },
-  ],
-  support: [
-    { index: "01", name: "船用配套设备升级", count: "6套", company: "南通重工装备", owner: "扬州重工", progress: "首套设备完成联调，剩余设备按船期分批交付，当前重点跟踪现场安装反馈。" },
-    { index: "02", name: "智能能效系统交付", count: "4套", company: "威海重工科技", owner: "大连川崎", progress: "系统功能测试完成，船端数据接口已联通，计划本周完成用户验收。" },
-  ],
-};
-
-function PageBizProgress({ section = "shipbuilding" }: { section?: BizProjectSection }) {
-  const [selectedCompany, setSelectedCompany] = useState("all");
-  const projects = BIZ_PROJECTS[section];
-  const companies = Array.from(new Set(projects.map(project => project.company)));
-  const visibleProjects = selectedCompany === "all"
-    ? projects
-    : projects.filter(project => project.company === selectedCompany);
-  return (
-    <>
-      <StatusBar />
-      <NavBar title="经营主题" backLabel="返回经营主题" backPage="biz" />
-      <BreadcrumbBar crumbs={["首页", "经营主题", "本周进展"]} period="截至7.10" />
-
-      <Card
-        title="本周重点项目进展明细"
-        className="mt-3 biz-project-detail-card"
-        extra={(
-          <label className="biz-project-company-filter">
-            <span>承建企业</span>
-            <span className="biz-project-company-select">
-              <select
-                value={selectedCompany}
-                onChange={(event) => setSelectedCompany(event.target.value)}
-                aria-label="按承建企业筛选项目"
-              >
-                <option value="all">全部企业</option>
-                {companies.map(company => <option key={company} value={company}>{company}</option>)}
-              </select>
-              <ChevronDown size={12} strokeWidth={2.2} aria-hidden="true" />
-            </span>
-          </label>
-        )}
-      >
-        <div className="biz-project-detail-list">
-          {visibleProjects.map(project => <article key={project.index} className="biz-project-detail-item">
-            <header><span>{project.index}</span><strong>{project.name}</strong><StatusBadge tone="info">{project.count}</StatusBadge></header>
-            <dl><div><dt>船东</dt><dd>{project.owner}</dd></div></dl>
-            <div className="biz-project-detail-progress"><span>项目进展</span><p>{project.progress}</p></div>
-          </article>)}
-          {visibleProjects.length === 0 && (
-            <div className="biz-project-detail-empty">
-              当前承建企业暂无重点项目
-            </div>
-          )}
-        </div>
-      </Card>
-
-      <Footer text="本周重点项目进展明细 · 数据随时间口径切换" />
     </>
   );
 }
@@ -5996,11 +5853,6 @@ function renderPage(id: string) {
     case "biz-shipbuilding":  return <PageBiz initialTab="造船" />;
     case "biz-offshore":      return <PageBiz initialTab="海工" />;
     case "biz-support":       return <PageBiz initialTab="配套" />;
-    case "biz-progress":      return <PageBizProgress />;
-    case "biz-progress-repair": return <PageBizProgress section="repair" />;
-    case "biz-progress-shipbuilding": return <PageBizProgress section="shipbuilding" />;
-    case "biz-progress-offshore": return <PageBizProgress section="offshore" />;
-    case "biz-progress-support": return <PageBizProgress section="support" />;
     case "biz-overdue":       return <PageBizOverdue />;
     case "biz-collection-plan": return <PageBizCollectionPlan business="海工" />;
     case "biz-collection-plan-repair": return <PageBizCollectionPlan business="修船" />;
