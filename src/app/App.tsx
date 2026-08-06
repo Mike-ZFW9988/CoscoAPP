@@ -524,11 +524,15 @@ function TRow({ cells, head = false }: { cells: string[]; head?: boolean }) {
   );
 }
 
-function Footer({ text }: { text: string }) {
+function getMonthlyDataFooter(date = new Date()) {
+  return `数据口径月更 · 截至${date.getFullYear()}.${date.getMonth() + 1}`;
+}
+
+function Footer({ text: _text }: { text?: string }) {
   return (
     <div className="px-2.5 pt-2.5 pb-7 text-center">
       <div className="h-px bg-border mb-3" />
-      <span className="text-[9px] text-muted-foreground tracking-wide">{text}</span>
+      <span className="app-data-footer-text">{getMonthlyDataFooter()}</span>
     </div>
   );
 }
@@ -1385,17 +1389,12 @@ const ENERGY_KPI_BY_SEGMENT: Record<EnergyMode, {
 };
 
 const OVERDUE_RECEIVABLE_OVERVIEW = [
-  { key: "receivable", label: "应收账款总额", value: "118,260.00", unit: "万元", mom: "较上月 ↓1.8%", tone: "primary" },
-  { key: "overdue", label: "逾期账款总额", value: "4,360.00", unit: "万元", mom: "较上月 ↓6.2%", tone: "danger" },
+  { key: "receivable", label: "应收账款总额", value: "11.83", unit: "亿元", mom: "较上月 ↓1.8%", tone: "primary" },
+  { key: "overdue", label: "逾期账款总额", value: "0.44", unit: "亿元", mom: "较上月 ↓6.2%", tone: "danger" },
   { key: "ratio", label: "逾期账款占比", value: "3.69", unit: "%", mom: "较上月 ↓0.18pct", tone: "success" },
 ] as const;
 
-// 首页按亿元展示，底层接口仍可统一返回万元；详情及业务配置继续保留万元口径。
-const HOME_OVERDUE_RECEIVABLE_OVERVIEW = OVERDUE_RECEIVABLE_OVERVIEW.map(item => (
-  item.unit === "万元"
-    ? { ...item, value: (Number(item.value.replaceAll(",", "")) / 10_000).toFixed(2), unit: "亿元" }
-    : item
-));
+const HOME_OVERDUE_RECEIVABLE_OVERVIEW = OVERDUE_RECEIVABLE_OVERVIEW;
 
 type BusinessOrderKey = "repair" | "shipbuilding" | "offshore" | "support";
 type BusinessOrderProgressDTO = {
@@ -1797,6 +1796,11 @@ function parseCollectionAmount(value: string | number | null | undefined) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+/** 收款接口金额保持万元原值，视图层统一换算为亿元并保留两位小数。 */
+function formatCollectionAmountYi(value: string | number | null | undefined) {
+  return (parseCollectionAmount(value) / 10_000).toFixed(2);
+}
+
 /** 待收由结账状态判断；逾期必须以逾期金额大于 0 为准，不能只依赖状态文案。 */
 function matchesCollectionFilter(project: CollectionPlanProject, filter: CollectionFilter) {
   if (filter === "全部") return true;
@@ -1815,7 +1819,7 @@ function getCollectionAgingItems(project: CollectionPlanProject) {
 const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
   title: "经营计划收款" | "经营逾期收款";
   flow: "plan" | "overdue";
-  overviewMetrics: Array<{ label: string; value: string; unit: "万元" | "%" | "家"; meta: string; tone: "primary" | "success" | "danger"; trend: "up" | "down" | "good" }>;
+  overviewMetrics: Array<{ label: string; value: string; unit: "亿元" | "%" | "家"; meta: string; tone: "primary" | "success" | "danger"; trend: "up" | "down" | "good" }>;
   summary: {
     heading: string;
     primary: { label: string; value: string };
@@ -1833,8 +1837,8 @@ const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
     overviewMetrics: OVERDUE_RECEIVABLE_OVERVIEW.map(item => ({ label: item.label, value: item.value, unit: item.unit, meta: item.mom, tone: item.tone, trend: "good" as const })),
     summary: {
       heading: "应收账款风险概览",
-      primary: { label: "应收账款总额", value: "118,260.00" },
-      secondary: { label: "逾期账款总额", value: "4,360.00", tone: "danger" },
+      primary: { label: "应收账款总额", value: "11.83" },
+      secondary: { label: "逾期账款总额", value: "0.44", tone: "danger" },
       progress: { label: "逾期账款占比", value: "3.69%", width: "3.69%", meta: "较上月下降 0.18pct", tone: "risk" },
       stats: [
         { label: "应收项目", value: 18 },
@@ -1855,15 +1859,15 @@ const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
     title: "经营计划收款",
     flow: "plan",
     overviewMetrics: [
-      { label: "本年计划收款", value: "245,000.00", unit: "万元", meta: "同比 ↓ 2.8%", tone: "primary", trend: "down" },
-      { label: "本年实收金额", value: "216,800.00", unit: "万元", meta: "同比 ↑ 7.6%", tone: "success", trend: "up" },
-      { label: "7月实收总额", value: "26,400.00", unit: "万元", meta: "同比 ↑ 5.1%", tone: "primary", trend: "up" },
+      { label: "本年计划收款", value: "24.50", unit: "亿元", meta: "同比 ↓ 2.8%", tone: "primary", trend: "down" },
+      { label: "本年实收金额", value: "21.68", unit: "亿元", meta: "同比 ↑ 7.6%", tone: "success", trend: "up" },
+      { label: "7月实收总额", value: "2.64", unit: "亿元", meta: "同比 ↑ 5.1%", tone: "primary", trend: "up" },
     ],
     summary: {
       heading: "年度收款计划执行",
-      primary: { label: "本年计划收款", value: "245,000.00" },
-      secondary: { label: "本年实收金额", value: "216,800.00", tone: "success" },
-      progress: { label: "年度计划达成率", value: "88.5%", width: "88.5%", meta: "距计划 28,200.00万元", tone: "behind" },
+      primary: { label: "本年计划收款", value: "24.50" },
+      secondary: { label: "本年实收金额", value: "21.68", tone: "success" },
+      progress: { label: "年度计划达成率", value: "88.5%", width: "88.5%", meta: "距计划 2.82亿元", tone: "behind" },
       stats: [{ label: "计划项目", value: 24 }, { label: "待收项目", value: 13 }, { label: "逾期项目", value: 2, tone: "risk" }],
     },
     detailRoute: "biz-collection-plan-shipbuilding",
@@ -1879,15 +1883,15 @@ const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
     title: "经营计划收款",
     flow: "plan",
     overviewMetrics: [
-      { label: "本年计划收款", value: "186,500.00", unit: "万元", meta: "同比 ↓ 4.8%", tone: "primary", trend: "down" },
-      { label: "本年实收金额", value: "172,360.00", unit: "万元", meta: "同比 ↑ 9.6%", tone: "success", trend: "up" },
-      { label: "7月实收总额", value: "21,680.00", unit: "万元", meta: "同比 ↑ 5.4%", tone: "primary", trend: "up" },
+      { label: "本年计划收款", value: "18.65", unit: "亿元", meta: "同比 ↓ 4.8%", tone: "primary", trend: "down" },
+      { label: "本年实收金额", value: "17.24", unit: "亿元", meta: "同比 ↑ 9.6%", tone: "success", trend: "up" },
+      { label: "7月实收总额", value: "2.17", unit: "亿元", meta: "同比 ↑ 5.4%", tone: "primary", trend: "up" },
     ],
     summary: {
       heading: "年度收款计划执行",
-      primary: { label: "本年计划收款", value: "186,500.00" },
-      secondary: { label: "本年实收金额", value: "172,360.00", tone: "success" },
-      progress: { label: "年度计划达成率", value: "92.4%", width: "92.4%", meta: "距计划 14,140.00万元", tone: "behind" },
+      primary: { label: "本年计划收款", value: "18.65" },
+      secondary: { label: "本年实收金额", value: "17.24", tone: "success" },
+      progress: { label: "年度计划达成率", value: "92.4%", width: "92.4%", meta: "距计划 1.41亿元", tone: "behind" },
       stats: [{ label: "计划项目", value: 12 }, { label: "待收项目", value: 7 }, { label: "逾期项目", value: 2, tone: "risk" }],
     },
     detailRoute: "biz-collection-plan",
@@ -1903,14 +1907,14 @@ const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
     title: "经营逾期收款",
     flow: "overdue",
     overviewMetrics: [
-      { label: "应收账款总额", value: "328,600.00", unit: "万元", meta: "较上月 ↓ 2.1%", tone: "primary", trend: "good" },
-      { label: "逾期账款总额", value: "7,420.00", unit: "万元", meta: "较上月 ↓ 5.4%", tone: "danger", trend: "good" },
+      { label: "应收账款总额", value: "32.86", unit: "亿元", meta: "较上月 ↓ 2.1%", tone: "primary", trend: "good" },
+      { label: "逾期账款总额", value: "0.74", unit: "亿元", meta: "较上月 ↓ 5.4%", tone: "danger", trend: "good" },
       { label: "逾期账款占比", value: "2.26", unit: "%", meta: "较上月 ↓ 0.08pct", tone: "success", trend: "good" },
     ],
     summary: {
       heading: "应收账款风险概览",
-      primary: { label: "应收账款总额", value: "328,600.00" },
-      secondary: { label: "逾期账款总额", value: "7,420.00", tone: "danger" },
+      primary: { label: "应收账款总额", value: "32.86" },
+      secondary: { label: "逾期账款总额", value: "0.74", tone: "danger" },
       progress: { label: "逾期账款占比", value: "2.26%", width: "2.26%", meta: "较上月下降 0.08pct", tone: "risk" },
       stats: [
         { label: "应收项目", value: 22 },
@@ -2926,7 +2930,7 @@ function PageBizCollectionPlan({ business }: { business: CollectionPlanBusiness 
 
       <section className="collection-plan-summary" aria-label={`${config.title}概览`}>
         <div className="collection-plan-summary-head">
-          <span>{summary.heading}</span><small>单位：万元</small>
+          <span>{summary.heading}</span><small>单位：亿元</small>
         </div>
         <div className="collection-plan-summary-values">
           <div><span>{summary.primary.label}</span><strong>{summary.primary.value}</strong></div>
@@ -2972,20 +2976,20 @@ function PageBizCollectionPlan({ business }: { business: CollectionPlanBusiness 
                 {project.customerCredit && <em>客户资信 {project.customerCredit}</em>}
               </div>
               <div className="collection-plan-amount-grid">
-                <div><span>期末账面余额</span><strong>{project.balance}<small>万元</small></strong></div>
-                <div className={hasOverdue ? "is-risk" : ""}><span>逾期应收账款合计</span><strong>{project.overdue}<small>万元</small></strong></div>
+                <div><span>期末账面余额</span><strong>{formatCollectionAmountYi(project.balance)}<small>亿元</small></strong></div>
+                <div className={hasOverdue ? "is-risk" : ""}><span>逾期应收账款合计</span><strong>{formatCollectionAmountYi(project.overdue)}<small>亿元</small></strong></div>
               </div>
               <div className="collection-plan-project-meta">
                 <span>合同约定付款日 <b>{project.dueDate}</b></span>
               </div>
               {hasOverdue && (
                 <div className="collection-plan-overdue-detail">
-                  <span>本月新增逾期 <b>{project.monthNew}万元</b></span>
+                  <span>本月新增逾期 <b>{formatCollectionAmountYi(project.monthNew)}亿元</b></span>
                   {agingItems.length > 0 && (
                   <div className="collection-plan-aging">
                     <span>非零账龄分布</span>
                     <div>{agingItems.map(([label, value]) => (
-                    <span key={String(label)}><small>{label}</small><b>{Number(value).toLocaleString()}</b></span>
+                    <span key={String(label)}><small>{label}</small><b>{formatCollectionAmountYi(value)}亿</b></span>
                     ))}</div>
                   </div>
                   )}
@@ -3539,6 +3543,7 @@ function PageProdRepairCompletion() {
           </div>
         </Card>
       </div>
+      <Footer />
     </>
   );
 }
@@ -5202,7 +5207,7 @@ function PagePurchaseGroup({ initialSection = "management" }: { initialSection?:
       </Card>
       </> : activeSection === "steel" ? <PurchaseSteelPanel /> : <PurchaseSupplierPanel />}
 
-      <div style={{ height: 20 }} />
+      <Footer />
     </>
   );
 }

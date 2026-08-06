@@ -9879,6 +9879,13 @@
 }
 
 /* Business collection plan — overview and mobile drill-down. */
+.app-phone-screen .app-data-footer-text {
+  color: var(--app-text-regular);
+  font-size: 11px;
+  font-weight: 550;
+  letter-spacing: 0.02em;
+}
+
 .app-phone-screen .biz-collection-overview {
   margin: 0 10px 8px;
   overflow: hidden;
@@ -9920,33 +9927,38 @@
 .app-phone-screen .biz-collection-overview-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
-  padding: 9px 9px 7px;
+  gap: 8px;
+  padding: 10px;
 }
 .app-phone-screen .biz-collection-overview-grid > article {
+  display: flex;
   min-width: 0;
-  padding: 9px;
+  min-height: 96px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 11px 10px;
   border: 1px solid rgb(0 80 142 / 8%);
   border-radius: 10px;
   background: linear-gradient(180deg, var(--app-white), var(--app-primary-soft));
 }
 .app-phone-screen .biz-collection-overview-grid > article:nth-child(3) {
   grid-column: 1 / -1;
+  min-height: 82px;
 }
 .app-phone-screen .biz-collection-overview-grid > article > span {
   color: var(--app-text-secondary);
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 650;
 }
 .app-phone-screen .biz-collection-overview-grid > article > div {
   display: flex;
   align-items: flex-end;
   gap: 3px;
-  margin: 6px 0 5px;
+  margin: 7px 0 6px;
 }
 .app-phone-screen .biz-collection-overview-grid strong {
   color: var(--app-primary);
-  font-size: 20px;
+  font-size: 24px;
   font-weight: var(--app-weight-data);
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -9960,12 +9972,13 @@
 .app-phone-screen .biz-collection-overview-grid em {
   padding-bottom: 1px;
   color: var(--app-text-regular);
-  font-size: 9px;
+  font-size: 11px;
   font-style: normal;
 }
 .app-phone-screen .biz-collection-overview-grid small {
   color: var(--app-text-secondary);
-  font-size: 9px;
+  font-size: 11px;
+  line-height: 1.35;
 }
 .app-phone-screen .biz-collection-overview-grid small.is-up {
   color: var(--app-success-900);
@@ -10026,13 +10039,13 @@
 .app-phone-screen .collection-plan-summary-values span {
   display: block;
   color: var(--app-text-secondary);
-  font-size: 11px;
+  font-size: 12px;
 }
 .app-phone-screen .collection-plan-summary-values strong {
   display: block;
   margin-top: 6px;
   color: var(--app-primary);
-  font-size: 22px;
+  font-size: 24px;
   font-weight: var(--app-weight-data);
   font-variant-numeric: tabular-nums;
   line-height: 1;
