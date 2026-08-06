@@ -2327,7 +2327,7 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
               <div style={{ padding: "10px 10px 0", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                 {(bizTab === "修船" || bizTab === "造船" || bizTab === "海工" || bizTab === "配套") && (
                   <>
-                    <div style={{ display: "flex", minWidth: 0, alignItems: "center" }}>
+                    <div className={bizTab === "配套" ? "biz-support-module-heading" : undefined} style={{ display: "flex", minWidth: 0, alignItems: "center" }}>
                       <span style={{ overflow: "hidden", color: C.t1, fontSize: 13, fontWeight: 700, lineHeight: 1, textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {bizTab === "造船" ? "船舶建造产值及边贡" : bizTab === "海工" ? "海工建造产值及边贡" : bizTab === "配套" ? "配套营业收入分析" : trendTab === "区域分布" ? "产值市场区域分布" : "修理改装产值及边贡"}
                       </span>
