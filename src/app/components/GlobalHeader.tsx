@@ -33,6 +33,7 @@ type GlobalHeaderProps = {
   dateLabel?: string;
   pageTitle?: string;
   pageSubtitle?: string;
+  backLabel?: string;
   onBack?: () => void;
   badgeMode?: "date" | "freshness";
   badgeExpanded?: boolean;
@@ -43,6 +44,7 @@ function GlobalHeader({
   dateLabel = DEFAULT_GLOBAL_DATE,
   pageTitle,
   pageSubtitle,
+  backLabel,
   onBack,
   badgeMode = "date",
   badgeExpanded = false,
@@ -152,7 +154,7 @@ function GlobalHeader({
 
       {hasPageChrome && (
         <div className="brand-page-chrome">
-          <button type="button" className="brand-page-back" aria-label="Back" onClick={onBack}>
+          <button type="button" className="brand-page-back" aria-label={backLabel ?? "返回上一页"} onClick={onBack}>
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path d="M9.75 3.5L5.25 8l4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

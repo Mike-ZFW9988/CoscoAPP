@@ -148,6 +148,7 @@ function StatusBar() {
 function NavBar({
   title,
   subtitle,
+  backLabel,
   backPage,
   dateBadge,
   badgeMode,
@@ -168,6 +169,7 @@ function NavBar({
       dateLabel={dateBadge ?? DEFAULT_GLOBAL_DATE}
       pageTitle={backPage ? title : undefined}
       pageSubtitle={backPage ? subtitle : undefined}
+      backLabel={backPage ? backLabel : undefined}
       onBack={backPage ? () => nav(backPage) : undefined}
       badgeMode={badgeMode}
       badgeExpanded={badgeExpanded}
@@ -1395,21 +1397,41 @@ const HOME_OVERDUE_RECEIVABLE_OVERVIEW = OVERDUE_RECEIVABLE_OVERVIEW.map(item =>
     : item
 ));
 
+type BusinessOrderKey = "repair" | "shipbuilding" | "offshore" | "support";
+type BusinessOrderProgressDTO = {
+  key: BusinessOrderKey;
+  label: string;
+  target: number;
+  actual: number;
+  rate: number;
+  subs: ReadonlyArray<{ name: string; rate: string }>;
+};
+
+// DTO 结构可直接由后端 JSON 替换；组件层只负责单位与小数格式化。
 const BIZ_ORDER_PROGRESS_ROWS = [
-  { key: "repair", label: "船舶修理", target: 105, actual: 15.69, rate: 14.95, subs: [] as Array<{ name: string; rate: string }> },
+  { key: "repair", label: "船舶修理", target: 105, actual: 15.69, rate: 14.95, subs: [] },
   { key: "shipbuilding", label: "船舶建造", target: 452, actual: 162.88, rate: 36.04, subs: [{ name: "本部", rate: "50.23%" }, { name: "川崎", rate: "17.33%" }] },
-  { key: "offshore", label: "海洋工程", target: 90, actual: 18.54, rate: 20.60, subs: [] as Array<{ name: string; rate: string }> },
-  { key: "support", label: "配套业务", target: 73, actual: 17.59, rate: 24.10, subs: [] as Array<{ name: string; rate: string }> },
-] as const;
+  { key: "offshore", label: "海洋工程", target: 90, actual: 18.54, rate: 20.60, subs: [] },
+  { key: "support", label: "配套业务", target: 73, actual: 17.59, rate: 24.10, subs: [] },
+] satisfies ReadonlyArray<BusinessOrderProgressDTO>;
 
-const BIZ_ORDER_PROGRESS_SUMMARY = {
-  target: BIZ_ORDER_PROGRESS_ROWS.reduce((sum, item) => sum + item.target, 0),
-  actual: BIZ_ORDER_PROGRESS_ROWS.reduce((sum, item) => sum + item.actual, 0),
-  rate: 29.82,
-  yoy: 30.28,
-} as const;
+const BIZ_ORDER_PROGRESS_BASE_ROWS = [
+  { key: "repair", label: "船舶修理", target: 58, actual: 45, rate: 77.59, subs: [] },
+  { key: "shipbuilding", label: "船舶建造", target: 285, actual: 245, rate: 85.96, subs: [] },
+  { key: "offshore", label: "海洋工程", target: 111, actual: 80, rate: 72.07, subs: [] },
+  { key: "support", label: "配套业务", target: 33, actual: 30, rate: 90.91, subs: [] },
+] satisfies ReadonlyArray<BusinessOrderProgressDTO>;
 
-function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; focusSection?: "overdue" }) {
+const buildOrderProgressSummary = (rows: ReadonlyArray<BusinessOrderProgressDTO>, yoy: number) => {
+  const target = rows.reduce((sum, item) => sum + item.target, 0);
+  const actual = rows.reduce((sum, item) => sum + item.actual, 0);
+  return { target, actual, rate: target > 0 ? actual / target * 100 : 0, yoy };
+};
+
+const BIZ_ORDER_PROGRESS_SUMMARY = buildOrderProgressSummary(BIZ_ORDER_PROGRESS_ROWS, 30.28);
+const BIZ_ORDER_PROGRESS_BASE_SUMMARY = buildOrderProgressSummary(BIZ_ORDER_PROGRESS_BASE_ROWS, 18.60);
+
+function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; focusSection?: "overdue" | "business-progress" }) {
   const [freshnessOpen, setFreshnessOpen] = useState(false);
   const [freshnessContainer, setFreshnessContainer] = useState<HTMLElement | null>(null);
   const currentMonth = getCurrentMonthLabels();
@@ -1421,7 +1443,12 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
   useEffect(() => {
     if (!focusSection) return;
     const timer = window.setTimeout(() => {
-      document.querySelector<HTMLElement>(`[data-home-section="${focusSection}"]`)?.scrollIntoView({ block: "start" });
+      const target = document.querySelector<HTMLElement>(`[data-home-section="${focusSection}"]`);
+      const phoneScreen = target?.closest<HTMLElement>(".app-phone-screen");
+      const scrollContainer = phoneScreen?.querySelector<HTMLElement>(":scope > .flex-1.overflow-y-auto");
+      if (!target || !scrollContainer) return;
+      const targetTop = target.getBoundingClientRect().top - scrollContainer.getBoundingClientRect().top + scrollContainer.scrollTop;
+      scrollContainer.scrollTo({ top: Math.max(0, targetTop - 8), behavior: "auto" });
     }, 80);
     return () => window.clearTimeout(timer);
   }, [focusSection]);
@@ -1537,10 +1564,10 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
       <ChannelBar items={["经营", "财务", "生产", "采购", "质量", "能源"]} active="经营" />
 
       {/* 主营业务完成进度：与年度接单指标进度共用同一数据模型 */}
-      <div className="home-order-progress-card" onClick={() => nav("biz-kpi-progress")}>
+      <div data-home-section="business-progress" className="home-order-progress-card" onClick={() => nav("biz-kpi-progress-home")}>
         <div className="home-business-card-head">
           <div><CardIcon /><span>主营业务完成进度</span><small>含南北川崎</small></div>
-          <button type="button" className="app-drilldown-link" onClick={(event) => { event.stopPropagation(); nav("biz-kpi-progress"); }}>查看全部 <ChevronRight size={13} strokeWidth={2.3}/></button>
+          <button type="button" className="app-drilldown-link" onClick={(event) => { event.stopPropagation(); nav("biz-kpi-progress-home"); }}>查看全部 <ChevronRight size={13} strokeWidth={2.3}/></button>
         </div>
         <div className="home-order-progress-summary">
           <div className="home-order-progress-summary-head">
@@ -1610,7 +1637,6 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
             <span style={{ fontSize: 15, fontWeight: 700, color: C.t1 }}>采购</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>{currentMonth.compact}</span>
             <button type="button" className="app-drilldown-link" onClick={(e) => { e.stopPropagation(); nav("purchase-group"); }}>
             查看全部 <ChevronRight size={13} strokeWidth={2.3} />
             </button>
@@ -1649,7 +1675,6 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>{currentMonth.compact}</span>
             <button type="button" className="app-drilldown-link" onClick={(e) => { e.stopPropagation(); nav("quality"); }}>
             查看全部 <ChevronRight size={13} strokeWidth={2.3} />
             </button>
@@ -1687,7 +1712,6 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>{currentMonth.compact}</span>
             <button type="button" className="app-drilldown-link" onClick={(e) => { e.stopPropagation(); nav("energy"); }}>
             查看全部 <ChevronRight size={13} strokeWidth={2.3} />
             </button>
@@ -2171,26 +2195,16 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
     }
     setIsMarketDragging(false);
   };
+  const businessOrderIcons: Record<BusinessOrderKey, React.ReactNode> = {
+    repair: <BusinessRepairIcon />,
+    shipbuilding: <BusinessShipbuildingIcon />,
+    offshore: <BusinessOffshoreIcon />,
+    support: <BusinessSupportIcon />,
+  };
   const orderOverview = includeKawasaki
-    ? {
-        summary: { target: "720.00", actual: "214.70", rate: "29.82" },
-        businesses: [
-          { icon: <BusinessRepairIcon />, name: "船舶修理", pct: "14.95", amount: "15.69", target: "105" },
-          { icon: <BusinessShipbuildingIcon />, name: "船舶建造", pct: "36.04", amount: "162.88", target: "452" },
-          { icon: <BusinessOffshoreIcon />, name: "海洋工程", pct: "20.60", amount: "18.54", target: "90" },
-          { icon: <BusinessSupportIcon />, name: "配套业务", pct: "24.10", amount: "17.59", target: "73" },
-        ],
-      }
-    : {
-        summary: { target: "156", actual: "106", rate: "68" },
-        businesses: [
-          { icon: <BusinessRepairIcon />, name: "船舶修理", pct: "78", amount: "45", target: "58" },
-          { icon: <BusinessShipbuildingIcon />, name: "船舶建造", pct: "86", amount: "245", target: "285" },
-          { icon: <BusinessOffshoreIcon />, name: "海洋工程", pct: "72", amount: "80", target: "111" },
-          { icon: <BusinessSupportIcon />, name: "配套业务", pct: "90", amount: "30", target: "33" },
-        ],
-      };
-  const compactOrderValue = (value: string) => String(Math.round(Number(value)));
+    ? { summary: BIZ_ORDER_PROGRESS_SUMMARY, businesses: BIZ_ORDER_PROGRESS_ROWS }
+    : { summary: BIZ_ORDER_PROGRESS_BASE_SUMMARY, businesses: BIZ_ORDER_PROGRESS_BASE_ROWS };
+  const compactOrderValue = (value: number) => String(Math.round(value));
   return (
     <>
       <style>{`@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}`}</style>
@@ -2233,15 +2247,15 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
 
         <div className="biz-order-grid">
           {orderOverview.businesses.map((it) => (
-            <div key={it.name} className="biz-order-card">
-              <span className="biz-order-card-icon">{it.icon}</span>
+            <div key={it.key} className="biz-order-card">
+              <span className="biz-order-card-icon">{businessOrderIcons[it.key]}</span>
               <span className="biz-order-card-main">
-                <span className="biz-order-card-name">{it.name}</span>
+                <span className="biz-order-card-name">{it.label}</span>
               </span>
               <span className="biz-order-card-side">
-                <span key={`${it.name}-rate-${includeKawasaki}`} className="biz-order-card-pct biz-order-value-change">{compactOrderValue(it.pct)}<em>%</em></span>
+                <span key={`${it.key}-rate-${includeKawasaki}`} className="biz-order-card-pct biz-order-value-change">{compactOrderValue(it.rate)}<em>%</em></span>
               </span>
-              <span key={`${it.name}-${includeKawasaki}`} className="biz-order-card-desc biz-order-value-change">新接 {compactOrderValue(it.amount)}亿 · 目标 {compactOrderValue(it.target)}亿</span>
+              <span key={`${it.key}-${includeKawasaki}`} className="biz-order-card-desc biz-order-value-change">新接 {compactOrderValue(it.actual)}亿 · 目标 {compactOrderValue(it.target)}亿</span>
             </div>
           ))}
         </div>
@@ -2801,29 +2815,35 @@ function PageBizRepairArea() {
 }
 
 
-function PageBizKpiProgress() {
+function PageBizKpiProgress({ fromHome = false }: { fromHome?: boolean }) {
   const timeProgress = 24.82;
   const rows = BIZ_ORDER_PROGRESS_ROWS;
+  const currentMonth = getCurrentMonthLabels();
   return (
     <>
       <StatusBar />
-      <NavBar title="年度接单指标进度" subtitle="经营口径" backLabel="返回经营主题" backPage="biz" />
-      <BreadcrumbBar crumbs={["首页", "经营主题", "指标进度"]} period="截至7.10" />
+      <NavBar
+        title="年度接单指标进度"
+        subtitle="经营口径"
+        backLabel={fromHome ? "返回首页主营业务完成进度" : "返回经营主题"}
+        backPage={fromHome ? "home-business-progress" : "biz"}
+      />
+      <BreadcrumbBar crumbs={fromHome ? ["首页", "主营业务完成进度"] : ["首页", "经营主题", "指标进度"]} period={currentMonth.compact} />
 
       {/* 英雄卡：深色背景 */}
       <div className="app-kpi-hero biz-progress-hero">
         <img className="biz-progress-ship-3d" src="/assets/order-ship-3d.png" alt="" aria-hidden="true" />
         <div className="biz-progress-hero-title">年度接单总体进度</div>
         <div className="biz-progress-hero-value">
-          29.82<span>%</span>
+          {BIZ_ORDER_PROGRESS_SUMMARY.rate.toFixed(2)}<span>%</span>
         </div>
         <div className="biz-progress-hero-meta">
-          <span>累计已接单 <strong>214.70</strong> 亿</span>
+          <span>累计已接单 <strong>{BIZ_ORDER_PROGRESS_SUMMARY.actual.toFixed(2)}</strong> 亿</span>
           <i aria-hidden="true" />
-          <span>全年目标 <strong>720.00</strong> 亿</span>
+          <span>全年目标 <strong>{BIZ_ORDER_PROGRESS_SUMMARY.target.toFixed(2)}</strong> 亿</span>
         </div>
         {/* 总进度条 */}
-        <Progress value={29.82} className="biz-progress-hero-bar" />
+        <Progress value={BIZ_ORDER_PROGRESS_SUMMARY.rate} className="biz-progress-hero-bar" />
         <div className="biz-progress-status-line">
           <span aria-hidden="true" />
           提示：接单目标实际进度较时间进度超5%，进度正常
@@ -2856,8 +2876,8 @@ function PageBizKpiProgress() {
                     {row.subs.map(s => (
                       <div key={s.name} style={{ display: "flex", alignItems: "center", gap: 4 }}>
                         <div style={{ width: 5, height: 5, borderRadius: 1, background: C.phDark }} />
-                        <span style={{ fontSize: 9, color: C.t3 }}>{s.name}</span>
-                        <span style={{ fontSize: 10, fontWeight: 600, color: C.t2 }}>{s.rate}</span>
+                        <span style={{ fontSize: 11, color: C.t3 }}>{s.name}</span>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: C.t2 }}>{s.rate}</span>
                       </div>
                     ))}
                   </div>
@@ -2871,11 +2891,11 @@ function PageBizKpiProgress() {
         <div style={{ display: "flex", gap: 14, marginTop: 18, paddingTop: 12, borderTop: `1px solid ${C.divider}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <div style={{ width: 16, height: 8, borderRadius: 2, background: C.brand }} />
-            <span style={{ fontSize: 9, color: C.t3 }}>已接单金额</span>
+            <span style={{ fontSize: 11, color: C.t3 }}>已接单金额</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <div style={{ width: 16, height: 8, borderRadius: 2, background: C.ph }} />
-            <span style={{ fontSize: 9, color: C.t3 }}>年度目标额</span>
+            <span style={{ fontSize: 11, color: C.t3 }}>年度目标额</span>
           </div>
         </div>
 
@@ -2886,7 +2906,7 @@ function PageBizKpiProgress() {
         </div>
       </div>
 
-      <Footer text="指标进度 · 年度接单口径 · 截至7.10" />
+      <Footer text={`指标进度 · 年度接单口径 · ${currentMonth.compact}`} />
     </>
   );
 }
@@ -5867,6 +5887,7 @@ function renderPage(id: string) {
   switch (id) {
     case "home":              return <PageHome />;
     case "home-overdue":      return <PageHome focusSection="overdue" />;
+    case "home-business-progress": return <PageHome focusSection="business-progress" />;
     case "biz":               return <PageBiz />;
     case "biz-repair":        return <PageBiz initialTab="修船" />;
     case "biz-shipbuilding":  return <PageBiz initialTab="造船" />;
@@ -5879,6 +5900,7 @@ function renderPage(id: string) {
     case "biz-collection-overdue-support": return <PageBizCollectionPlan business="配套" />;
     case "biz-support-revenue-detail": return <PageBizSupportRevenueDetail />;
     case "biz-kpi-progress":  return <PageBizKpiProgress />;
+    case "biz-kpi-progress-home": return <PageBizKpiProgress fromHome />;
     case "prod-repair":       return <PageProdRepair />;
     case "prod-repair-ships":      return <PageProdRepairShips />;
     case "prod-repair-completion": return <PageProdRepairCompletion />;
@@ -5919,7 +5941,11 @@ function nav(pageId: string) {
 export default function App() {
   const [activePage, setActivePage] = useState("home");
   const pageScrollRef = useRef<HTMLDivElement | null>(null);
-  const displayActivePage = activePage === "home-overdue" ? "home" : activePage;
+  const displayActivePage = activePage === "home-overdue" || activePage === "home-business-progress"
+    ? "home"
+    : activePage === "biz-kpi-progress-home"
+      ? "biz-kpi-progress"
+      : activePage;
 
   useEffect(() => {
     const handler = (e: Event) => setActivePage((e as CustomEvent<string>).detail);
@@ -5932,7 +5958,7 @@ export default function App() {
   }, [activePage]);
 
   return (
-    <div className="flex min-h-[100dvh]" style={{ fontFamily: "var(--font-ui, 'Noto Sans SC', 'PingFang SC', -apple-system, sans-serif)", background: "#1A2A3A" }}>
+    <div className="flex min-h-[100dvh]" style={{ fontFamily: "var(--app-font-family)", background: "#1A2A3A" }}>
 
       {/* Left Nav Panel */}
       <div className="w-[200px] shrink-0 overflow-y-auto pt-4" style={{ background: "#00345F", scrollbarWidth: "thin", scrollbarColor: "#1E3A5A #00345F" }}>
