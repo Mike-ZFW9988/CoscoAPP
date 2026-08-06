@@ -1398,9 +1398,16 @@ const HOME_OVERDUE_RECEIVABLE_OVERVIEW = OVERDUE_RECEIVABLE_OVERVIEW.map(item =>
 const BIZ_ORDER_PROGRESS_ROWS = [
   { key: "repair", label: "船舶修理", target: 105, actual: 15.69, rate: 14.95, subs: [] as Array<{ name: string; rate: string }> },
   { key: "shipbuilding", label: "船舶建造", target: 452, actual: 162.88, rate: 36.04, subs: [{ name: "本部", rate: "50.23%" }, { name: "川崎", rate: "17.33%" }] },
-  { key: "offshore", label: "海工业务", target: 90, actual: 18.54, rate: 20.60, subs: [] as Array<{ name: string; rate: string }> },
+  { key: "offshore", label: "海洋工程", target: 90, actual: 18.54, rate: 20.60, subs: [] as Array<{ name: string; rate: string }> },
   { key: "support", label: "配套业务", target: 73, actual: 17.59, rate: 24.10, subs: [] as Array<{ name: string; rate: string }> },
 ] as const;
+
+const BIZ_ORDER_PROGRESS_SUMMARY = {
+  target: BIZ_ORDER_PROGRESS_ROWS.reduce((sum, item) => sum + item.target, 0),
+  actual: BIZ_ORDER_PROGRESS_ROWS.reduce((sum, item) => sum + item.actual, 0),
+  rate: 29.82,
+  yoy: 30.28,
+} as const;
 
 function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; focusSection?: "overdue" }) {
   const [freshnessOpen, setFreshnessOpen] = useState(false);
@@ -1529,18 +1536,30 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
       {/* 频道导航 */}
       <ChannelBar items={["经营", "财务", "生产", "采购", "质量", "能源"]} active="经营" />
 
-      {/* L5 指标进度：与年度接单指标进度共用四板块数据 */}
+      {/* 主营业务完成进度：与年度接单指标进度共用同一数据模型 */}
       <div className="home-order-progress-card" onClick={() => nav("biz-kpi-progress")}>
         <div className="home-business-card-head">
-          <div><CardIcon /><span>指标进度</span></div>
+          <div><CardIcon /><span>主营业务完成进度</span><small>含南北川崎</small></div>
           <button type="button" className="app-drilldown-link" onClick={(event) => { event.stopPropagation(); nav("biz-kpi-progress"); }}>查看全部 <ChevronRight size={13} strokeWidth={2.3}/></button>
+        </div>
+        <div className="home-order-progress-summary">
+          <div className="home-order-progress-summary-head">
+            <span>经营订单承接金额 <small>本年累计</small></span>
+            <em>同比 {BIZ_ORDER_PROGRESS_SUMMARY.yoy.toFixed(2)}% ↑</em>
+          </div>
+          <div className="home-order-progress-summary-value"><strong>{BIZ_ORDER_PROGRESS_SUMMARY.actual.toFixed(2)}</strong><span>亿元</span></div>
+          <div className="home-order-progress-summary-track"><i style={{ width: `${BIZ_ORDER_PROGRESS_SUMMARY.rate}%` }} /></div>
+          <div className="home-order-progress-summary-meta">
+            <span>目标 <b>{BIZ_ORDER_PROGRESS_SUMMARY.target.toFixed(2)}亿元</b></span>
+            <span>完成率 <b>{BIZ_ORDER_PROGRESS_SUMMARY.rate.toFixed(2)}%</b></span>
+          </div>
         </div>
         <div className="home-order-progress-grid">
           {BIZ_ORDER_PROGRESS_ROWS.map(row => (
             <article key={row.key}>
               <header><strong>{row.label}</strong><em>{row.rate.toFixed(2)}%</em></header>
-              <div><span>新接订单金额</span><b>{row.actual.toFixed(2)}<small>亿</small></b></div>
-              <footer><span>目标金额 {row.target.toFixed(2)}亿</span><i><b style={{ width: `${Math.min(row.rate, 100)}%` }}/></i></footer>
+              <div className="home-order-progress-sector-track"><i style={{ width: `${Math.min(row.rate, 100)}%` }} /></div>
+              <footer><span>目标 <b>{row.target.toFixed(2)}亿</b></span><span>实际 <b>{row.actual.toFixed(2)}亿</b></span></footer>
             </article>
           ))}
         </div>
@@ -2156,19 +2175,19 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
     ? {
         summary: { target: "720.00", actual: "214.70", rate: "29.82" },
         businesses: [
-          { icon: <BusinessShipbuildingIcon />, name: "船舶建造", pct: "36.04", amount: "162.88", target: "452" },
           { icon: <BusinessRepairIcon />, name: "船舶修理", pct: "14.95", amount: "15.69", target: "105" },
-          { icon: <BusinessOffshoreIcon />, name: "海工业务", pct: "20.60", amount: "18.54", target: "90" },
-          { icon: <BusinessSupportIcon />, name: "配套服务", pct: "24.10", amount: "17.59", target: "73" },
+          { icon: <BusinessShipbuildingIcon />, name: "船舶建造", pct: "36.04", amount: "162.88", target: "452" },
+          { icon: <BusinessOffshoreIcon />, name: "海洋工程", pct: "20.60", amount: "18.54", target: "90" },
+          { icon: <BusinessSupportIcon />, name: "配套业务", pct: "24.10", amount: "17.59", target: "73" },
         ],
       }
     : {
         summary: { target: "156", actual: "106", rate: "68" },
         businesses: [
-          { icon: <BusinessShipbuildingIcon />, name: "船舶建造", pct: "86", amount: "245", target: "285" },
           { icon: <BusinessRepairIcon />, name: "船舶修理", pct: "78", amount: "45", target: "58" },
-          { icon: <BusinessOffshoreIcon />, name: "海工业务", pct: "72", amount: "80", target: "111" },
-          { icon: <BusinessSupportIcon />, name: "配套服务", pct: "90", amount: "30", target: "33" },
+          { icon: <BusinessShipbuildingIcon />, name: "船舶建造", pct: "86", amount: "245", target: "285" },
+          { icon: <BusinessOffshoreIcon />, name: "海洋工程", pct: "72", amount: "80", target: "111" },
+          { icon: <BusinessSupportIcon />, name: "配套业务", pct: "90", amount: "30", target: "33" },
         ],
       };
   const compactOrderValue = (value: string) => String(Math.round(Number(value)));
@@ -2218,11 +2237,11 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
               <span className="biz-order-card-icon">{it.icon}</span>
               <span className="biz-order-card-main">
                 <span className="biz-order-card-name">{it.name}</span>
-                <span key={`${it.name}-${includeKawasaki}`} className="biz-order-card-desc biz-order-value-change">新接 {compactOrderValue(it.amount)}亿 / 目标 {compactOrderValue(it.target)}亿</span>
               </span>
               <span className="biz-order-card-side">
                 <span key={`${it.name}-rate-${includeKawasaki}`} className="biz-order-card-pct biz-order-value-change">{compactOrderValue(it.pct)}<em>%</em></span>
               </span>
+              <span key={`${it.name}-${includeKawasaki}`} className="biz-order-card-desc biz-order-value-change">新接 {compactOrderValue(it.amount)}亿 · 目标 {compactOrderValue(it.target)}亿</span>
             </div>
           ))}
         </div>
