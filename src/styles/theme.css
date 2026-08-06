@@ -10443,3 +10443,82 @@
 .app-phone-screen .finance-assessment-progress i { display: block; height: 100%; border-radius: inherit; }.app-phone-screen .finance-assessment-progress i.is-good { background: linear-gradient(90deg,var(--app-success-900),var(--app-success)); }.app-phone-screen .finance-assessment-progress i.is-watch { background: linear-gradient(90deg,var(--app-danger-900),var(--app-danger)); }
 .app-phone-screen .finance-assessment-progress span { position: absolute; top: 0; width: 1px; height: 100%; background: rgb(255 255 255/.88); box-shadow: 0 0 0 1px rgb(0 52 95/.15); }
 .app-phone-screen .finance-assessment-note { margin-top: 9px; padding: 9px 10px; border-radius: 10px; background: var(--app-primary-soft); color: var(--app-text-regular); font-size: 10px; line-height: 16px; }
+
+/* Homepage shared KPI cards: home and detail pages consume the same data model. */
+.app-phone-screen .home-shared-kpi-grid {
+  display: grid;
+  padding: 11px 10px 12px;
+  gap: 0;
+}
+.app-phone-screen .home-shared-kpi-grid.is-two { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.app-phone-screen .home-shared-kpi-grid.is-three { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.app-phone-screen .home-shared-kpi {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  text-align: center;
+}
+.app-phone-screen .home-shared-kpi-grid.is-two .home-shared-kpi {
+  align-items: flex-start;
+  padding: 9px 10px;
+  border: 1px solid var(--app-border-lighter);
+  border-radius: 10px;
+  background: linear-gradient(180deg,#fff 0%,var(--app-primary-soft) 100%);
+  text-align: left;
+}
+.app-phone-screen .home-shared-kpi > i {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: var(--app-divider);
+}
+.app-phone-screen .home-shared-kpi > span {
+  overflow: hidden;
+  width: 100%;
+  color: var(--app-text-secondary);
+  font-size: 11px;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-phone-screen .home-shared-kpi > div {
+  display: flex;
+  min-height: 34px;
+  align-items: flex-end;
+  gap: 2px;
+}
+.app-phone-screen .home-shared-kpi strong {
+  color: var(--app-primary-900);
+  font-size: 26px;
+  font-weight: 760;
+  font-variant-numeric: tabular-nums;
+  line-height: 32px;
+}
+.app-phone-screen .home-shared-kpi[data-tone="success"] strong { color: var(--app-success-900); }
+.app-phone-screen .home-shared-kpi[data-tone="warning"] strong { color: var(--app-warning-900); }
+.app-phone-screen .home-shared-kpi small {
+  padding-bottom: 4px;
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  line-height: 14px;
+  white-space: nowrap;
+}
+.app-phone-screen .home-shared-kpi em {
+  overflow: hidden;
+  width: 100%;
+  color: var(--app-text-secondary);
+  font-size: 9px;
+  font-style: normal;
+  line-height: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-phone-screen .home-shared-kpi em b { color: var(--app-success-900); font-weight: 650; }
+.app-phone-screen .home-shared-kpi[data-tone="warning"] em b { color: var(--app-warning-900); }
+.app-phone-screen .energy-kpi-grid em { line-height: 14px; white-space: normal; }

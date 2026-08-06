@@ -1359,20 +1359,51 @@ function MetricPair({ a, b }: { a: { label: string; value: string; target: strin
 
 /* ─── Page Renderers ─── */
 
+const getCurrentMonthLabels = (date = new Date()) => ({
+  compact: `截至${date.getFullYear()}.${date.getMonth() + 1}`,
+  full: `${date.getFullYear()}年${date.getMonth() + 1}月`,
+});
+
+const PURCHASE_OVERVIEW_METRICS = [
+  { label: "总采购金额（船用物资）", homeLabel: "总采购金额", value: "128", unit: "亿", subLabel: "本月新增", subValue: "19.14亿元" },
+  { label: "集采金额", homeLabel: "集采金额", value: "104", unit: "亿", subLabel: "本月新增", subValue: "18.14亿元" },
+  { label: "集采率", homeLabel: "集采率", value: "81.3", unit: "%", subLabel: "较上月", subValue: "+1%" },
+] as const;
+
+const QUALITY_OVERVIEW_METRICS = [
+  { key: "inspection", label: "报验一次合规率", value: "98.6", target: "98", yoy: "同比↑0.8%" },
+  { key: "rt", label: "RT/PAUT一次合规率", value: "96.2", target: "97", yoy: "同比↓0.6%" },
+] as const;
+
+const ENERGY_KPI_BY_SEGMENT: Record<EnergyMode, {
+  perVal: string;
+  perTarget: string;
+  perYoy: string;
+  carbon: string;
+  carbonTarget: string;
+  carbonYoy: string;
+}> = {
+  整体: { perVal: "0.0345", perTarget: "0.0345", perYoy: "同比↓4.0%", carbon: "0.48", carbonTarget: "0.45", carbonYoy: "同比↓2.1%" },
+  造船: { perVal: "0.0298", perTarget: "0.0310", perYoy: "同比↓5.2%", carbon: "0.42", carbonTarget: "0.45", carbonYoy: "同比↓3.8%" },
+  修船: { perVal: "0.0412", perTarget: "0.0400", perYoy: "同比↑2.6%", carbon: "0.56", carbonTarget: "0.50", carbonYoy: "同比↑4.4%" },
+  海工: { perVal: "0.0387", perTarget: "0.0380", perYoy: "同比↑1.8%", carbon: "0.51", carbonTarget: "0.48", carbonYoy: "同比↑2.9%" },
+};
+
 function PageHome({ repairMode = false }: { repairMode?: boolean }) {
   const [alertExpanded, setAlertExpanded] = useState(false);
   const [freshnessOpen, setFreshnessOpen] = useState(false);
   const [freshnessContainer, setFreshnessContainer] = useState<HTMLElement | null>(null);
+  const currentMonth = getCurrentMonthLabels();
 
   useEffect(() => {
     setFreshnessContainer(document.querySelector<HTMLElement>(".app-phone-screen"));
   }, []);
 
   const DATA_FRESHNESS = [
-    { module: "新接订单", date: "2026年8月8日", cadence: "每日更新" },
-    { module: "年度交付", date: "2026年7月31日", cadence: "按月更新" },
-    { module: "完工出厂", date: "2026年7月31日", cadence: "按月更新" },
-    { module: "逾期应收", date: "2026年8月7日", cadence: "每日更新" },
+    { module: "新接订单", date: currentMonth.full, cadence: "每日更新" },
+    { module: "年度交付", date: currentMonth.full, cadence: "按月更新" },
+    { module: "完工出厂", date: currentMonth.full, cadence: "按月更新" },
+    { module: "逾期应收", date: currentMonth.full, cadence: "每日更新" },
   ];
 
   const ALERTS = [
@@ -1380,7 +1411,7 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
     { cat: "经营", text: "新接订单完成率 29.8%，低于时间进度 5%", pri: "高优先级", link: "经营",  page: "biz"         },
     { cat: "财务", text: "逾期应收本周新增 +1931",                 pri: "高优先级", link: "财务",  page: "finance"     },
     { cat: "采购", text: "钢材集采率 81.3%，低于目标 85%",         pri: "中优先级", link: "采购",  page: "purchase-group" },
-    { cat: "质量", text: "结构RT一次合格率 96.2%，低于目标 97%",   pri: "中优先级", link: "质量",  page: "quality"     },
+    { cat: "质量", text: "RT/PAUT一次合规率 96.2%，低于目标 97%", pri: "中优先级", link: "质量",  page: "quality"     },
   ];
   const visibleAlerts = alertExpanded ? ALERTS : ALERTS.slice(0, 3);
 
@@ -1600,43 +1631,23 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
             <span style={{ fontSize: 15, fontWeight: 700, color: C.t1 }}>采购</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>截至3.16</span>
+            <span style={{ fontSize: 11, color: C.t3 }}>{currentMonth.compact}</span>
             <button type="button" className="app-drilldown-link" onClick={(e) => { e.stopPropagation(); nav("purchase-group"); }}>
             查看全部 <ChevronRight size={13} strokeWidth={2.3} />
             </button>
           </div>
         </div>
 
-        {/* 3列指标：竖分割线 */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", padding: "14px 0 16px" }}>
-          {/* 总采购金额 */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, borderRight: `1px solid ${C.divider}`, padding: "0 8px" }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>总采购金额</span>
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 2 }}>
-              <span style={{ fontSize: 28, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>128</span>
-              <span style={{ fontSize: 13, color: C.t2, paddingBottom: 2, fontWeight: 500 }}>亿</span>
+        {/* 与采购主题总览共用同一组指标数据 */}
+        <div className="home-shared-kpi-grid is-three">
+          {PURCHASE_OVERVIEW_METRICS.map((item, index) => (
+            <div key={item.label} className="home-shared-kpi" data-tone={item.unit === "%" ? "warning" : "default"}>
+              <span>{item.homeLabel}</span>
+              <div><strong>{item.value}</strong><small>{item.unit}</small></div>
+              <em>{item.subLabel} <b>{item.subValue}</b></em>
+              {index < PURCHASE_OVERVIEW_METRICS.length - 1 && <i aria-hidden="true" />}
             </div>
-            <span style={{ fontSize: 11, color: C.t3 }}>本周+6.2亿</span>
-          </div>
-
-          {/* 集采金额 */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, borderRight: `1px solid ${C.divider}`, padding: "0 8px" }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>集采金额</span>
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 2 }}>
-              <span style={{ fontSize: 28, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>104</span>
-              <span style={{ fontSize: 13, color: C.t2, paddingBottom: 2, fontWeight: 500 }}>亿</span>
-            </div>
-            <span style={{ fontSize: 11, color: C.t3 }}>较上周+5.1亿</span>
-          </div>
-
-          {/* 集采率 */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "0 8px" }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>集采率</span>
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 1 }}>
-              <span style={{ fontSize: 28, fontWeight: 700, color: C.warning, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>81.3</span>
-              <span style={{ fontSize: 13, color: C.t3, paddingBottom: 2 }}>%</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -1655,53 +1666,27 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
             {/* ▲ RT待提升 预警tag */}
             <div style={{ display: "flex", alignItems: "center", gap: 3, background: C.ph, border: `1px solid ${C.border}`, borderRadius: 4, padding: "2px 7px" }}>
               <span style={{ fontSize: 9, color: C.t2 }}>▲</span>
-              <span style={{ fontSize: 10, color: C.t2, fontWeight: 500 }}>RT待提升</span>
+              <span style={{ fontSize: 10, color: C.t2, fontWeight: 500 }}>RT/PAUT待提升</span>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>截至3.16</span>
+            <span style={{ fontSize: 11, color: C.t3 }}>{currentMonth.compact}</span>
             <button type="button" className="app-drilldown-link" onClick={(e) => { e.stopPropagation(); nav("quality"); }}>
             查看全部 <ChevronRight size={13} strokeWidth={2.3} />
             </button>
           </div>
         </div>
 
-        {/* 两列合格率指标 */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: "10px 10px 8px", gap: 8 }}>
-          {[
-            { label: "报验一次合格率", value: "98.6", target: "≥98%", ok: true },
-            { label: "结构RT一次合格率", value: "96.2", target: "≥97%", ok: false },
-          ].map((it, i) => (
-            <div key={i} style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-              <span style={{ fontSize: 11, color: C.t3 }}>{it.label}</span>
-              <div style={{ display: "flex", alignItems: "flex-end", gap: 1 }}>
-                <span style={{ fontSize: 28, fontWeight: 700, fontVariantNumeric: "tabular-nums", lineHeight: 1, color: it.ok ? C.success : C.warning }}>{it.value}</span>
-                <span style={{ fontSize: 13, color: C.t3, paddingBottom: 2 }}>%</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <span style={{ fontSize: 10, color: C.t3 }}>目标{it.target}</span>
-                <span style={{ fontSize: 9, padding: "1px 5px", borderRadius: 4, background: it.ok ? `${C.success}15` : `${C.warning}15`, color: it.ok ? C.success : C.warning, fontWeight: 600 }}>{it.ok ? "达标" : "待提升"}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* 质量活动动态 */}
-        <div className="home-news-card">
-          <div className="home-news-head">
-            <span>质量活动动态 · 本周3场</span>
-            <button type="button" className="home-news-action" onClick={(e) => { e.stopPropagation(); nav("quality"); }}>
-              查看 <ChevronRight size={12} strokeWidth={2.3} />
-            </button>
-          </div>
-          <button type="button" className="home-news-item" onClick={(e) => { e.stopPropagation(); nav("quality"); }}>
-            <span className="home-news-date">
-              <em>3月</em>
-              <b>11-12</b>
-            </span>
-            <span className="home-news-title">组织中远海运重工/船研所 QC 小组活动专题培训班</span>
-            <ChevronRight className="home-news-chevron" size={14} strokeWidth={2.3} />
-          </button>
+        {/* 与质量主题总览共用同一组指标数据 */}
+        <div className="home-shared-kpi-grid is-two">
+          {QUALITY_OVERVIEW_METRICS.map(item => {
+            const ok = Number(item.value) >= Number(item.target);
+            return <div key={item.key} className="home-shared-kpi" data-tone={ok ? "success" : "warning"}>
+              <span>{item.label}</span>
+              <div><strong>{item.value}</strong><small>%</small></div>
+              <em>目标≥{item.target}% · <b>{item.yoy}</b></em>
+            </div>;
+          })}
         </div>
       </div>
 
@@ -1723,33 +1708,26 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>截至3.16</span>
+            <span style={{ fontSize: 11, color: C.t3 }}>{currentMonth.compact}</span>
             <button type="button" className="app-drilldown-link" onClick={(e) => { e.stopPropagation(); nav("energy"); }}>
             查看全部 <ChevronRight size={13} strokeWidth={2.3} />
             </button>
           </div>
         </div>
 
-        {/* 两列指标 */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: "10px 10px 10px", gap: 8 }}>
-          {/* 万元产值碳排放 */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>万元产值碳排放</span>
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 3 }}>
-              <span style={{ fontSize: 28, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>0.48</span>
-              <span style={{ fontSize: 12, color: C.t3, paddingBottom: 2 }}>吨</span>
-            </div>
-            <span style={{ fontSize: 11, color: C.t3 }}>目标≤0.45</span>
-          </div>
-          {/* 万元产值综合能耗 */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            <span style={{ fontSize: 11, color: C.t3 }}>万元产值综合能耗</span>
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 3 }}>
-              <span style={{ fontSize: 28, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>0.32</span>
-              <span style={{ fontSize: 12, color: C.t3, paddingBottom: 2 }}>吨标煤/万元</span>
-            </div>
-            <span style={{ fontSize: 11, color: C.t3 }}>同比↓4%</span>
-          </div>
+        {/* 顺序及数据与能源主题整体口径保持一致 */}
+        <div className="home-shared-kpi-grid is-two">
+          {[
+            { label: "万元产值综合能耗", value: ENERGY_KPI_BY_SEGMENT.整体.perVal, unit: "吨标煤/万元", target: ENERGY_KPI_BY_SEGMENT.整体.perTarget, yoy: ENERGY_KPI_BY_SEGMENT.整体.perYoy },
+            { label: "万元产值碳排放", value: ENERGY_KPI_BY_SEGMENT.整体.carbon, unit: "吨/万元", target: ENERGY_KPI_BY_SEGMENT.整体.carbonTarget, yoy: ENERGY_KPI_BY_SEGMENT.整体.carbonYoy },
+          ].map(item => {
+            const ok = Number(item.value) <= Number(item.target);
+            return <div key={item.label} className="home-shared-kpi" data-tone={ok ? "success" : "warning"}>
+              <span>{item.label}</span>
+              <div><strong>{item.value}</strong><small>{item.unit}</small></div>
+              <em>目标≤{item.target} · <b>{item.yoy}</b></em>
+            </div>;
+          })}
         </div>
       </div>
 
@@ -5309,11 +5287,7 @@ function PagePurchaseGroup({ initialSection = "management" }: { initialSection?:
           <span>集采率明细 <ChevronRight aria-hidden="true" /></span>
         </button>
         <div className="purchase-overview-kpis">
-          {[
-            { label: "总采购金额（船用物资）", value: "128", unit: "亿", subLabel: "本月新增", subValue: "19.14亿元" },
-            { label: "集采金额", value: "104", unit: "亿", subLabel: "本月新增", subValue: "18.14亿元" },
-            { label: "集采率", value: "81.3", unit: "%", subLabel: "较上月", subValue: "+1%" },
-          ].map((item) => <div key={item.label}><span>{item.label}</span><strong>{item.value}<small>{item.unit}</small></strong><em>{item.subLabel} <b>{item.subValue}</b></em></div>)}
+          {PURCHASE_OVERVIEW_METRICS.map((item) => <div key={item.label}><span>{item.label}</span><strong>{item.value}<small>{item.unit}</small></strong><em>{item.subLabel} <b>{item.subValue}</b></em></div>)}
         </div>
         <div className="purchase-data-source">采购数据来源为EP系统，价格不含税</div>
       </Card>
@@ -5544,8 +5518,10 @@ function PageQuality() {
 
       <Card title="质量运营总览" className="mt-3 quality-overview-card">
         <div className="quality-overview-metrics">
-          <div><span>报验一次合格率</span><strong>98.6%</strong><small>目标 ≥98%</small><b className="is-good"><ShieldCheck size={12}/>达标</b></div>
-          <div><span>RT/PAUT一次合规率</span><strong>96.2%</strong><small>目标 ≥97%</small><b className="is-warning"><AlertTriangle size={12}/>待提升 0.8%</b></div>
+          {QUALITY_OVERVIEW_METRICS.map(item => {
+            const ok = Number(item.value) >= Number(item.target);
+            return <div key={item.key}><span>{item.label}</span><strong>{item.value}%</strong><small>目标 ≥{item.target}% · {item.yoy}</small><b className={ok ? "is-good" : "is-warning"}>{ok ? <ShieldCheck size={12}/> : <AlertTriangle size={12}/>} {ok ? "达标" : `待提升 ${(Number(item.target) - Number(item.value)).toFixed(1)}%`}</b></div>;
+          })}
         </div>
         <div className="quality-overview-alerts">
           <div className="quality-overview-alert-title"><AlertTriangle size={14}/><strong>重点提醒</strong><span>2项待关注</span></div>
@@ -5622,6 +5598,7 @@ function PageQualityRT() {
     ["广东重工", "修船", "92.0%", "100%", "—"], ["广东重工", "造船", "95.2%", "97.4%", "—"],
   ];
   const visibleRows = business === "全部" ? rows : rows.filter(row => row[1] === business);
+  const rtOverview = QUALITY_OVERVIEW_METRICS.find(item => item.key === "rt")!;
   return (
     <>
       <StatusBar />
@@ -5629,8 +5606,8 @@ function PageQualityRT() {
       <BreadcrumbBar crumbs={["首页", "质量主题", "质量-RT/PAUT合规率"]} />
 
       <Card title="结构RT/PAUT一次性合规率总览" className="mt-3 quality-rt-summary-card">
-        <div className="quality-rt-summary"><div><span>年度累计</span><strong>98.6%</strong><small className="is-good">高于目标 4.3%</small></div><div><span>本月合格率</span><strong>98.4%</strong></div><div><span>年度目标</span><strong>94.3%</strong></div></div>
-        <div className="quality-rt-conclusion"><ShieldCheck size={14}/><span>年度累计与本月合格率均高于目标，整体质量表现稳定</span></div>
+        <div className="quality-rt-summary"><div><span>年度累计</span><strong>{rtOverview.value}%</strong><small className="is-risk">低于目标 {(Number(rtOverview.target)-Number(rtOverview.value)).toFixed(1)}%</small></div><div><span>本月合规率</span><strong>96.4%</strong></div><div><span>年度目标</span><strong>{rtOverview.target}%</strong></div></div>
+        <div className="quality-rt-conclusion"><AlertTriangle size={14}/><span>年度累计低于目标，{rtOverview.yoy}，需持续跟踪重点企业改进情况</span></div>
       </Card>
 
       <Card title="企业结构RT/PAUT一次性合规率表现" className="quality-rt-list-card">
@@ -5710,6 +5687,7 @@ function PageQualityInspection() {
     ["舟山重工", "造船", "98.7%", "99.9%", "99.9%"],
     ["上海重工", "海工", "98.0%", "98.9%", "99.3%"],
   ];
+  const inspectionOverview = QUALITY_OVERVIEW_METRICS.find(item => item.key === "inspection")!;
   return (
     <>
       <StatusBar />
@@ -5717,7 +5695,7 @@ function PageQualityInspection() {
       <BreadcrumbBar crumbs={["首页", "质量主题", "质量-报验一次合规率"]} />
 
       <Card title="报验一次合规率总览" className="mt-3 quality-rt-summary-card">
-        <div className="quality-rt-summary"><div><span>年度累计</span><strong>99.2%</strong><small className="is-good">高于目标 1.7%</small></div><div><span>本月合规率</span><strong>99.0%</strong></div><div><span>年度目标</span><strong>97.5%</strong></div></div>
+        <div className="quality-rt-summary"><div><span>年度累计</span><strong>{inspectionOverview.value}%</strong><small className="is-good">高于目标 {(Number(inspectionOverview.value)-Number(inspectionOverview.target)).toFixed(1)}%</small></div><div><span>本月合规率</span><strong>98.8%</strong></div><div><span>年度目标</span><strong>{inspectionOverview.target}%</strong></div></div>
         <div className="quality-rt-conclusion"><ShieldCheck size={14}/><span>年度累计及本月报验一次合规率均达标，整体表现稳定</span></div>
       </Card>
 
@@ -5976,11 +5954,11 @@ function PageEnergy() {
   type TrendMode = "total" | "intensity" | "carbon";
   const [seg, setSeg] = useState<Seg>("整体");
   const [trendMode, setTrendMode] = useState<TrendMode>("total");
-  const data: Record<Seg, { feeRatio:string; feeTarget:string; feeTrend:string; totalEnergy:string; perVal:string; perTarget:string; carbon:string; carbonTarget:string; ranking:[string,string,string,string][] }> = {
-    整体:{ feeRatio:"2.08",feeTarget:"3.5",feeTrend:"同比 3.9%",totalEnergy:"13,526.83",perVal:"0.0345",perTarget:"0.0345",carbon:"0.48",carbonTarget:"0.45",ranking:[["1","威海重工科技","0.0028","+1"],["2","南通远洋配套","0.0069","+1"],["3","启东海工","0.0163","+1"],["4","南通船务","0.0191","+1"],["5","大连川崎","0.0195","+1"],["6","南通川崎","0.0225","+1"],["7","舟山重工","0.0237","+1"],["8","大连重工","0.0248","+1"],["9","扬州重工","0.0277","+1"],["10","广东重工","0.0438","+1"],["11","上海重工","0.0462","+1"],["12","南通重工装备","—",""],["13","大连迪施","—",""],["14","市一万度力","—",""]]},
-    造船:{ feeRatio:"1.92",feeTarget:"3.2",feeTrend:"同比 2.8%",totalEnergy:"8,312.40",perVal:"0.0298",perTarget:"0.0310",carbon:"0.42",carbonTarget:"0.45",ranking:[["1","南通川崎","18,720","+2"],["2","大连川崎","19,340","-1"],["3","扬州重工","20,180","+1"],["4","大连重工","21,050","-1"],["5","舟山重工","22,610","+3"],["6","上海重工","24,390","-2"],["7","广东重工","25,810","-1"]]},
-    修船:{ feeRatio:"2.54",feeTarget:"4.0",feeTrend:"同比 4.5%",totalEnergy:"3,108.62",perVal:"0.0412",perTarget:"0.0400",carbon:"0.56",carbonTarget:"0.50",ranking:[["1","舟山重工","21,880","+1"],["2","广东重工","22,460","-1"],["3","大连重工","23,190","+2"],["4","上海重工","24,830","-1"],["5","南通船务","26,710","+1"]]},
-    海工:{ feeRatio:"2.31",feeTarget:"3.8",feeTrend:"同比 3.2%",totalEnergy:"2,105.81",perVal:"0.0387",perTarget:"0.0380",carbon:"0.51",carbonTarget:"0.48",ranking:[["1","启东海工","20,310","+1"],["2","南通船务","22,580","-1"],["3","大连重工","24,170","+1"],["4","上海重工","25,490","-1"]]},
+  const data: Record<Seg, { feeRatio:string; feeTarget:string; feeTrend:string; totalEnergy:string; perVal:string; perTarget:string; perYoy:string; carbon:string; carbonTarget:string; carbonYoy:string; ranking:[string,string,string,string][] }> = {
+    整体:{ feeRatio:"2.08",feeTarget:"3.5",feeTrend:"同比 3.9%",totalEnergy:"13,526.83",...ENERGY_KPI_BY_SEGMENT.整体,ranking:[["1","威海重工科技","0.0028","+1"],["2","南通远洋配套","0.0069","+1"],["3","启东海工","0.0163","+1"],["4","南通船务","0.0191","+1"],["5","大连川崎","0.0195","+1"],["6","南通川崎","0.0225","+1"],["7","舟山重工","0.0237","+1"],["8","大连重工","0.0248","+1"],["9","扬州重工","0.0277","+1"],["10","广东重工","0.0438","+1"],["11","上海重工","0.0462","+1"],["12","南通重工装备","—",""],["13","大连迪施","—",""],["14","市一万度力","—",""]]},
+    造船:{ feeRatio:"1.92",feeTarget:"3.2",feeTrend:"同比 2.8%",totalEnergy:"8,312.40",...ENERGY_KPI_BY_SEGMENT.造船,ranking:[["1","南通川崎","18,720","+2"],["2","大连川崎","19,340","-1"],["3","扬州重工","20,180","+1"],["4","大连重工","21,050","-1"],["5","舟山重工","22,610","+3"],["6","上海重工","24,390","-2"],["7","广东重工","25,810","-1"]]},
+    修船:{ feeRatio:"2.54",feeTarget:"4.0",feeTrend:"同比 4.5%",totalEnergy:"3,108.62",...ENERGY_KPI_BY_SEGMENT.修船,ranking:[["1","舟山重工","21,880","+1"],["2","广东重工","22,460","-1"],["3","大连重工","23,190","+2"],["4","上海重工","24,830","-1"],["5","南通船务","26,710","+1"]]},
+    海工:{ feeRatio:"2.31",feeTarget:"3.8",feeTrend:"同比 3.2%",totalEnergy:"2,105.81",...ENERGY_KPI_BY_SEGMENT.海工,ranking:[["1","启东海工","20,310","+1"],["2","南通船务","22,580","-1"],["3","大连重工","24,170","+1"],["4","上海重工","25,490","-1"]]},
   };
   const trends: Record<TrendMode, Record<Seg, number[]>> = {
     total:{ 整体:[14200,13800,12100,11500,12800,13200,13600,14100,14800,13900,13500,14300],造船:[8800,8500,7400,7100,7900,8100,8400,8700,9100,8600,8300,8800],修船:[3200,3100,2700,2600,2900,3000,3100,3200,3400,3200,3100,3300],海工:[2200,2200,2000,1800,2000,2100,2100,2200,2300,2100,2100,2200]},
@@ -6010,8 +5988,8 @@ function PageEnergy() {
         <div className="energy-kpi-grid">
           <div><span>能源费用比率</span><strong>{d.feeRatio}<small>%</small></strong><em className="is-good">目标≤{d.feeTarget}%</em></div>
           <div><span>年累综合能耗</span><strong>{d.totalEnergy}</strong><em>万吨标煤</em></div>
-          <div><span>万元产值综合能耗</span><strong>{d.perVal}</strong><em className={Number(d.perVal)<=Number(d.perTarget)?"is-good":"is-risk"}>目标≤{d.perTarget}</em></div>
-          <div><span>万元产值碳排放</span><strong>{d.carbon}<small>吨</small></strong><em className={Number(d.carbon)<=Number(d.carbonTarget)?"is-good":"is-risk"}>目标≤{d.carbonTarget}</em></div>
+          <div><span>万元产值综合能耗</span><strong>{d.perVal}</strong><em className={Number(d.perVal)<=Number(d.perTarget)?"is-good":"is-risk"}>目标≤{d.perTarget} · {d.perYoy}</em></div>
+          <div><span>万元产值碳排放</span><strong>{d.carbon}<small>吨</small></strong><em className={Number(d.carbon)<=Number(d.carbonTarget)?"is-good":"is-risk"}>目标≤{d.carbonTarget} · {d.carbonYoy}</em></div>
         </div>
         <div className="energy-alert-strip"><AlertTriangle size={14}/><span>{Number(d.carbon)>Number(d.carbonTarget)?`${seg}万元产值碳排放高于目标 ${(Number(d.carbon)-Number(d.carbonTarget)).toFixed(2)}吨`:`${seg}能源费用与碳排放均处于目标范围内`}</span></div>
       </Card>
