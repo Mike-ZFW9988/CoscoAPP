@@ -1389,7 +1389,20 @@ const ENERGY_KPI_BY_SEGMENT: Record<EnergyMode, {
   海工: { perVal: "0.0387", perTarget: "0.0380", perYoy: "同比↑1.8%", carbon: "0.51", carbonTarget: "0.48", carbonYoy: "同比↑2.9%" },
 };
 
-function PageHome({ repairMode = false }: { repairMode?: boolean }) {
+const OVERDUE_RECEIVABLE_OVERVIEW = [
+  { key: "receivable", label: "应收账款总额", value: "118,260.00", unit: "万元", mom: "较上月 ↓1.8%", tone: "primary" },
+  { key: "overdue", label: "逾期账款总额", value: "4,360.00", unit: "万元", mom: "较上月 ↓6.2%", tone: "danger" },
+  { key: "ratio", label: "逾期账款占比", value: "3.69", unit: "%", mom: "较上月 ↓0.18pct", tone: "success" },
+] as const;
+
+const BIZ_ORDER_PROGRESS_ROWS = [
+  { key: "repair", label: "船舶修理", target: 105, actual: 15.69, rate: 14.95, subs: [] as Array<{ name: string; rate: string }> },
+  { key: "shipbuilding", label: "船舶建造", target: 452, actual: 162.88, rate: 36.04, subs: [{ name: "本部", rate: "50.23%" }, { name: "川崎", rate: "17.33%" }] },
+  { key: "offshore", label: "海工业务", target: 90, actual: 18.54, rate: 20.60, subs: [] as Array<{ name: string; rate: string }> },
+  { key: "support", label: "配套业务", target: 73, actual: 17.59, rate: 24.10, subs: [] as Array<{ name: string; rate: string }> },
+] as const;
+
+function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; focusSection?: "overdue" }) {
   const [alertExpanded, setAlertExpanded] = useState(false);
   const [freshnessOpen, setFreshnessOpen] = useState(false);
   const [freshnessContainer, setFreshnessContainer] = useState<HTMLElement | null>(null);
@@ -1399,17 +1412,25 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
     setFreshnessContainer(document.querySelector<HTMLElement>(".app-phone-screen"));
   }, []);
 
+  useEffect(() => {
+    if (!focusSection) return;
+    const timer = window.setTimeout(() => {
+      document.querySelector<HTMLElement>(`[data-home-section="${focusSection}"]`)?.scrollIntoView({ block: "start" });
+    }, 80);
+    return () => window.clearTimeout(timer);
+  }, [focusSection]);
+
   const DATA_FRESHNESS = [
-    { module: "新接订单", date: currentMonth.full, cadence: "每日更新" },
+    { module: "新接订单", date: currentMonth.full, cadence: "按月更新" },
     { module: "年度交付", date: currentMonth.full, cadence: "按月更新" },
     { module: "完工出厂", date: currentMonth.full, cadence: "按月更新" },
-    { module: "逾期应收", date: currentMonth.full, cadence: "每日更新" },
+    { module: "逾期应收", date: currentMonth.full, cadence: "按月更新" },
   ];
 
   const ALERTS = [
     { cat: "生产", text: "广东重工交付完成率 90%",                 pri: "高优先级", link: "生产",  page: "prod-repair" },
     { cat: "经营", text: "新接订单完成率 29.8%，低于时间进度 5%", pri: "高优先级", link: "经营",  page: "biz"         },
-    { cat: "财务", text: "逾期应收本周新增 +1931",                 pri: "高优先级", link: "财务",  page: "finance"     },
+    { cat: "财务", text: "逾期账款占比较上月下降 0.18pct",        pri: "高优先级", link: "财务",  page: "finance"     },
     { cat: "采购", text: "钢材集采率 81.3%，低于目标 85%",         pri: "中优先级", link: "采购",  page: "purchase-group" },
     { cat: "质量", text: "RT/PAUT一次合规率 96.2%，低于目标 97%", pri: "中优先级", link: "质量",  page: "quality"     },
   ];
@@ -1534,47 +1555,25 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
         ))}
       </div>
 
-      {/* L5 指标进度 */}
-      <div onClick={() => nav("biz-kpi-progress")} style={{ background: C.card, borderRadius: 12, boxShadow: "var(--app-shadow-card)", margin: "0 10px 8px", overflow: "hidden", cursor: "pointer" }}>
-        <div style={{ padding: "9px 14px 8px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${C.divider}` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <CardIcon />
-            <span style={{ fontSize: 15, fontWeight: 700, color: C.t1 }}>指标进度</span>
-          </div>
+      {/* L5 指标进度：与年度接单指标进度共用四板块数据 */}
+      <div className="home-order-progress-card" onClick={() => nav("biz-kpi-progress")}>
+        <div className="home-business-card-head">
+          <div><CardIcon /><span>指标进度</span></div>
+          <button type="button" className="app-drilldown-link" onClick={(event) => { event.stopPropagation(); nav("biz-kpi-progress"); }}>查看全部 <ChevronRight size={13} strokeWidth={2.3}/></button>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "56px 1fr 1fr 1fr", padding: "7px 14px 5px", borderBottom: `1px solid ${C.divider}` }}>
-          <span />
-          {["订单艘数", "万载重吨", "金额"].map(h => (
-            <span key={h} style={{ fontSize: 11, color: C.t3, textAlign: "center" }}>{h}</span>
+        <div className="home-order-progress-grid">
+          {BIZ_ORDER_PROGRESS_ROWS.map(row => (
+            <article key={row.key}>
+              <header><strong>{row.label}</strong><em>{row.rate.toFixed(2)}%</em></header>
+              <div><span>新接订单金额</span><b>{row.actual.toFixed(2)}<small>亿</small></b></div>
+              <footer><span>目标金额 {row.target.toFixed(2)}亿</span><i><b style={{ width: `${Math.min(row.rate, 100)}%` }}/></i></footer>
+            </article>
           ))}
         </div>
-        {[
-          { label: "新接", n: "8", nu: "艘", dwt: "95", dwtu: "万DWT", amt: "62", amtu: "亿" },
-          { label: "在手", n: "72", nu: "艘", dwt: "860", dwtu: "万DWT", amt: "520", amtu: "亿" },
-          { label: "交付", n: "6", nu: "艘", dwt: "78", dwtu: "万DWT", amt: "45", amtu: "亿" },
-        ].map((row, i, arr) => (
-          <div key={row.label} style={{ display: "grid", gridTemplateColumns: "56px 1fr 1fr 1fr", padding: "8px 14px", borderBottom: i < arr.length - 1 ? `1px solid ${C.divider}` : "none", alignItems: "center" }}>
-            <button type="button" className="home-progress-link" onClick={(e) => { e.stopPropagation(); nav("biz-kpi-progress"); }}>
-              {row.label}<ChevronRight size={12} strokeWidth={2.4} />
-            </button>
-            <div style={{ textAlign: "center" }}>
-              <span style={{ fontSize: 18, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums" }}>{row.n}</span>
-              <span style={{ fontSize: 11, color: C.t3 }}>{row.nu}</span>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <span style={{ fontSize: 18, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums" }}>{row.dwt}</span>
-              <span style={{ fontSize: 10, color: C.t3 }}>{row.dwtu}</span>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <span style={{ fontSize: 18, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums" }}>{row.amt}</span>
-              <span style={{ fontSize: 11, color: C.t3 }}>{row.amtu}</span>
-            </div>
-          </div>
-        ))}
       </div>
 
       {/* 逾期应收 */}
-      <div onClick={() => nav("biz-overdue")} style={{ background: C.card, borderRadius: 12, boxShadow: "var(--app-shadow-card)", margin: "0 10px 8px", overflow: "hidden", cursor: "pointer" }}>
+      <div data-home-section="overdue" onClick={() => nav("biz-overdue")} style={{ background: C.card, borderRadius: 12, boxShadow: "var(--app-shadow-card)", margin: "0 10px 8px", overflow: "hidden", cursor: "pointer" }}>
         {/* 卡头 */}
         <div style={{ padding: "12px 14px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${C.divider}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1588,28 +1587,15 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
             </button>
           </div>
         </div>
-        {/* 3列指标 */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", padding: "14px 0 12px" }}>
-          {[
-            { label: "本周新增", value: "+1931", unit: "万", positive: true },
-            { label: "本周收回", value: "-133", unit: "万", positive: false },
-            { label: "净变动", value: "+1798", unit: "万", positive: true },
-          ].map((it, i) => (
-            <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, borderRight: i < 2 ? `1px solid ${C.divider}` : "none", padding: "0 8px" }}>
-              <span style={{ fontSize: 11, color: C.t3 }}>{it.label}</span>
-              <div style={{ display: "flex", alignItems: "flex-end", gap: 2 }}>
-                <span style={{ fontSize: 24, fontWeight: 700, fontVariantNumeric: "tabular-nums", lineHeight: 1, color: it.positive ? C.danger : C.success }}>{it.value}</span>
-                <span style={{ fontSize: 12, color: C.t3, paddingBottom: 2 }}>{it.unit}</span>
-              </div>
-            </div>
+        <div className="home-overdue-kpi-grid">
+          {OVERDUE_RECEIVABLE_OVERVIEW.map((item, index) => (
+            <article key={item.key} data-tone={item.tone}>
+              <span>{item.label}</span>
+              <div><strong>{item.value}</strong><small>{item.unit}</small></div>
+              <em>{item.mom}</em>
+              {index < OVERDUE_RECEIVABLE_OVERVIEW.length - 1 && <i aria-hidden="true" />}
+            </article>
           ))}
-        </div>
-        {/* 归因文本区 */}
-        <div style={{ margin: "0 14px 14px", background: "#FFF8F2", border: `1px solid #EDE0D4`, borderRadius: 8, padding: "8px 10px", display: "flex", gap: 6 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.warning, flexShrink: 0, marginTop: 1 }}>注</span>
-          <span style={{ fontSize: 11, color: C.t2, lineHeight: "18px" }}>
-            本周新增主要为修理改装板块，舟山重工"BLUE DREAM MELODY"轮 <b style={{ color: C.t1 }}>1213万</b>，催收跟进中。
-          </span>
         </div>
       </div>
 
@@ -1731,7 +1717,7 @@ function PageHome({ repairMode = false }: { repairMode?: boolean }) {
         </div>
       </div>
 
-      <Footer text="数据口径混合日更/月更 · 点主题卡下钻至详情" />
+      <Footer text="数据口径月更 · 点主题卡下钻至详情" />
 
       <Sheet open={freshnessOpen} onOpenChange={setFreshnessOpen}>
         <SheetContent side="bottom" className="home-freshness-sheet" container={freshnessContainer}>
@@ -1827,11 +1813,7 @@ const COLLECTION_PLAN_CONFIG: Record<CollectionPlanBusiness, {
   修船: {
     title: "经营逾期收款",
     flow: "overdue",
-    overviewMetrics: [
-      { label: "应收账款总额", value: "118,260.00", unit: "万元", meta: "较上月 ↓ 1.8%", tone: "primary", trend: "good" },
-      { label: "逾期账款总额", value: "4,360.00", unit: "万元", meta: "较上月 ↓ 6.2%", tone: "danger", trend: "good" },
-      { label: "逾期账款占比", value: "3.69", unit: "%", meta: "较上月 ↓ 0.18pct", tone: "success", trend: "good" },
-    ],
+    overviewMetrics: OVERDUE_RECEIVABLE_OVERVIEW.map(item => ({ label: item.label, value: item.value, unit: item.unit, meta: item.mom, tone: item.tone, trend: "good" as const })),
     summary: {
       heading: "应收账款风险概览",
       primary: { label: "应收账款总额", value: "118,260.00" },
@@ -2938,16 +2920,7 @@ function PageBizRepairArea() {
 
 function PageBizKpiProgress() {
   const timeProgress = 24.82;
-  const rows = [
-    {
-      label: "船舶建造",
-      target: 452, actual: 162.88, rate: "36.04%",
-      subs: [{ name: "本部", rate: "50.23%" }, { name: "川崎", rate: "17.33%" }],
-    },
-    { label: "船舶修理改装", target: 105, actual: 15.69,  rate: "14.95%", subs: [] },
-    { label: "海工业务",     target: 90,  actual: 18.54,  rate: "20.60%", subs: [] },
-    { label: "配套业务",     target: 73,  actual: 17.59,  rate: "24.10%", subs: [] },
-  ];
+  const rows = BIZ_ORDER_PROGRESS_ROWS;
   return (
     <>
       <StatusBar />
@@ -2979,7 +2952,7 @@ function PageBizKpiProgress() {
         <div style={{ fontSize: 13, fontWeight: 600, color: C.t1, marginBottom: 16 }}>各业务板块接单进度</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {rows.map((row) => {
-            const rateValue = Number.parseFloat(row.rate);
+            const rateValue = row.rate;
             const isAheadOfTime = rateValue >= timeProgress;
             return (
               <div key={row.label} className="biz-progress-item">
@@ -2989,9 +2962,9 @@ function PageBizKpiProgress() {
                   <span className="biz-progress-actual">已接 <strong>{row.actual}</strong> 亿</span>
                 </div>
                 <div className="biz-progress-item-track-row">
-                  <Progress value={rateValue} className="biz-progress-track" aria-label={`${row.label}接单进度 ${row.rate}`} />
-                  <strong className={`biz-progress-rate ${isAheadOfTime ? "is-ahead" : "is-behind"}`} aria-label={`${row.rate}，${isAheadOfTime ? "高于" : "低于"}时间进度`}>
-                    {row.rate}
+                  <Progress value={rateValue} className="biz-progress-track" aria-label={`${row.label}接单进度 ${row.rate.toFixed(2)}%`} />
+                  <strong className={`biz-progress-rate ${isAheadOfTime ? "is-ahead" : "is-behind"}`} aria-label={`${row.rate.toFixed(2)}%，${isAheadOfTime ? "高于" : "低于"}时间进度`}>
+                    {row.rate.toFixed(2)}%
                   </strong>
                 </div>
                 {/* 细分子标注（船舶建造专用） */}
@@ -3145,6 +3118,7 @@ function PageBizSupportRevenueDetail() {
 
 function PageBizOverdue() {
   const [distTab, setDistTab] = useState<"合计" | "系内" | "系外">("合计");
+  const currentMonth = getCurrentMonthLabels();
 
   type AgingAmount = { overYear: number; underYear: number };
   const distributionData: Array<{
@@ -3153,11 +3127,11 @@ function PageBizOverdue() {
     external: AgingAmount;
   }> = [
     { label: "船舶建造", internal: { overYear: 0, underYear: 0 }, external: { overYear: 0, underYear: 0 } },
-    { label: "修理改装", internal: { overYear: 1200, underYear: 3000 }, external: { overYear: 3600, underYear: 2200 } },
-    { label: "海工及新能源", internal: { overYear: 540, underYear: 1260 }, external: { overYear: 1350, underYear: 750 } },
-    { label: "配套业务", internal: { overYear: 215, underYear: 500 }, external: { overYear: 560, underYear: 319 } },
+    { label: "修理改装", internal: { overYear: 420, underYear: 900 }, external: { overYear: 960, underYear: 680 } },
+    { label: "海洋工程", internal: { overYear: 120, underYear: 280 }, external: { overYear: 310, underYear: 190 } },
+    { label: "配套业务", internal: { overYear: 60, underYear: 100 }, external: { overYear: 180, underYear: 160 } },
   ];
-  const axisMax = 10000;
+  const axisMax = 2000;
   const overdueColors = {
     external: C.danger,
     internal: C.brand,
@@ -3174,47 +3148,12 @@ function PageBizOverdue() {
   return (
     <>
       <StatusBar />
-      <NavBar title="逾期应收账款" subtitle="经营口径" backLabel="返回经营主题" backPage="biz" />
-      <BreadcrumbBar crumbs={["首页", "经营主题", "逾期应收"]} period="截至7.10" />
+      <NavBar title="逾期应收账款" subtitle="经营口径" backLabel="返回首页逾期应收" backPage="home-overdue" />
+      <BreadcrumbBar crumbs={["首页", "逾期应收"]} period={currentMonth.compact} />
 
       {/* 英雄数字区 */}
-      <div style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #F8FBFF 100%)", border: "1px solid rgba(0,80,142,0.08)", margin: "8px 10px 0", borderRadius: 12, padding: "10px 10px 10px", boxShadow: "0 4px 10px rgba(20,76,128,0.055)" }}>
-        <div style={{ fontSize: 11, color: C.t2, fontWeight: 500, marginBottom: 4 }}>逾期应收账款总规模（万元）</div>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 6, marginBottom: 10 }}>
-          <span style={{ fontSize: 36, fontWeight: 700, color: C.brand, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>15,494</span>
-          <span style={{ fontSize: 12, color: C.t3, paddingBottom: 4 }}>万元</span>
-          <span style={{ borderRadius: 999, background: overdueColors.riskSoft, color: overdueColors.risk, fontSize: 9, fontWeight: 700, lineHeight: 1, padding: "3px 6px", marginBottom: 5 }}>风险存量</span>
-        </div>
-        {/* 两色说明行 */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px", marginBottom: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 2, background: overdueColors.external, flexShrink: 0 }} />
-            <span style={{ fontSize: 11, color: C.t2 }}>逾期</span>
-            <span style={{ fontSize: 11, color: C.t3 }}>≥1年</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: overdueColors.external }}>7,465</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 2, background: overdueColors.internal, flexShrink: 0 }} />
-            <span style={{ fontSize: 11, color: C.t2 }}>逾期</span>
-            <span style={{ fontSize: 11, color: C.t3 }}>{"<"}1年</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: overdueColors.internal }}>8,029</span>
-          </div>
-        </div>
-        {/* 分隔 */}
-        <div style={{ height: 1, background: C.divider, marginBottom: 10 }} />
-        {/* 本周变动 */}
-        <div style={{ display: "flex", gap: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span style={{ fontSize: 10, color: C.t3 }}>上周新增逾期</span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: overdueColors.external }}>+1,931</span>
-            <span style={{ fontSize: 10, color: C.t3 }}>万</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span style={{ fontSize: 10, color: C.t3 }}>收回</span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: overdueColors.recovery }}>133</span>
-            <span style={{ fontSize: 10, color: C.t3 }}>万</span>
-          </div>
-        </div>
+      <div className="biz-overdue-summary-card">
+        {OVERDUE_RECEIVABLE_OVERVIEW.map(item => <article key={item.key} data-tone={item.tone}><span>{item.label}</span><div><strong>{item.value}</strong><small>{item.unit}</small></div><em>{item.mom}</em></article>)}
       </div>
 
       {/* 堆叠横向条形图 */}
@@ -3310,13 +3249,16 @@ function PageBizOverdue() {
         </div>
         {/* X轴刻度 */}
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, paddingLeft: 35 }}>
-          {[0, 2500, 5000, 7500, 10000].map(v => (
+          {[0, .25, .5, .75, 1].map(ratio => {
+            const v = axisMax * ratio;
+            return (
             <span key={v} style={{ fontSize: 9, color: C.t3 }}>{v.toLocaleString()}</span>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      <Footer text="经营逾期收款 · 经营口径 · 截至7.10" />
+      <Footer text={`经营逾期收款 · 经营口径 · ${currentMonth.compact}`} />
     </>
   );
 }
@@ -6009,6 +5951,7 @@ function PageEnergy() {
 function renderPage(id: string) {
   switch (id) {
     case "home":              return <PageHome />;
+    case "home-overdue":      return <PageHome focusSection="overdue" />;
     case "biz":               return <PageBiz />;
     case "biz-repair":        return <PageBiz initialTab="修船" />;
     case "biz-shipbuilding":  return <PageBiz initialTab="造船" />;
@@ -6066,6 +6009,7 @@ function nav(pageId: string) {
 export default function App() {
   const [activePage, setActivePage] = useState("home");
   const pageScrollRef = useRef<HTMLDivElement | null>(null);
+  const displayActivePage = activePage === "home-overdue" ? "home" : activePage;
 
   useEffect(() => {
     const handler = (e: Event) => setActivePage((e as CustomEvent<string>).detail);
@@ -6096,11 +6040,11 @@ export default function App() {
             onClick={() => setActivePage(p.id)}
             className={cn(
               "block w-full text-left py-2 px-4 text-[11px] leading-4 transition-all duration-100 border-none cursor-pointer",
-              activePage === p.id
+              displayActivePage === p.id
                 ? "text-white font-semibold border-l-2 border-primary"
                 : "text-white/35 font-normal border-l-2 border-transparent hover:text-white/60"
             )}
-            style={{ background: activePage === p.id ? "rgba(0,80,142,0.15)" : "transparent" }}
+            style={{ background: displayActivePage === p.id ? "rgba(0,80,142,0.15)" : "transparent" }}
           >
             {p.label}
           </button>
@@ -6131,7 +6075,7 @@ export default function App() {
           {/* Page label */}
           <div className="mt-4 text-center">
             <span className="text-[11px] text-white/50 bg-white/10 rounded-full px-3 py-1 tracking-tight">
-              {PAGES.find(p => p.id === activePage)?.label}
+              {PAGES.find(p => p.id === displayActivePage)?.label}
             </span>
           </div>
         </div>

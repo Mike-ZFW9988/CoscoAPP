@@ -10522,3 +10522,50 @@
 .app-phone-screen .home-shared-kpi em b { color: var(--app-success-900); font-weight: 650; }
 .app-phone-screen .home-shared-kpi[data-tone="warning"] em b { color: var(--app-warning-900); }
 .app-phone-screen .energy-kpi-grid em { line-height: 14px; white-space: normal; }
+
+/* Homepage overdue receivables and four-sector order progress */
+.app-phone-screen .home-business-card-head {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--app-divider);
+}
+.app-phone-screen .home-business-card-head > div { display: flex; align-items: center; gap: 8px; }
+.app-phone-screen .home-business-card-head > div > span { color: var(--foreground); font-size: 15px; font-weight: 700; }
+.app-phone-screen .home-order-progress-card { margin: 0 10px 8px; overflow: hidden; border-radius: 12px; background: var(--card); box-shadow: var(--app-shadow-card); cursor: pointer; }
+.app-phone-screen .home-order-progress-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; padding: 10px; }
+.app-phone-screen .home-order-progress-grid article { min-width: 0; padding: 10px; border: 1px solid var(--app-border-lighter); border-radius: 11px; background: linear-gradient(180deg,#fff 0%,var(--app-primary-soft) 100%); }
+.app-phone-screen .home-order-progress-grid header { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.app-phone-screen .home-order-progress-grid header strong { overflow: hidden; color: var(--foreground); font-size: 13px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.app-phone-screen .home-order-progress-grid header em { color: var(--app-primary-900); font-size: 14px; font-style: normal; font-weight: 760; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.app-phone-screen .home-order-progress-grid article > div { display: flex; align-items: baseline; justify-content: space-between; gap: 5px; margin-top: 9px; }
+.app-phone-screen .home-order-progress-grid article > div span { color: var(--app-text-secondary); font-size: 10px; white-space: nowrap; }
+.app-phone-screen .home-order-progress-grid article > div b { color: var(--app-primary-900); font-size: 20px; font-weight: 760; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.app-phone-screen .home-order-progress-grid article > div small { margin-left: 2px; color: var(--app-text-secondary); font-size: 9px; font-weight: 500; }
+.app-phone-screen .home-order-progress-grid footer { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 7px; margin-top: 8px; }
+.app-phone-screen .home-order-progress-grid footer > span { color: var(--app-text-secondary); font-size: 9px; white-space: nowrap; }
+.app-phone-screen .home-order-progress-grid footer > i { height: 5px; overflow: hidden; border-radius: 999px; background: var(--app-primary-100); }
+.app-phone-screen .home-order-progress-grid footer > i b { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,var(--app-primary),var(--app-primary-500)); }
+.app-phone-screen .home-overdue-kpi-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); padding: 13px 0 14px; }
+.app-phone-screen .home-overdue-kpi-grid article { position: relative; display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 5px; padding: 0 5px; text-align: center; }
+.app-phone-screen .home-overdue-kpi-grid article > i { position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: var(--app-divider); }
+.app-phone-screen .home-overdue-kpi-grid article > span { color: var(--app-text-secondary); font-size: 10px; white-space: nowrap; }
+.app-phone-screen .home-overdue-kpi-grid article > div { display: flex; min-width: 0; align-items: flex-end; justify-content: center; gap: 2px; }
+.app-phone-screen .home-overdue-kpi-grid strong { color: var(--app-primary-900); font-size: 17px; font-weight: 760; font-variant-numeric: tabular-nums; line-height: 23px; white-space: nowrap; }
+.app-phone-screen .home-overdue-kpi-grid article[data-tone="danger"] strong { color: var(--app-danger); }
+.app-phone-screen .home-overdue-kpi-grid article[data-tone="success"] strong { color: var(--app-success-900); }
+.app-phone-screen .home-overdue-kpi-grid small { padding-bottom: 2px; color: var(--app-text-secondary); font-size: 8px; white-space: nowrap; }
+.app-phone-screen .home-overdue-kpi-grid em { color: var(--app-success-900); font-size: 9px; font-style: normal; white-space: nowrap; }
+.app-phone-screen .biz-overdue-summary-card { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin: 8px 10px 0; }
+.app-phone-screen .biz-overdue-summary-card article { min-width: 0; padding: 12px; border: 1px solid var(--app-border-lighter); border-radius: 12px; background: linear-gradient(180deg,#fff 0%,var(--app-primary-soft) 100%); box-shadow: 0 4px 10px rgb(20 76 128/.055); }
+.app-phone-screen .biz-overdue-summary-card article:last-child { grid-column: 1/-1; }
+.app-phone-screen .biz-overdue-summary-card article > span { display: block; color: var(--app-text-regular); font-size: 11px; }
+.app-phone-screen .biz-overdue-summary-card article > div { display: flex; align-items: flex-end; gap: 4px; margin-top: 5px; }
+.app-phone-screen .biz-overdue-summary-card strong { color: var(--app-primary-900); font-size: 23px; font-weight: 760; font-variant-numeric: tabular-nums; line-height: 29px; }
+.app-phone-screen .biz-overdue-summary-card article[data-tone="danger"] strong { color: var(--app-danger); }
+.app-phone-screen .biz-overdue-summary-card article[data-tone="success"] strong { color: var(--app-success-900); }
+.app-phone-screen .biz-overdue-summary-card small { padding-bottom: 3px; color: var(--app-text-secondary); font-size: 9px; }
+.app-phone-screen .biz-overdue-summary-card em { display: block; margin-top: 6px; color: var(--app-success-900); font-size: 10px; font-style: normal; }
