@@ -2738,6 +2738,228 @@
   font-weight: 500;
 }
 
+/* 财务主题核心指标：统一营业收入、资产负债与可用资金的信息层级。 */
+.app-phone-screen .finance-overview-stack {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.app-phone-screen .finance-overview-stack > .app-dashboard-card {
+  margin: 0 10px;
+}
+
+.app-phone-screen .finance-overview-metric-card .app-card-body {
+  padding: 0;
+}
+
+.app-phone-screen .finance-overview-metric-body {
+  display: block;
+  width: 100%;
+  min-height: 0 !important;
+  padding: 12px 14px 13px !important;
+  border: 0;
+  border-radius: 0 !important;
+  background: linear-gradient(145deg, #fff 0%, var(--app-primary-100) 100%) !important;
+  color: var(--app-text-primary);
+  text-align: left;
+  box-shadow: none !important;
+}
+
+.app-phone-screen .finance-overview-primary-label {
+  display: block;
+  color: var(--app-text-secondary);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.app-phone-screen .finance-overview-primary-value {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 3px;
+}
+
+.app-phone-screen .finance-overview-primary-value strong {
+  color: var(--app-primary);
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1.08;
+}
+
+.app-phone-screen .finance-overview-primary-value small {
+  color: var(--app-text-regular);
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.app-phone-screen .finance-overview-secondary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--app-border-extra-light);
+}
+
+.app-phone-screen .finance-overview-secondary-grid > span {
+  min-width: 0;
+  padding: 0 8px;
+}
+
+.app-phone-screen .finance-overview-secondary-grid > span:first-child { padding-left: 0; }
+.app-phone-screen .finance-overview-secondary-grid > span + span { border-left: 1px solid var(--app-border-extra-light); }
+
+.app-phone-screen .finance-overview-secondary-grid small,
+.app-phone-screen .finance-overview-secondary-grid b {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-phone-screen .finance-overview-secondary-grid small {
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  font-weight: 550;
+}
+
+.app-phone-screen .finance-overview-secondary-grid b {
+  margin-top: 4px;
+  color: var(--app-text-primary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+}
+
+.app-phone-screen .finance-overview-secondary-grid b.is-good,
+.app-phone-screen .finance-balance-overview .is-good,
+.app-phone-screen .finance-balance-company-list .is-good { color: var(--app-success); }
+
+.app-phone-screen .finance-overview-secondary-grid b.is-risk,
+.app-phone-screen .finance-balance-company-list .is-risk { color: var(--app-danger); }
+
+.app-phone-screen .finance-rate-entry-card {
+  margin-top: 10px;
+}
+
+.app-phone-screen .finance-rate-entry-body {
+  display: grid;
+  width: 100%;
+  min-height: 0 !important;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+  gap: 11px;
+  align-items: stretch;
+  padding: 12px 14px !important;
+  border: 0;
+  border-radius: 0 !important;
+  background: linear-gradient(145deg, #fff, var(--app-primary-100)) !important;
+  text-align: left;
+  box-shadow: none !important;
+}
+
+.app-phone-screen .finance-rate-entry-body > i { background: var(--app-border-extra-light); }
+.app-phone-screen .finance-rate-entry-body > span { min-width: 0; }
+.app-phone-screen .finance-rate-entry-body small,
+.app-phone-screen .finance-rate-entry-body strong,
+.app-phone-screen .finance-rate-entry-body em { display: block; }
+.app-phone-screen .finance-rate-entry-body small { color: var(--app-text-secondary); font-size: 11px; font-weight: 600; }
+.app-phone-screen .finance-rate-entry-body strong { margin-top: 4px; color: var(--app-primary); font-size: 23px; font-weight: 800; line-height: 1.1; }
+.app-phone-screen .finance-rate-entry-body em { margin-top: 5px; color: var(--app-text-secondary); font-size: 10px; font-style: normal; }
+.app-phone-screen .finance-rate-entry-body em.is-risk { color: var(--app-danger); }
+
+/* 可用资金下钻页：金额统一折算为人民币亿元，字号对齐营业收入下钻页。 */
+.app-phone-screen .finance-fund-overview {
+  margin: 10px 0;
+  padding: 14px;
+  border: 1px solid var(--app-border-extra-light);
+  background: linear-gradient(145deg, #fff 0%, var(--app-primary-100) 100%);
+}
+
+.app-phone-screen .finance-fund-overview-head > strong { font-size: 16px; }
+
+.app-phone-screen .finance-fund-total {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin: 12px 0 13px;
+}
+
+.app-phone-screen .finance-fund-total > span { color: var(--app-text-secondary); font-size: 12px; font-weight: 650; }
+.app-phone-screen .finance-fund-total > strong { color: var(--app-primary); font-size: 30px; font-variant-numeric: tabular-nums; font-weight: 800; line-height: 1; }
+.app-phone-screen .finance-fund-total > small { color: var(--app-text-regular); font-size: 12px; }
+.app-phone-screen .finance-fund-kpis { padding-top: 11px; border-top: 1px solid var(--app-border-extra-light); }
+.app-phone-screen .finance-fund-kpis span { font-size: 11px; }
+.app-phone-screen .finance-fund-kpis strong { font-size: 20px; }
+.app-phone-screen .finance-fund-kpis small { font-size: 10px; }
+.app-phone-screen .finance-fund-unit { font-size: 10px; }
+.app-phone-screen .finance-fund-row { min-height: 42px !important; grid-template-columns: 24px 78px minmax(0, 1fr) 50px; }
+.app-phone-screen .finance-fund-rank { font-size: 10px; }
+.app-phone-screen .finance-fund-company { font-size: 11px; }
+.app-phone-screen .finance-fund-row > strong { font-size: 11px; }
+.app-phone-screen .finance-fund-hint { font-size: 10px; }
+.finance-fund-sheet-values span { font-size: 11px; }
+.finance-fund-sheet-values strong { font-size: 19px; }
+.finance-fund-sheet-values small { font-size: 9px; }
+
+/* 资产负债下钻页 */
+.app-phone-screen .finance-balance-overview {
+  margin: 10px 0;
+  padding: 14px;
+  border: 1px solid var(--app-border-extra-light);
+  border-radius: var(--app-radius-card);
+  background: linear-gradient(145deg, #fff 0%, var(--app-primary-100) 100%);
+}
+
+.app-phone-screen .finance-balance-overview > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-phone-screen .finance-balance-overview > header > strong { color: var(--app-text-primary); font-size: 16px; font-weight: 750; }
+.app-phone-screen .finance-balance-primary { display: flex; align-items: baseline; gap: 5px; margin-top: 14px; }
+.app-phone-screen .finance-balance-primary > span { color: var(--app-text-secondary); font-size: 12px; font-weight: 650; }
+.app-phone-screen .finance-balance-primary > strong { color: var(--app-primary); font-size: 30px; font-variant-numeric: tabular-nums; font-weight: 800; line-height: 1; }
+.app-phone-screen .finance-balance-primary > small { color: var(--app-text-regular); font-size: 12px; }
+.app-phone-screen .finance-balance-primary > em { margin-left: auto; font-size: 10px; font-style: normal; font-weight: 650; }
+.app-phone-screen .finance-balance-summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--app-border-extra-light); }
+.app-phone-screen .finance-balance-summary-grid article { min-width: 0; padding: 0 8px; }
+.app-phone-screen .finance-balance-summary-grid article:first-child { padding-left: 0; }
+.app-phone-screen .finance-balance-summary-grid article + article { border-left: 1px solid var(--app-border-extra-light); }
+.app-phone-screen .finance-balance-summary-grid span,
+.app-phone-screen .finance-balance-summary-grid strong,
+.app-phone-screen .finance-balance-summary-grid em { display: block; }
+.app-phone-screen .finance-balance-summary-grid span { color: var(--app-text-secondary); font-size: 10px; font-weight: 600; }
+.app-phone-screen .finance-balance-summary-grid strong { margin-top: 4px; color: var(--app-primary); font-size: 17px; font-variant-numeric: tabular-nums; font-weight: 800; white-space: nowrap; }
+.app-phone-screen .finance-balance-summary-grid strong small { margin-left: 2px; font-size: 9px; font-weight: 550; }
+.app-phone-screen .finance-balance-summary-grid em { margin-top: 4px; color: var(--app-text-secondary); font-size: 9px; font-style: normal; line-height: 1.35; }
+
+.app-phone-screen .finance-balance-detail-card .app-card-body { display: grid; gap: 12px; }
+.app-phone-screen .finance-balance-composition { padding: 11px; border: 1px solid var(--app-border-extra-light); border-radius: 10px; background: var(--app-fill-extra-light); }
+.app-phone-screen .finance-balance-composition > header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.app-phone-screen .finance-balance-composition > header strong { color: var(--app-text-primary); font-size: 13px; }
+.app-phone-screen .finance-balance-composition > header span { color: var(--app-text-secondary); font-size: 10px; }
+.app-phone-screen .finance-balance-composition article + article { margin-top: 8px; }
+.app-phone-screen .finance-balance-composition article > div { display: grid; grid-template-columns: minmax(0, 1fr) auto 36px; gap: 7px; align-items: center; }
+.app-phone-screen .finance-balance-composition article > div span { color: var(--app-text-regular); font-size: 11px; font-weight: 600; }
+.app-phone-screen .finance-balance-composition article > div b { color: var(--app-text-primary); font-size: 11px; font-variant-numeric: tabular-nums; }
+.app-phone-screen .finance-balance-composition article > div em { color: var(--app-text-secondary); font-size: 10px; font-style: normal; text-align: right; }
+.app-phone-screen .finance-balance-composition article > i { display: block; height: 6px; margin-top: 4px; overflow: hidden; border-radius: 999px; background: var(--app-primary-100); }
+.app-phone-screen .finance-balance-composition article > i span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--app-primary-900), var(--app-info-500)); }
+.app-phone-screen .finance-balance-composition.is-liability article > i span { background: linear-gradient(90deg, var(--app-warning), #f8b84a); }
+
+.app-phone-screen .finance-balance-company-head,
+.app-phone-screen .finance-balance-company-list article { display: grid; grid-template-columns: minmax(82px, 1.15fr) .65fr .65fr .72fr; gap: 6px; align-items: center; }
+.app-phone-screen .finance-balance-company-head { padding: 0 4px 7px; color: var(--app-text-secondary); font-size: 10px; }
+.app-phone-screen .finance-balance-company-head span:not(:first-child) { text-align: right; }
+.app-phone-screen .finance-balance-company-list article { position: relative; min-height: 46px; padding: 7px 4px 15px; border-top: 1px solid var(--app-border-extra-light); }
+.app-phone-screen .finance-balance-company-list article > strong { overflow: hidden; color: var(--app-text-primary); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.app-phone-screen .finance-balance-company-list article > span,
+.app-phone-screen .finance-balance-company-list article > b { color: var(--app-text-primary); font-size: 11px; font-variant-numeric: tabular-nums; text-align: right; }
+.app-phone-screen .finance-balance-company-list article > small { position: absolute; right: 4px; bottom: 2px; color: var(--app-text-secondary); font-size: 9px; }
+
 .app-phone-screen .finance-revenue-company-card .app-card-body {
   padding: 10px;
 }

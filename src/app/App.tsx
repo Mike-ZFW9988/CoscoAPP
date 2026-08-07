@@ -101,6 +101,7 @@ const PAGES = [
   { id: "finance-fund",         label: "4  财务·可用资金" },
   { id: "finance-rate",         label: "4  财务·汇率" },
   { id: "finance-revenue",      label: "4  财务·营业收入" },
+  { id: "finance-balance-sheet", label: "4  财务·资产负债" },
   { id: "finance-assessment",   label: "4  财务·所属企业经营考核" },
   { id: "purchase-steel-dist",  label: "5  钢材·企业分布" },
   { id: "purchase-steel-delivery", label: "5  钢材·锁价交付" },
@@ -151,6 +152,7 @@ function NavBar({
   backLabel,
   backPage,
   dateBadge,
+  hideDateBadge,
   badgeMode,
   badgeExpanded,
   onBadgeClick,
@@ -160,6 +162,7 @@ function NavBar({
   backLabel?: string;
   backPage?: string;
   dateBadge?: string;
+  hideDateBadge?: boolean;
   badgeMode?: "date" | "freshness";
   badgeExpanded?: boolean;
   onBadgeClick?: () => void;
@@ -167,6 +170,7 @@ function NavBar({
   return (
     <GlobalHeader
       dateLabel={dateBadge ?? DEFAULT_GLOBAL_DATE}
+      showDateBadge={!hideDateBadge}
       pageTitle={backPage ? title : undefined}
       pageSubtitle={backPage ? subtitle : undefined}
       backLabel={backPage ? backLabel : undefined}
@@ -229,6 +233,7 @@ function TabCtrl({ options, sel }: { options: string[]; sel: string }) {
 function getTitleIcon(title?: string): LucideIcon {
   if (!title) return BarChart3;
   if (/风险|逾期|异常|告警|待提升|超标/.test(title)) return AlertTriangle;
+  if (/资产|负债/.test(title)) return Landmark;
   if (/财务|资金|收入|成本|汇率|应收|金额|费用/.test(title)) return CircleDollarSign;
   if (/采购|钢材|集采|供应商|锁价/.test(title)) return PackageCheck;
   if (/质量|合格|RT|PAUT|QC/.test(title)) return ShieldCheck;
@@ -4157,7 +4162,7 @@ const FINANCE_ASSESSMENT_DATA: FinanceAssessmentCompany[] = [
   { id: "support-04", company: "南京船配", segment: "配套企业", revenueTarget: 32000, revenueActual: 14560, profitTarget: 2600, profitActual: 1092 },
 ];
 
-const FINANCE_ASSESSMENT_TIME_PROGRESS = 50;
+const FINANCE_ASSESSMENT_TIME_PROGRESS = 66.7;
 let financeAssessmentPreferredSegment: FinanceAssessmentSegment = "造修企业";
 const assessmentProgress = (actual: number, target: number) => target > 0 ? Math.round(actual / target * 1000) / 10 : 0;
 const assessmentStatus = (row: FinanceAssessmentCompany) =>
@@ -4178,7 +4183,7 @@ function FinanceAssessmentOverviewCard() {
   };
 
   return (
-    <Card title="所属企业经营考核" tag="1-6月" extra="查看明细" onExtra={openAssessmentDetail} className="finance-assessment-overview-card">
+    <Card title="所属企业经营考核" tag="本年累计" extra="查看明细" onExtra={openAssessmentDetail} className="finance-assessment-overview-card">
       <div className="finance-assessment-segments" aria-label="企业类型筛选">
         {(["造修企业", "配套企业"] as FinanceAssessmentSegment[]).map(item => (
           <button key={item} type="button" className={segment === item ? "is-active" : ""} aria-pressed={segment === item} onClick={() => setSegment(item)}>{item}</button>
@@ -4193,127 +4198,161 @@ function FinanceAssessmentOverviewCard() {
   );
 }
 
+type FinanceOverviewMetric = { label: string; value: string; tone?: "good" | "risk" };
+
+type FinanceOverviewCardProps = {
+  title: string;
+  tag: string;
+  actionLabel: string;
+  route: string;
+  primaryLabel: string;
+  value: string;
+  unit: string;
+  metrics: FinanceOverviewMetric[];
+};
+
+// 财务主题模拟数据。后端接入时按相同字段返回 JSON 即可替换。
+const FINANCE_OVERVIEW_MOCK = {
+  revenue: {
+    title: "营业收入",
+    tag: "本年累计",
+    actionLabel: "趋势分析",
+    route: "finance-revenue",
+    primaryLabel: "累计营业收入",
+    value: "68.42",
+    unit: "亿元",
+    metrics: [
+      { label: "去年同期", value: "61.75亿元" },
+      { label: "同比", value: "↑ 10.8%", tone: "good" as const },
+      { label: "年度目标完成率", value: "72.0%" },
+    ],
+  },
+  balance: {
+    title: "资产负债",
+    tag: "本年累计",
+    actionLabel: "查看明细",
+    route: "finance-balance-sheet",
+    primaryLabel: "资产总额",
+    value: "318.60",
+    unit: "亿元",
+    metrics: [
+      { label: "负债总额", value: "214.20亿元" },
+      { label: "资产负债率", value: "67.2%" },
+      { label: "较年初", value: "↓ 1.6pct", tone: "good" as const },
+    ],
+  },
+  fund: {
+    title: "可用资金",
+    tag: "不含受限资金",
+    actionLabel: "分企业明细",
+    route: "finance-fund",
+    primaryLabel: "折合人民币合计",
+    value: "24.86",
+    unit: "亿元",
+    metrics: [
+      { label: "人民币", value: "17.86亿元" },
+      { label: "美元折算", value: "6.41亿元" },
+      { label: "欧元折算", value: "0.59亿元" },
+    ],
+  },
+} satisfies Record<string, Omit<FinanceOverviewCardProps, "metrics"> & { metrics: FinanceOverviewMetric[] }>;
+
+function FinanceOverviewCard({ title, tag, actionLabel, route, primaryLabel, value, unit, metrics }: FinanceOverviewCardProps) {
+  return (
+    <Card title={title} tag={tag} extra={actionLabel} onExtra={() => nav(route)} className="finance-overview-metric-card">
+      <button type="button" className="finance-overview-metric-body" onClick={() => nav(route)} aria-label={`${title}${actionLabel}`}>
+        <span className="finance-overview-primary-label">{primaryLabel}</span>
+        <div className="finance-overview-primary-value"><strong>{value}</strong><small>{unit}</small></div>
+        <div className="finance-overview-secondary-grid">
+          {metrics.map(metric => <span key={metric.label}><small>{metric.label}</small><b className={metric.tone ? `is-${metric.tone}` : ""}>{metric.value}</b></span>)}
+        </div>
+      </button>
+    </Card>
+  );
+}
+
 function PageFinance() {
   return (
     <>
       <StatusBar />
-      <NavBar title="财务主题" backLabel="返回首页" backPage="home" />
+      <NavBar title="财务主题" backLabel="返回首页" backPage="home" hideDateBadge />
       <BreadcrumbBar crumbs={["首页", "财务主题"]} />
 
-      {/* L5 汇率 — 整卡可点击 */}
-      <Card title="汇率（USD/CNY）" extra="走势详情" onExtra={() => nav("finance-rate")} className="mt-3">
-        <div onClick={() => nav("finance-rate")} style={{ display: "flex", alignItems: "stretch", gap: 0, cursor: "pointer" }}>
-          <div style={{ flex: 1, paddingRight: 14 }}>
-            <div style={{ fontSize: 10, color: C.t3, marginBottom: 5 }}>实时汇率</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-              <span style={{ fontSize: 30, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>7.1833</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#D4700A" }}>↑ 0.12%</span>
-            </div>
-            <div style={{ fontSize: 10, color: C.t3, marginTop: 5 }}>较记账偏升 0.03</div>
-          </div>
-          <div style={{ width: 1, background: C.divider, alignSelf: "stretch", flexShrink: 0 }} />
-          <div style={{ flex: 1, paddingLeft: 14 }}>
-            <div style={{ fontSize: 10, color: C.t3, marginBottom: 5 }}>月度记账汇率</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-              <span style={{ fontSize: 30, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>7.1500</span>
-            </div>
-            <div style={{ fontSize: 10, color: C.t3, marginTop: 5 }}>本月固定记账基准</div>
-          </div>
-        </div>
-      </Card>
-
-      {/* L5 可用资金 — 整卡可点击 */}
-      <Card title="可用资金" tag="不含受限资金" extra="分企业明细" onExtra={() => nav("finance-fund")}>
-        <div onClick={() => nav("finance-fund")} style={{ display: "flex", gap: 12, cursor: "pointer" }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 10, color: C.t3, marginBottom: 4 }}>合计（人民币）</div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums", lineHeight: 1.3 }}>1,692,871.67</div>
-            <div style={{ fontSize: 9, color: C.t3 }}>万</div>
-            <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 3 }}>
-              {[["人民币", "72.25%"], ["美元", "27.48%"], ["欧元", "0.27%"]].map(([k, v]) => (
-                <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.t3 }}>
-                  <span>{k}</span><span style={{ fontWeight: 600, color: C.t1 }}>{v}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div style={{ width: 90, flexShrink: 0 }}>
-            <DonutBox label="币种占比" center={"72.25%\n人民币"} />
-          </div>
-        </div>
-      </Card>
-
-      {/* L7 业务分区 — 各卡可点击下钻 */}
-      {[
-        { title: "营业收入", v: "567,882.34", prev: "5,678.82", pct: "1.48%", budget: "5,678.82", rate: "56.78%", page: "finance-revenue" },
-        { title: "利润总额", v: "567,882.34", prev: "567.88",   pct: "7.48%", budget: "567.88",   rate: "56.78%", page: "finance-revenue" },
-      ].map((it) => (
-        <Card key={it.title} title={it.title} tag="1-7月累计" extra="趋势分析" onExtra={() => nav(it.page)}>
-          <div onClick={() => nav(it.page)} style={{ cursor: "pointer" }}>
-            <div style={{ marginBottom: 4 }}>
-              <span style={{ fontSize: 20, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums" }}>{it.v}</span>
-              <span style={{ fontSize: 10, color: C.t3, marginLeft: 4 }}>万</span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4, fontSize: 10, color: C.t3 }}>
-              <div>去年同期<br /><b style={{ color: C.t1 }}>{it.prev}万</b></div>
-              <div>同比<br /><b style={{ color: C.t1 }}>{it.pct}</b></div>
-              <div>完成率<br /><b style={{ color: C.t1 }}>{it.rate}</b></div>
-            </div>
-          </div>
-        </Card>
-      ))}
-
-      <Card title="成本费用占收入比" tag="1-7月累计" extra="下钻明细" onExtra={() => nav("finance-revenue")}>
-        <div style={{ fontSize: 28, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums" }}>75.67<span style={{ fontSize: 12, fontWeight: 400 }}>%</span></div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4, fontSize: 10, color: C.t3, marginTop: 6 }}>
-          <div>预算<br /><b style={{ color: C.t1 }}>20.67%</b></div>
-          <div>去年同期<br /><b style={{ color: C.t1 }}>18.67%</b></div>
-          <div>同比<br /><b style={{ color: C.t1 }}>1.48%</b></div>
-        </div>
-      </Card>
+      <div className="finance-overview-stack">
+        <FinanceOverviewCard {...FINANCE_OVERVIEW_MOCK.revenue} />
+        <FinanceOverviewCard {...FINANCE_OVERVIEW_MOCK.balance} />
+        <FinanceOverviewCard {...FINANCE_OVERVIEW_MOCK.fund} />
+      </div>
 
       <FinanceAssessmentOverviewCard />
+
+      {/* 汇率固定置于财务主题末位，数据均为模拟值。 */}
+      <Card title="汇率（USD/CNY）" extra="走势详情" onExtra={() => nav("finance-rate")} className="finance-rate-entry-card">
+        <button type="button" onClick={() => nav("finance-rate")} className="finance-rate-entry-body">
+          <span><small>市场参考汇率</small><strong>7.1726</strong><em className="is-risk">↑ 0.18%</em></span>
+          <i />
+          <span><small>月度记账汇率</small><strong>7.1600</strong><em>本月记账基准</em></span>
+        </button>
+      </Card>
 
       <Footer text="财务主题 · 总部合并口径 · 月更（久其到数）" />
     </>
   );
 }
 
+type FinanceFundCompanyDTO = {
+  id: string;
+  company: string;
+  cny: number;
+  usdConverted: number;
+  eurConverted: number;
+};
+
+// 模拟数据：三个币种均按人民币折算为亿元，便于前端统一比较和后端直接映射。
+const FINANCE_FUND_MOCK: FinanceFundCompanyDTO[] = [
+  { id: "fund-01", company: "大连川崎", cny: 2.05, usdConverted: 0.52, eurConverted: 0.04 },
+  { id: "fund-02", company: "上海重工", cny: 2.75, usdConverted: 0.75, eurConverted: 0.03 },
+  { id: "fund-03", company: "舟山重工", cny: 2.80, usdConverted: 0.93, eurConverted: 0.05 },
+  { id: "fund-04", company: "南通船务", cny: 2.20, usdConverted: 0.64, eurConverted: 0.06 },
+  { id: "fund-05", company: "广东重工", cny: 1.80, usdConverted: 0.58, eurConverted: 0.07 },
+  { id: "fund-06", company: "扬州重工", cny: 1.60, usdConverted: 0.49, eurConverted: 0.08 },
+  { id: "fund-07", company: "启东海工", cny: 1.65, usdConverted: 0.82, eurConverted: 0.04 },
+  { id: "fund-08", company: "大连重工", cny: 2.32, usdConverted: 1.00, eurConverted: 0.08 },
+  { id: "fund-09", company: "南京船配", cny: 0.62, usdConverted: 0.28, eurConverted: 0.06 },
+  { id: "fund-10", company: "威海科技", cny: 0.07, usdConverted: 0.40, eurConverted: 0.08 },
+];
+
 function PageFinanceFund() {
   const [fundCurrency, setFundCurrency] = useState<"total" | "cny" | "usd" | "eur">("total");
   const [selectedCompany, setSelectedCompany] = useState<number | null>(null);
-  // 企业顺序按需求排列
-  const companies = ["大连川崎", "扬州重工", "南通船务", "启东海工", "大连重工", "舟山重工", "上海重工", "广东重工", "南通重工装备", "南京船配"];
-  const cny = [12800, 9600, 8700, 6200, 18400, 22100, 15300, 11500, 4800, 3200];
-  const usd = [4200, 2100, 1800, 900, 6800, 8900, 5600, 3400, 600, 400];
-  const eur = [120, 60, 340, 580, 210, 80, 30, 160, 20, 10];
-  const totalCny = cny.reduce((s, v) => s + v, 0);
-  const totalUsd = usd.reduce((s, v) => s + v, 0);
-  const totalEur = eur.reduce((s, v) => s + v, 0);
-  const totalByCompany = companies.map((_, index) => Math.round(cny[index] + usd[index] * 7.2 + eur[index] * 7.8));
+  const totalCny = FINANCE_FUND_MOCK.reduce((sum, item) => sum + item.cny, 0);
+  const totalUsd = FINANCE_FUND_MOCK.reduce((sum, item) => sum + item.usdConverted, 0);
+  const totalEur = FINANCE_FUND_MOCK.reduce((sum, item) => sum + item.eurConverted, 0);
+  const totalByCompany = FINANCE_FUND_MOCK.map(item => item.cny + item.usdConverted + item.eurConverted);
   const currencyMap = {
-    total: { label: "合计", values: totalByCompany, color: "var(--app-primary-900)", unit: "万元" },
-    cny: { label: "人民币", values: cny, color: "var(--app-primary)", unit: "万元" },
-    usd: { label: "美元", values: usd, color: "var(--app-primary-500)", unit: "万美元" },
-    eur: { label: "欧元", values: eur, color: "var(--app-success)", unit: "万欧元" },
+    total: { label: "合计", values: totalByCompany, color: "var(--app-primary-900)", unit: "亿元" },
+    cny: { label: "人民币", values: FINANCE_FUND_MOCK.map(item => item.cny), color: "var(--app-primary)", unit: "亿元" },
+    usd: { label: "美元折算", values: FINANCE_FUND_MOCK.map(item => item.usdConverted), color: "var(--app-primary-500)", unit: "亿元" },
+    eur: { label: "欧元折算", values: FINANCE_FUND_MOCK.map(item => item.eurConverted), color: "var(--app-success)", unit: "亿元" },
   };
   const activeCurrency = currencyMap[fundCurrency];
   const maxValue = Math.max(...activeCurrency.values);
-  const rankedCompanies = companies.map((company, index) => ({ company, index, value: activeCurrency.values[index] })).sort((a, b) => b.value - a.value);
+  const rankedCompanies = FINANCE_FUND_MOCK.map((item, index) => ({ company: item.company, index, value: activeCurrency.values[index] })).sort((a, b) => b.value - a.value);
 
   return (
     <>
       <StatusBar />
-      <NavBar title="财务主题" backLabel="返回财务主题" backPage="finance" />
+      <NavBar title="可用资金" backLabel="返回财务主题" backPage="finance" hideDateBadge />
       <div className="finance-fund-overview">
         <div className="finance-fund-overview-head"><strong>可用资金总览</strong><StatusBadge tone="primary">不含受限资金</StatusBadge></div>
+        <div className="finance-fund-total"><span>折合人民币合计</span><strong>{(totalCny + totalUsd + totalEur).toFixed(2)}</strong><small>亿元</small></div>
         <div className="finance-fund-kpis">
           {[
-            { label: "人民币", value: totalCny, unit: "万元", color: "var(--app-primary)" },
-            { label: "美元", value: totalUsd, unit: "万美元", color: "var(--app-primary-500)" },
-            { label: "欧元", value: totalEur, unit: "万欧元", color: "var(--app-success)" },
+            { label: "人民币", value: totalCny, color: "var(--app-primary)" },
+            { label: "美元折算", value: totalUsd, color: "var(--app-primary-500)" },
+            { label: "欧元折算", value: totalEur, color: "var(--app-success)" },
           ].map((item) => (
-            <div key={item.label}><span><i style={{ background: item.color }} />{item.label}</span><strong>{item.value.toLocaleString()}</strong><small>{item.unit}</small></div>
+            <div key={item.label}><span><i style={{ background: item.color }} />{item.label}</span><strong>{item.value.toFixed(2)}</strong><small>亿元</small></div>
           ))}
         </div>
       </div>
@@ -4325,8 +4364,7 @@ function PageFinanceFund() {
           ))}
         </div>
         <div className="finance-fund-unit">
-          单位：{activeCurrency.unit} · 按金额从高到低
-          {fundCurrency === "total" && <span> · 人民币折算：USD 7.20 / EUR 7.80</span>}
+          单位：{activeCurrency.unit} · 统一折算人民币 · 按金额从高到低
         </div>
         <div className="finance-fund-ranking">
           {rankedCompanies.map((item, rank) => (
@@ -4334,7 +4372,7 @@ function PageFinanceFund() {
               <span className="finance-fund-rank">{String(rank + 1).padStart(2, "0")}</span>
               <span className="finance-fund-company">{item.company}</span>
               <span className="finance-fund-track"><i style={{ width: `${(item.value / maxValue) * 100}%`, background: activeCurrency.color }} /></span>
-              <strong>{item.value.toLocaleString()}</strong>
+              <strong>{item.value.toFixed(2)}</strong>
             </button>
           ))}
         </div>
@@ -4346,13 +4384,13 @@ function PageFinanceFund() {
           {selectedCompany !== null && (
             <>
               <SheetHeader>
-                <SheetTitle>{companies[selectedCompany]} · 可用资金</SheetTitle>
-                <SheetDescription>不含受限资金，按原币金额展示</SheetDescription>
+                <SheetTitle>{FINANCE_FUND_MOCK[selectedCompany].company} · 可用资金</SheetTitle>
+                <SheetDescription>模拟数据 · 统一折算人民币展示</SheetDescription>
               </SheetHeader>
               <div className="finance-fund-sheet-values">
-                <div><span><i className="is-cny" />人民币</span><strong>{cny[selectedCompany].toLocaleString()}<small>万元</small></strong></div>
-                <div><span><i className="is-usd" />美元</span><strong>{usd[selectedCompany].toLocaleString()}<small>万美元</small></strong></div>
-                <div><span><i className="is-eur" />欧元</span><strong>{eur[selectedCompany].toLocaleString()}<small>万欧元</small></strong></div>
+                <div><span><i className="is-cny" />人民币</span><strong>{FINANCE_FUND_MOCK[selectedCompany].cny.toFixed(2)}<small>亿元</small></strong></div>
+                <div><span><i className="is-usd" />美元折算</span><strong>{FINANCE_FUND_MOCK[selectedCompany].usdConverted.toFixed(2)}<small>亿元</small></strong></div>
+                <div><span><i className="is-eur" />欧元折算</span><strong>{FINANCE_FUND_MOCK[selectedCompany].eurConverted.toFixed(2)}<small>亿元</small></strong></div>
               </div>
             </>
           )}
@@ -4364,14 +4402,130 @@ function PageFinanceFund() {
   );
 }
 
+type FinanceBalanceCompositionDTO = {
+  label: string;
+  value: number;
+  share: number;
+};
+
+type FinanceBalanceCompanyDTO = {
+  id: string;
+  company: string;
+  assetTotal: number;
+  liabilityTotal: number;
+  debtRatio: number;
+  currentRatio: number;
+};
+
+type FinanceBalanceSheetDTO = {
+  periodLabel: string;
+  assetTotal: number;
+  liabilityTotal: number;
+  debtRatio: number;
+  currentRatio: number;
+  assetGrowth: number;
+  liabilityGrowth: number;
+  assets: FinanceBalanceCompositionDTO[];
+  liabilities: FinanceBalanceCompositionDTO[];
+  companies: FinanceBalanceCompanyDTO[];
+};
+
+// 资产负债下钻页模拟 DTO。字段命名与未来接口保持一致，当前数值及企业均为演示数据。
+const FINANCE_BALANCE_MOCK: FinanceBalanceSheetDTO = {
+  periodLabel: "本年累计",
+  assetTotal: 318.60,
+  liabilityTotal: 214.20,
+  debtRatio: 67.2,
+  currentRatio: 1.24,
+  assetGrowth: 8.6,
+  liabilityGrowth: 5.9,
+  assets: [
+    { label: "货币资金", value: 64.80, share: 20.3 },
+    { label: "应收账款", value: 71.40, share: 22.4 },
+    { label: "存货", value: 82.60, share: 25.9 },
+    { label: "固定及其他资产", value: 99.80, share: 31.4 },
+  ],
+  liabilities: [
+    { label: "应付账款", value: 78.50, share: 36.6 },
+    { label: "合同负债", value: 52.80, share: 24.7 },
+    { label: "借款", value: 46.20, share: 21.6 },
+    { label: "其他负债", value: 36.70, share: 17.1 },
+  ],
+  companies: [
+    { id: "balance-01", company: "东海重装", assetTotal: 58.40, liabilityTotal: 36.10, debtRatio: 61.8, currentRatio: 1.38 },
+    { id: "balance-02", company: "蓝港船务", assetTotal: 49.80, liabilityTotal: 35.70, debtRatio: 71.7, currentRatio: 1.08 },
+    { id: "balance-03", company: "远洋装备", assetTotal: 46.20, liabilityTotal: 29.30, debtRatio: 63.4, currentRatio: 1.31 },
+    { id: "balance-04", company: "海岳工程", assetTotal: 41.60, liabilityTotal: 30.80, debtRatio: 74.0, currentRatio: 0.96 },
+    { id: "balance-05", company: "华舟制造", assetTotal: 38.70, liabilityTotal: 24.50, debtRatio: 63.3, currentRatio: 1.27 },
+  ],
+};
+
+function FinanceBalanceComposition({ title, total, items, tone }: { title: string; total: number; items: FinanceBalanceCompositionDTO[]; tone: "asset" | "liability" }) {
+  return (
+    <section className={`finance-balance-composition is-${tone}`}>
+      <header><strong>{title}</strong><span>合计 {total.toFixed(2)}亿元</span></header>
+      <div>
+        {items.map(item => (
+          <article key={item.label}>
+            <div><span>{item.label}</span><b>{item.value.toFixed(2)}亿元</b><em>{item.share.toFixed(1)}%</em></div>
+            <i><span style={{ width: `${item.share}%` }} /></i>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PageFinanceBalanceSheet() {
+  const data = FINANCE_BALANCE_MOCK;
+  return (
+    <>
+      <StatusBar />
+      <NavBar title="资产负债分析" backLabel="返回财务主题" backPage="finance" hideDateBadge />
+
+      <section className="finance-balance-overview">
+        <header><strong>资产负债核心指标</strong><StatusBadge tone="primary">{data.periodLabel}</StatusBadge></header>
+        <div className="finance-balance-primary"><span>资产总额</span><strong>{data.assetTotal.toFixed(2)}</strong><small>亿元</small><em className="is-good">较年初 ↑ {data.assetGrowth.toFixed(1)}%</em></div>
+        <div className="finance-balance-summary-grid">
+          <article><span>负债总额</span><strong>{data.liabilityTotal.toFixed(2)}<small>亿元</small></strong><em>较年初 ↑ {data.liabilityGrowth.toFixed(1)}%</em></article>
+          <article><span>资产负债率</span><strong>{data.debtRatio.toFixed(1)}<small>%</small></strong><em className="is-good">较年初 ↓ 1.6pct</em></article>
+          <article><span>流动比率</span><strong>{data.currentRatio.toFixed(2)}</strong><em>流动资产 / 流动负债</em></article>
+        </div>
+      </section>
+
+      <Card title="资产与负债构成" tag="单位：亿元" className="finance-balance-detail-card">
+        <FinanceBalanceComposition title="资产构成" total={data.assetTotal} items={data.assets} tone="asset" />
+        <FinanceBalanceComposition title="负债构成" total={data.liabilityTotal} items={data.liabilities} tone="liability" />
+      </Card>
+
+      <Card title="主要企业资产负债表现" tag="模拟企业" className="finance-balance-company-card">
+        <div className="finance-balance-company-head"><span>企业</span><span>资产</span><span>负债</span><span>负债率</span></div>
+        <div className="finance-balance-company-list">
+          {data.companies.map(item => (
+            <article key={item.id}>
+              <strong>{item.company}</strong>
+              <span>{item.assetTotal.toFixed(1)}</span>
+              <span>{item.liabilityTotal.toFixed(1)}</span>
+              <b className={item.debtRatio >= 70 ? "is-risk" : "is-good"}>{item.debtRatio.toFixed(1)}%</b>
+              <small>流动比率 {item.currentRatio.toFixed(2)}</small>
+            </article>
+          ))}
+        </div>
+      </Card>
+
+      <Footer text="资产负债分析 · 模拟数据 · 单位：亿元" />
+    </>
+  );
+}
+
 function PageFinanceRate() {
   const [rateType, setRateType] = useState<"book" | "mid" | "offshore">("book");
   const [rateRange, setRateRange] = useState<"1M" | "3M" | "1Y">("1Y");
-  const months = ["2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04"];
+  const months = ["2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08"];
   const rateSeries = {
-    book: { label: "记账汇率", current: 7.2000, values: [7.08, 7.12, 7.18, 7.24, 7.19, 7.21, 7.26, 7.20] },
-    mid: { label: "中间价", current: 7.1833, values: [7.06, 7.10, 7.16, 7.22, 7.17, 7.20, 7.23, 7.1833] },
-    offshore: { label: "离岸价", current: 7.1500, values: [7.04, 7.08, 7.14, 7.19, 7.15, 7.18, 7.21, 7.15] },
+    book: { label: "记账汇率", current: 7.1600, values: [7.11, 7.15, 7.19, 7.14, 7.18, 7.21, 7.17, 7.16] },
+    mid: { label: "中间价", current: 7.1726, values: [7.09, 7.13, 7.17, 7.12, 7.16, 7.20, 7.15, 7.1726] },
+    offshore: { label: "离岸价", current: 7.1468, values: [7.07, 7.11, 7.15, 7.10, 7.14, 7.18, 7.13, 7.1468] },
   };
   const selectedRate = rateSeries[rateType];
   const sliceCount = rateRange === "1M" ? 2 : rateRange === "3M" ? 4 : months.length;
@@ -4386,14 +4540,14 @@ function PageFinanceRate() {
 
       <div className="finance-rate-overview">
         <div className="finance-rate-overview-head"><span>美元兑人民币 · 记账汇率</span><StatusBadge tone="primary">USD/CNY</StatusBadge></div>
-        <div className="finance-rate-current"><strong>7.2000</strong><span className="is-up">+0.0200　+0.28%</span></div>
-        <div className="finance-rate-meta"><span>同比 <b>+0.0500</b></span><span>环比 <b>+0.0200</b></span><span>更新 10:30</span></div>
+        <div className="finance-rate-current"><strong>7.1600</strong><span className="is-down">-0.0100　-0.14%</span></div>
+        <div className="finance-rate-meta"><span>同比 <b>+0.0420</b></span><span>环比 <b>-0.0100</b></span><span>更新 10:30</span></div>
       </div>
 
       <Card title="市场汇率" tag="最近更新 10:30" className="app-production-card finance-rate-market-card">
         {[
-          { name: "美元兑人民币（中间价）", code: "中间价", value: 7.1833, delta: "+0.0083", pct: "+0.12%", tone: "up", high: 7.2300, low: 7.0600 },
-          { name: "美元兑人民币（离岸价）", code: "离岸价", value: 7.1500, delta: "-0.0120", pct: "-0.17%", tone: "down", high: 7.2100, low: 7.0400 },
+          { name: "美元兑人民币（中间价）", code: "中间价", value: 7.1726, delta: "+0.0126", pct: "+0.18%", tone: "up", high: 7.2200, low: 7.0900 },
+          { name: "美元兑人民币（离岸价）", code: "离岸价", value: 7.1468, delta: "-0.0032", pct: "-0.04%", tone: "down", high: 7.1900, low: 7.0700 },
         ].map((quote) => (
           <div className="finance-rate-quote" key={quote.code}>
             <div className="finance-rate-quote-head"><strong>{quote.name}</strong><StatusBadge tone="muted">{quote.code}</StatusBadge></div>
@@ -5516,7 +5670,7 @@ function PageFinanceAssessment() {
     <>
       <StatusBar />
       <NavBar title="所属企业经营考核" subtitle="财务·考核口径" backLabel="返回财务主题" backPage="finance" />
-      <BreadcrumbBar crumbs={["首页", "财务主题", "所属企业经营考核"]} period="1-6月累计" />
+      <BreadcrumbBar crumbs={["首页", "财务主题", "所属企业经营考核"]} period="1-8月累计" />
       <section className="finance-assessment-page" aria-label="所属企业经营考核明细">
         <div className="finance-assessment-detail-head">
           <div><Landmark aria-hidden="true" /><span><strong>经营考核总览</strong><small>收入与利润双指标</small></span></div>
@@ -5918,6 +6072,7 @@ function renderPage(id: string) {
     case "finance-fund":      return <PageFinanceFund />;
     case "finance-rate":      return <PageFinanceRate />;
     case "finance-revenue":   return <PageFinanceRevenue />;
+    case "finance-balance-sheet": return <PageFinanceBalanceSheet />;
     case "finance-assessment": return <PageFinanceAssessment />;
     case "purchase-steel-dist": return <PagePurchaseSteelDist />;
     case "purchase-steel-delivery": return <PagePurchaseSteelDelivery />;

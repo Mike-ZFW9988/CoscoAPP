@@ -31,6 +31,7 @@ function getMonthOptions(year: number) {
 
 type GlobalHeaderProps = {
   dateLabel?: string;
+  showDateBadge?: boolean;
   pageTitle?: string;
   pageSubtitle?: string;
   backLabel?: string;
@@ -42,6 +43,7 @@ type GlobalHeaderProps = {
 
 function GlobalHeader({
   dateLabel = DEFAULT_GLOBAL_DATE,
+  showDateBadge = true,
   pageTitle,
   pageSubtitle,
   backLabel,
@@ -202,7 +204,7 @@ function GlobalHeader({
             </div>
           </div>
 
-          <div className={cn("absolute left-[4px]", hasPageChrome ? "bottom-[-11px]" : "bottom-[8px]")}>
+          {showDateBadge && <div className={cn("absolute left-[4px]", hasPageChrome ? "bottom-[-11px]" : "bottom-[8px]")}>
             {isFreshnessBadge ? (
               <button
                 type="button"
@@ -315,7 +317,7 @@ function GlobalHeader({
                 )}
               </div>
             )}
-          </div>
+          </div>}
         </div>
       </div>
     </header>
