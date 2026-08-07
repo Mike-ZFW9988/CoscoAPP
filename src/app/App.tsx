@@ -4450,11 +4450,11 @@ const FINANCE_BALANCE_MOCK: FinanceBalanceSheetDTO = {
     { label: "其他负债", value: 36.70, share: 17.1 },
   ],
   companies: [
-    { id: "balance-01", company: "东海重装", assetTotal: 58.40, liabilityTotal: 36.10, debtRatio: 61.8, currentRatio: 1.38 },
-    { id: "balance-02", company: "蓝港船务", assetTotal: 49.80, liabilityTotal: 35.70, debtRatio: 71.7, currentRatio: 1.08 },
-    { id: "balance-03", company: "远洋装备", assetTotal: 46.20, liabilityTotal: 29.30, debtRatio: 63.4, currentRatio: 1.31 },
-    { id: "balance-04", company: "海岳工程", assetTotal: 41.60, liabilityTotal: 30.80, debtRatio: 74.0, currentRatio: 0.96 },
-    { id: "balance-05", company: "华舟制造", assetTotal: 38.70, liabilityTotal: 24.50, debtRatio: 63.3, currentRatio: 1.27 },
+    { id: "balance-01", company: "大连重工", assetTotal: 58.40, liabilityTotal: 36.10, debtRatio: 61.8, currentRatio: 1.38 },
+    { id: "balance-02", company: "启东海工", assetTotal: 49.80, liabilityTotal: 35.70, debtRatio: 71.7, currentRatio: 1.08 },
+    { id: "balance-03", company: "舟山重工", assetTotal: 46.20, liabilityTotal: 29.30, debtRatio: 63.4, currentRatio: 1.31 },
+    { id: "balance-04", company: "广东重工", assetTotal: 41.60, liabilityTotal: 30.80, debtRatio: 74.0, currentRatio: 0.96 },
+    { id: "balance-05", company: "上海重工", assetTotal: 38.70, liabilityTotal: 24.50, debtRatio: 63.3, currentRatio: 1.27 },
   ],
 };
 
@@ -4495,7 +4495,7 @@ function PageFinanceBalanceSheet() {
         <FinanceBalanceComposition title="负债构成" total={data.liabilityTotal} items={data.liabilities} tone="liability" />
       </Card>
 
-      <Card title="主要企业资产负债表现" tag="模拟企业" className="finance-balance-company-card">
+      <Card title="主要企业资产负债表现" className="finance-balance-company-card">
         <div className="finance-balance-company-head"><span>企业</span><span>资产</span><span>负债</span><span>负债率</span></div>
         <div className="finance-balance-company-list">
           {data.companies.map(item => (
