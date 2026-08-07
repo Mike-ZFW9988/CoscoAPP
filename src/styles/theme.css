@@ -1359,6 +1359,25 @@
 .app-phone-screen .daily-enterprise-row > span { display: flex; justify-content: flex-end; gap: 6px; color: var(--app-primary-900); font-size: 12px; }.app-phone-screen .daily-enterprise-row > span i { color: var(--app-text-secondary); font-style: normal; }.app-phone-screen .daily-enterprise-row > span .is-out { color: var(--app-success-900); }
 .app-phone-screen .daily-enterprise-row > em { color: var(--foreground); font-size: 13px; font-style: normal; font-weight: 700; text-align: right; }.app-phone-screen .daily-enterprise-row > em small { margin-left: 2px; color: var(--app-text-secondary); font-size: 10px; font-weight: 500; }
 
+.app-phone-screen .repair-daily-page .daily-list-head,
+.app-phone-screen .repair-daily-page .daily-enterprise-row {
+  grid-template-columns: minmax(0, 1.2fr) minmax(56px, .7fr) minmax(76px, .9fr);
+}
+
+.app-phone-screen .repair-daily-page .daily-enterprise-row > span b,
+.app-phone-screen .repair-daily-page .daily-enterprise-row > em {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+}
+
+.app-phone-screen .repair-daily-page .daily-enterprise-row > span small {
+  margin-left: 2px;
+  color: var(--app-text-secondary);
+  font-size: 10px;
+  font-weight: 500;
+}
+
 .app-phone-screen .stage-total { display: grid; grid-template-columns: 1fr auto; align-items: baseline; }
 .app-phone-screen .stage-total > span { color: var(--app-text-regular); font-size: 13px; }.app-phone-screen .stage-total > strong { color: var(--app-primary-900); font-size: 30px; font-variant-numeric: tabular-nums; }.app-phone-screen .stage-total > strong small { margin-left: 3px; color: var(--app-text-secondary); font-size: 11px; }.app-phone-screen .stage-total > em { grid-column: 1/-1; margin-top: 2px; color: var(--app-text-secondary); font-size: 11px; font-style: normal; }
 .app-phone-screen .stage-total > em b { color: var(--app-primary-900); font-weight: 700; }

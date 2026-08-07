@@ -3312,8 +3312,8 @@ function PageProdRepair() {
         <div className="repair-today-metrics repair-today-metrics-three">
           {[
             { label: "在厂船舶",  value: "92",    unit: "艘" },
-            { label: "今日进厂", value: "18", unit: "艘" },
-            { label: "今日出厂", value: "15", unit: "艘", tone: "success" },
+            { label: "本月进厂", value: "18", unit: "艘" },
+            { label: "本月出厂", value: "15", unit: "艘", tone: "success" },
           ].map((it, i) => (
             <div key={i}>
               <div className={`repair-metric-value${it.tone === "success" ? " is-success" : ""}`}>{it.value}<span>{it.unit}</span></div>
@@ -3555,11 +3555,11 @@ function PageProdRepairCompletion() {
 
 function PageProdRepairDaily() {
   const rows = [
-    { name: "南通船务", inbound: "1（瑞泰）", outbound: "—", labor: "1543+428", active: true },
-    { name: "大连重工", inbound: "—", outbound: "—", labor: "3356" },
-    { name: "舟山重工", inbound: "19", outbound: "—", labor: "3872", badge: "集团1", active: true },
-    { name: "上海重工", inbound: "29", outbound: "—", labor: "6168", active: true },
-    { name: "广东重工", inbound: "20", outbound: "—", labor: "3045", active: true },
+    { name: "南通船务", inbound: 3, completed: 2 },
+    { name: "大连重工", inbound: 4, completed: 4 },
+    { name: "舟山重工", inbound: 5, completed: 3 },
+    { name: "上海重工", inbound: 3, completed: 4 },
+    { name: "广东重工", inbound: 3, completed: 2 },
   ];
   return (
     <>
@@ -3569,18 +3569,17 @@ function PageProdRepairDaily() {
 
       <div className="production-detail-page repair-daily-page">
         <Card title="今日运营摘要" className="production-summary-card">
-          <div className="production-summary-grid"><div><span>在厂船舶</span><strong>92<small>艘</small></strong></div><div><span>今日进厂</span><strong>18<small>艘</small></strong></div><div><span>今日出厂</span><strong className="is-good">15<small>艘</small></strong></div></div>
+          <div className="production-summary-grid"><div><span>在厂船舶</span><strong>92<small>艘</small></strong></div><div><span>本月进厂</span><strong>18<small>艘</small></strong></div><div><span>本月出厂</span><strong className="is-good">15<small>艘</small></strong></div></div>
         </Card>
         <Card title="企业今日动态" className="production-list-card">
-          <div className="daily-list-head"><span>企业</span><span>进厂 / 出厂</span><span>劳动力</span></div>
+          <div className="daily-list-head"><span>企业</span><span>进厂</span><span>完工出厂</span></div>
           <div className="daily-enterprise-list">
-            {rows.map(row => <div className="daily-enterprise-row" key={row.name}><div className="daily-company"><i className={row.active ? "is-active" : ""}/><strong>{row.name}</strong>{row.badge && <small>{row.badge}</small>}</div><span><b>{row.inbound}</b><i>/</i><b className="is-out">{row.outbound}</b></span><em>{row.labor}<small>人</small></em></div>)}
+            {rows.map(row => <div className="daily-enterprise-row" key={row.name}><div className="daily-company"><strong>{row.name}</strong></div><span><b>{row.inbound}</b><small>艘</small></span><em>{row.completed}<small>艘</small></em></div>)}
           </div>
         </Card>
-        <div className="production-update-note">截至7.10</div>
       </div>
 
-      <Footer text="修船在厂/进出厂/劳动力明细（含集团船口径）" />
+      <Footer text="修船在厂/本月进厂/本月完工出厂明细 · 模拟数据" />
     </>
   );
 }
