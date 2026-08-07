@@ -4422,7 +4422,6 @@ type FinanceBalanceSheetDTO = {
   assetTotal: number;
   liabilityTotal: number;
   debtRatio: number;
-  currentRatio: number;
   assetGrowth: number;
   liabilityGrowth: number;
   assets: FinanceBalanceCompositionDTO[];
@@ -4436,7 +4435,6 @@ const FINANCE_BALANCE_MOCK: FinanceBalanceSheetDTO = {
   assetTotal: 318.60,
   liabilityTotal: 214.20,
   debtRatio: 67.2,
-  currentRatio: 1.24,
   assetGrowth: 8.6,
   liabilityGrowth: 5.9,
   assets: [
@@ -4489,7 +4487,6 @@ function PageFinanceBalanceSheet() {
         <div className="finance-balance-summary-grid">
           <article><span>负债总额</span><strong>{data.liabilityTotal.toFixed(2)}<small>亿元</small></strong><em>较年初 ↑ {data.liabilityGrowth.toFixed(1)}%</em></article>
           <article><span>资产负债率</span><strong>{data.debtRatio.toFixed(1)}<small>%</small></strong><em className="is-good">较年初 ↓ 1.6pct</em></article>
-          <article><span>流动比率</span><strong>{data.currentRatio.toFixed(2)}</strong><em>流动资产 / 流动负债</em></article>
         </div>
       </section>
 
@@ -5669,7 +5666,7 @@ function PageFinanceAssessment() {
   return (
     <>
       <StatusBar />
-      <NavBar title="所属企业经营考核" subtitle="财务·考核口径" backLabel="返回财务主题" backPage="finance" />
+      <NavBar title="所属企业经营考核" subtitle="财务·考核口径" backLabel="返回财务主题" backPage="finance" hideDateBadge />
       <BreadcrumbBar crumbs={["首页", "财务主题", "所属企业经营考核"]} period="1-8月累计" />
       <section className="finance-assessment-page" aria-label="所属企业经营考核明细">
         <div className="finance-assessment-detail-head">
