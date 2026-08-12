@@ -90,13 +90,13 @@ const PAGES = [
   { id: "biz-support-revenue-detail", label: "2  配套·营业收入分析" },
   { id: "biz-kpi-progress",     label: "2  经营·指标进度" },
   { id: "prod-repair",          label: "3  生产·修船主题" },
-  { id: "prod-repair-ships",      label: "3  修船·在厂艘数" },
+  { id: "prod-repair-ships",      label: "3  修船·在厂艘数统计" },
   { id: "prod-repair-completion", label: "3  修船·完工明细" },
-  { id: "prod-repair-daily",    label: "3  修船·今日动态" },
+  { id: "prod-repair-daily",    label: "3  修船·每日动态" },
   { id: "prod-ship",            label: "3  生产·造船主题" },
   { id: "prod-ship-delivery",        label: "3  造船·交付进度" },
   { id: "prod-ship-delivery-detail", label: "3  造船·交付进度明细" },
-  { id: "prod-ship-track",      label: "3  造船·生产跟踪" },
+  { id: "prod-ship-track",      label: "3  造船·每日运营摘要" },
   { id: "finance",              label: "4  财务主题" },
   { id: "finance-fund",         label: "4  财务·可用资金" },
   { id: "finance-rate",         label: "4  财务·汇率" },
@@ -156,6 +156,7 @@ function NavBar({
   badgeMode,
   badgeExpanded,
   onBadgeClick,
+  dateMode,
 }: {
   title: string;
   subtitle?: string;
@@ -166,6 +167,7 @@ function NavBar({
   badgeMode?: "date" | "freshness";
   badgeExpanded?: boolean;
   onBadgeClick?: () => void;
+  dateMode?: "month" | "day";
 }) {
   return (
     <GlobalHeader
@@ -178,6 +180,7 @@ function NavBar({
       badgeMode={badgeMode}
       badgeExpanded={badgeExpanded}
       onBadgeClick={onBadgeClick}
+      dateMode={dateMode}
     />
   );
 }
@@ -253,9 +256,9 @@ function getTitleIcon(title?: string): LucideIcon {
 }
 
 const DETAIL_CARD_TITLES = new Set([
-  "在厂艘数排名",
+  "在厂艘数统计",
   "修船完工·计划与实绩",
-  "在建艘数排名",
+  "在建艘数统计",
   "本周交付",
   "交付进度",
   "月度交付趋势（艘）",
@@ -1546,7 +1549,7 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
               </div>
               <div className="home-ops-metrics">
                 <span><em>完工</em><b>18</b>艘</span>
-                <span><em>累计完工</em><b>20</b>艘</span>
+                <span><em>年度累计完工</em><b>20</b>艘</span>
                 <span><em>完成率</em><b>72</b>%</span>
               </div>
             </div>
@@ -3207,64 +3210,72 @@ function PageBizOverdue() {
   );
 }
 
-function PageProdRepairShips() {
-  const companies = [
-    { name: "南通船务", total: 14, internal: 2 },
-    { name: "大连重工", total: 9,  internal: 3 },
-    { name: "舟山重工", total: 20, internal: 4 },
-    { name: "上海重工", total: 29, internal: 2 },
-    { name: "广东重工", total: 20, internal: 0 },
-  ];
-  const maxTotal = Math.max(...companies.map(c => c.total));
+type RepairFleetCompany = {
+  name: string;
+  total: number;
+  internal: number;
+};
+
+// 演示数据与后端字段保持一一对应，接入接口后可直接替换该数组。
+const REPAIR_FLEET_STATISTICS: RepairFleetCompany[] = [
+  { name: "南通川崎", total: 22, internal: 3 },
+  { name: "大连川崎", total: 20, internal: 2 },
+  { name: "扬州重工", total: 18, internal: 4 },
+  { name: "南通船务", total: 17, internal: 2 },
+  { name: "启东海工", total: 15, internal: 1 },
+];
+
+const REPAIR_OVERVIEW_STATISTICS = [
+  { name: "南通川崎", value: 26 },
+  { name: "大连川崎", value: 24 },
+  { name: "扬州重工", value: 22 },
+  { name: "南通船务", value: 20 },
+];
+
+function RepairFleetStatistics() {
+  const companies = REPAIR_FLEET_STATISTICS;
+  const maxTotal = Math.max(...companies.map((company) => company.total));
 
   return (
-    <>
-      <StatusBar />
-      <NavBar title="在厂艘数排名" subtitle="修船·生产口径" backLabel="返回修船主题" backPage="prod-repair" />
-      <BreadcrumbBar crumbs={["首页", "生产主题", "修船", "在厂艘数"]} period="截至7.10" />
-
-      <Card title="在厂船舶总览" className="repair-fleet-summary-card mt-2">
+    <div className="repair-fleet-statistics-section">
+      <Card title="在厂艘数统计" className="repair-fleet-summary-card">
         <div className="repair-fleet-summary">
           <div className="repair-fleet-total"><strong>92</strong><span>艘</span></div>
-          <div className="repair-fleet-flow"><div><span>进厂</span><strong>25<small>艘</small></strong><em>集团船5艘</em></div><div><span>出厂</span><strong>28<small>艘</small></strong><em>集团船5艘</em></div></div>
+          <div className="repair-fleet-flow"><div><span>本月进厂</span><strong>18<small>艘</small></strong><em>集团船5艘</em></div><div><span>本月出厂</span><strong>15<small>艘</small></strong><em>集团船4艘</em></div></div>
         </div>
       </Card>
 
-      {/* 堆叠横向条形图 */}
-      <div style={{ background: C.card, margin: "8px 10px 8px", borderRadius: 12, padding: "10px 10px 10px", boxShadow: "var(--app-shadow-card)" }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: C.t1, marginBottom: 12 }}>各企业在厂分布</div>
-        {/* 图例 */}
-        <div style={{ display: "flex", gap: 16, marginBottom: 14 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 14, height: 10, borderRadius: 2, background: C.brand }} />
-            <span style={{ fontSize: 10, color: C.t3 }}>外部船舶</span>
+      <Card title="各企业在厂分布" className="repair-fleet-distribution-card">
+        <div className="repair-fleet-legend">
+          <div>
+            <i className="is-external" />
+            <span>外部船舶</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 14, height: 10, borderRadius: 2, background: C.success }} />
-            <span style={{ fontSize: 10, color: C.t3 }}>集团内部船舶</span>
+          <div>
+            <i className="is-internal" />
+            <span>集团内部船舶</span>
           </div>
         </div>
-        {/* 条形图行 */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <div className="repair-fleet-company-list">
           {companies.map((co) => {
             const external = co.total - co.internal;
             const extPct = (external / maxTotal) * 100;
             const intPct = (co.internal / maxTotal) * 100;
             return (
-              <div key={co.name}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
-                  <span style={{ fontSize: 12, fontWeight: 500, color: C.t2 }}>{co.name}</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: C.t1, fontVariantNumeric: "tabular-nums" }}>{co.total} 艘</span>
+              <div className="repair-fleet-company-row" key={co.name}>
+                <div className="repair-fleet-company-heading">
+                  <span>{co.name}</span>
+                  <strong>{co.total}<small>艘</small></strong>
                 </div>
-                <div style={{ display: "flex", height: 16, borderRadius: 4, overflow: "hidden", background: C.bg }}>
+                <div className="repair-fleet-stacked-bar">
                   {external > 0 && (
-                    <div style={{ width: `${extPct}%`, background: C.brand, borderRadius: co.internal > 0 ? "4px 0 0 4px" : 4, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {extPct > 15 && <span style={{ fontSize: 9, color: "#FFF", fontWeight: 600 }}>{external}</span>}
+                    <div className="is-external" style={{ width: `${extPct}%` }}>
+                      {extPct > 15 && <span>{external}</span>}
                     </div>
                   )}
                   {co.internal > 0 && (
-                    <div style={{ width: `${intPct}%`, background: C.success, borderRadius: external > 0 ? "0 4px 4px 0" : 4, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {intPct > 10 && <span style={{ fontSize: 9, color: C.card, fontWeight: 600 }}>{co.internal}</span>}
+                    <div className="is-internal" style={{ width: `${intPct}%` }}>
+                      {intPct > 10 && <span>{co.internal}</span>}
                     </div>
                   )}
                 </div>
@@ -3272,22 +3283,30 @@ function PageProdRepairShips() {
             );
           })}
         </div>
-        {/* X轴刻度 */}
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+        <div className="repair-fleet-axis">
           {[0, 10, 20, 30].map(v => (
-            <span key={v} style={{ fontSize: 9, color: C.t3 }}>{v}</span>
+            <span key={v}>{v}</span>
           ))}
         </div>
-        {/* 小结 */}
-        <div style={{ marginTop: 12, background: C.bg, borderRadius: 8, padding: "7px 12px", display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.phDark }}>注</span>
-          <span style={{ fontSize: 11, color: C.t2 }}>
-            <span style={{ fontWeight: 600, color: C.t1 }}>上海重工</span>在厂体量最大，共 29 艘
-          </span>
+        <div className="repair-fleet-note">
+          <strong>注</strong>
+          <span><b>南通川崎</b>在厂体量最高，共 22 艘</span>
         </div>
-      </div>
+      </Card>
+    </div>
+  );
+}
 
-      <Footer text="在厂艘数排名 · 修船生产口径 · 截至7.10" />
+function PageProdRepairShips() {
+  return (
+    <>
+      <StatusBar />
+      <NavBar title="在厂艘数统计" subtitle="修船·生产口径" backLabel="返回修船主题" backPage="prod-repair" dateMode="day" />
+      <BreadcrumbBar crumbs={["首页", "生产主题", "修船", "在厂艘数统计"]} />
+
+      <RepairFleetStatistics />
+
+      <Footer />
     </>
   );
 }
@@ -3297,16 +3316,16 @@ function PageProdRepair() {
   return (
     <>
       <StatusBar />
-      <NavBar title="生产主题" backLabel="返回首页" backPage="home" />
+      <NavBar title="生产主题" backLabel="返回首页" backPage="home" dateMode="day" />
       <div className="repair-mode-shell">
         <ProductionModeTabs value="repair" onValueChange={(mode: ProductionMode) => nav(mode === "ship" ? "prod-ship" : "prod-repair")} />
       </div>
 
-      {/* L5 今日动态 */}
+      {/* L5 每日动态 */}
       <div className="repair-click-card" role="button" tabIndex={0} onClick={() => nav("prod-repair-daily")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") nav("prod-repair-daily"); }}>
       <Card className="app-production-card repair-today-card mode-content-first-card attached-overview-card">
         <div className="attached-overview-heading">
-          <strong>今日动态</strong>
+          <strong>每日动态</strong>
           <span>查看详情 <ChevronRight aria-hidden="true" /></span>
         </div>
         <div className="repair-today-metrics repair-today-metrics-three">
@@ -3324,19 +3343,13 @@ function PageProdRepair() {
       </Card>
       </div>
 
-      {/* 在厂艘数排名 */}
-      <Card title="在厂艘数排名" extra="下钻明细" onExtra={() => nav("prod-repair-ships")} className="app-production-card repair-ranking-card">
+      {/* 在厂艘数统计 */}
+      <Card title="在厂艘数统计" className="app-production-card repair-ranking-card fleet-statistics-card">
         <div className="repair-ranking-list">
-          {[
-            { name: "舟山重工", value: 32 },
-            { name: "大连重工", value: 25 },
-            { name: "广东重工", value: 19 },
-            { name: "南通中远", value: 16 },
-          ].map((item, index) => (
-            <div className="repair-ranking-row" key={item.name}>
-              <span className="repair-rank-index">{String(index + 1).padStart(2, "0")}</span>
+          {REPAIR_OVERVIEW_STATISTICS.map((item) => (
+            <div className="repair-ranking-row is-statistics" key={item.name}>
               <span className="repair-rank-name">{item.name}</span>
-              <HorizontalBar value={(item.value / 32) * 100} label={`${item.name} ${item.value}艘`} />
+              <HorizontalBar value={(item.value / 26) * 100} label={`${item.name} ${item.value}艘`} />
               <strong>{item.value}<small>艘</small></strong>
             </div>
           ))}
@@ -3501,7 +3514,7 @@ function PageProdRepairCompletion() {
   return (
     <>
       <StatusBar />
-      <NavBar title="修船完工明细" backLabel="返回修船主题" backPage="prod-repair" />
+      <NavBar title="修船完工明细" backLabel="返回修船主题" backPage="prod-repair" dateMode="day" />
       <BreadcrumbBar crumbs={["首页", "生产主题", "修船", "完工明细"]} period="截至7.10" />
       <div className="production-detail-page repair-completion-page">
         <Card title="完工表现总览" className="production-summary-card">
@@ -3555,31 +3568,32 @@ function PageProdRepairCompletion() {
 
 function PageProdRepairDaily() {
   const rows = [
-    { name: "南通船务", inbound: 3, completed: 2 },
-    { name: "大连重工", inbound: 4, completed: 4 },
-    { name: "舟山重工", inbound: 5, completed: 3 },
-    { name: "上海重工", inbound: 3, completed: 4 },
-    { name: "广东重工", inbound: 3, completed: 2 },
+    { name: "南通川崎", inbound: 3, completed: 2 },
+    { name: "大连川崎", inbound: 4, completed: 4 },
+    { name: "扬州重工", inbound: 5, completed: 3 },
+    { name: "南通船务", inbound: 3, completed: 4 },
+    { name: "启东海工", inbound: 3, completed: 2 },
   ];
   return (
     <>
       <StatusBar />
-      <NavBar title="生产主题" backLabel="返回修船主题" backPage="prod-repair" />
-      <BreadcrumbBar crumbs={["首页", "生产主题", "修船", "今日动态"]} />
+      <NavBar title="修船每日运营摘要" backLabel="返回修船主题" backPage="prod-repair" dateMode="day" />
+      <BreadcrumbBar crumbs={["首页", "生产主题", "修船", "每日动态"]} />
 
       <div className="production-detail-page repair-daily-page">
-        <Card title="今日运营摘要" className="production-summary-card">
+        <Card title="每日运营摘要" className="production-summary-card">
           <div className="production-summary-grid"><div><span>在厂船舶</span><strong>92<small>艘</small></strong></div><div><span>本月进厂</span><strong>18<small>艘</small></strong></div><div><span>本月出厂</span><strong className="is-good">15<small>艘</small></strong></div></div>
         </Card>
-        <Card title="企业今日动态" className="production-list-card">
+        <Card title="企业每日动态" className="production-list-card">
           <div className="daily-list-head"><span>企业</span><span>进厂</span><span>完工出厂</span></div>
           <div className="daily-enterprise-list">
             {rows.map(row => <div className="daily-enterprise-row" key={row.name}><div className="daily-company"><strong>{row.name}</strong></div><span><b>{row.inbound}</b><small>艘</small></span><em>{row.completed}<small>艘</small></em></div>)}
           </div>
         </Card>
+        <RepairFleetStatistics />
       </div>
 
-      <Footer text="修船在厂/本月进厂/本月完工出厂明细 · 模拟数据" />
+      <Footer />
     </>
   );
 }
@@ -3599,9 +3613,9 @@ function PageProdShip() {
       { label: "本周计划开工", value: "0",  unit: "艘" },
     ],
     trackBars: [
-      { name: "大连川崎", v: 18 }, { name: "舟山重工", v: 15 },
-      { name: "大连重工", v: 14 }, { name: "广东重工", v: 12 },
-      { name: "启东造船", v: 8  }, { name: "扬州重工", v: 5  },
+      { name: "南通川崎", v: 18 }, { name: "大连川崎", v: 15 },
+      { name: "扬州重工", v: 14 }, { name: "南通船务", v: 12 },
+      { name: "启东海工", v: 8  }, { name: "大连重工", v: 5  },
     ],
     deliveryRate: 26, deliveryCnt: "6", dwt: "78", cgt: "24",
     trendPts: [0, 2, 4, 5, 6, 4, 3, 5, 7, 9, 10, 11],
@@ -3635,7 +3649,7 @@ function PageProdShip() {
   return (
     <>
       <StatusBar />
-      <NavBar title="生产主题" backLabel="返回首页" backPage="home" />
+      <NavBar title="生产主题" backLabel="返回首页" backPage="home" dateMode="day" />
       <div className="repair-mode-shell">
         <ProductionModeTabs value="ship" onValueChange={(mode: ProductionMode) => {
           setSeg(mode === "ship" ? "造船" : "修船");
@@ -3644,11 +3658,11 @@ function PageProdShip() {
         }} />
       </div>
 
-      {/* 今日动态 — 整卡下钻至生产跟踪 */}
+      {/* 每日动态 — 整卡下钻至生产跟踪 */}
       <div className="repair-click-card" role="button" tabIndex={0} onClick={() => nav("prod-ship-track")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") nav("prod-ship-track"); }}>
         <Card className="app-production-card repair-today-card mode-content-first-card attached-overview-card">
           <div className="attached-overview-heading">
-            <strong>今日动态</strong>
+            <strong>每日动态</strong>
             <span>查看详情 <ChevronRight aria-hidden="true" /></span>
           </div>
           <div className="repair-today-metrics ship-today-metrics">
@@ -3662,12 +3676,11 @@ function PageProdShip() {
         </Card>
       </div>
 
-      {/* 在建艘数排名 */}
-      <Card title="在建艘数排名" extra="下钻明细" onExtra={() => nav("prod-ship-track")} className="app-production-card repair-ranking-card ship-ranking-card ship-detail-title-card">
+      {/* 在建艘数统计 */}
+      <Card title="在建艘数统计" extra="下钻明细" onExtra={() => nav("prod-ship-track")} className="app-production-card repair-ranking-card ship-ranking-card ship-detail-title-card fleet-statistics-card">
         <div className="repair-ranking-list">
-          {d.trackBars.map((item, index) => (
-            <div className="repair-ranking-row" key={item.name}>
-              <span className="repair-rank-index">{String(index + 1).padStart(2, "0")}</span>
+          {d.trackBars.map((item) => (
+            <div className="repair-ranking-row is-statistics" key={item.name}>
               <span className="repair-rank-name">{item.name}</span>
               <HorizontalBar value={(item.v / maxBar) * 100} label={`${item.name} ${item.v}艘`} />
               <strong>{item.v}<small>艘</small></strong>
@@ -3969,7 +3982,7 @@ function PageProdShipDelivery() {
   return (
     <>
       <StatusBar />
-      <NavBar title="交付实绩明细" backLabel="返回造船主题" backPage="prod-ship" />
+      <NavBar title="交付实绩明细" backLabel="返回造船主题" backPage="prod-ship" dateMode="day" />
 
       <div className="ship-delivery-detail-summary">
         <div className="ship-delivery-detail-period"><CalendarClock size={15} strokeWidth={2} /><strong>2024年10月实绩</strong></div>
@@ -4017,7 +4030,7 @@ function PageProdShipDeliveryDetail() {
   return (
     <>
       <StatusBar />
-      <NavBar title="交付进度明细" backLabel="返回造船主题" backPage="prod-ship" />
+      <NavBar title="交付进度明细" backLabel="返回造船主题" backPage="prod-ship" dateMode="day" />
       <BreadcrumbBar period="截至7.10" crumbs={[]} />
 
       {/* 累计交付情况 — 分组条形图 */}
@@ -4105,11 +4118,11 @@ function PageProdShipTrack() {
   return (
     <>
       <StatusBar />
-      <NavBar title="生产主题" backLabel="返回造船主题" backPage="prod-ship" />
-      <BreadcrumbBar crumbs={["首页", "生产主题", "造船", "生产跟踪"]} period="截至7.10" />
+      <NavBar title="造船每日运营摘要" backLabel="返回造船主题" backPage="prod-ship" dateMode="day" />
+      <BreadcrumbBar crumbs={["首页", "生产主题", "造船", "每日运营摘要"]} period="截至7.10" />
 
       <div className="production-detail-page ship-track-page">
-        <Card title="建造阶段总览" className="production-stage-card ship-detail-title-card">
+        <Card title="每日运营摘要" className="production-stage-card ship-detail-title-card">
           <div className="stage-total"><span>在建总数</span><strong>72<small>艘</small></strong><em>重点阶段 <b>码头舾装 29艘</b></em></div>
           <div className="stage-stacked-bar" aria-label="造船在建阶段分布"><i style={{ flex: 16 }}/><i style={{ flex: 18 }}/><i style={{ flex: 29 }}/><i style={{ flex: 9 }}/></div>
           <div className="stage-legend">{[["分段制作",16],["总组搭载",18],["码头舾装",29],["完工待交",9]].map(([label,value],i)=><div key={String(label)}><i data-index={i}/><span>{label}</span><strong>{value}<small>艘</small></strong></div>)}</div>

@@ -6,6 +6,31 @@ const GLOBAL_YEAR_OPTIONS = [2024, 2025, 2026];
 const LATEST_AVAILABLE_YEAR = 2026;
 const LATEST_AVAILABLE_MONTH = 8;
 const GLOBAL_MONTH_STORAGE_KEY = "cosco-dashboard-global-month";
+const PRODUCTION_DAY_STORAGE_KEY = "cosco-dashboard-production-day";
+
+const getProductionDateBounds = () => {
+  const max = new Date();
+  max.setHours(0, 0, 0, 0);
+  const min = new Date(max);
+  min.setFullYear(min.getFullYear() - 2);
+  return { min, max };
+};
+
+const formatDayLabel = (date: Date) => `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+
+function parseDayLabel(label: string) {
+  const match = label.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/);
+  if (!match) return null;
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return Number.isNaN(date.getTime()) || date.getFullYear() !== Number(match[1]) || date.getMonth() !== Number(match[2]) - 1 || date.getDate() !== Number(match[3]) ? null : date;
+}
+
+function clampProductionDay(label: string) {
+  const { min, max } = getProductionDateBounds();
+  const parsed = parseDayLabel(label) ?? max;
+  const clamped = parsed < min ? min : parsed > max ? max : parsed;
+  return formatDayLabel(clamped);
+}
 
 function normalizeMonthLabel(label: string) {
   const match = label.match(/^(\d{4})年(\d{1,2})月/);
@@ -39,6 +64,7 @@ type GlobalHeaderProps = {
   badgeMode?: "date" | "freshness";
   badgeExpanded?: boolean;
   onBadgeClick?: () => void;
+  dateMode?: "month" | "day";
 };
 
 function GlobalHeader({
@@ -51,6 +77,7 @@ function GlobalHeader({
   badgeMode = "date",
   badgeExpanded = false,
   onBadgeClick,
+  dateMode = "month",
 }: GlobalHeaderProps) {
   const hasPageChrome = Boolean(pageTitle && onBack);
   const isFreshnessBadge = badgeMode === "freshness";
@@ -62,6 +89,13 @@ function GlobalHeader({
     return savedMonth ? normalizeMonthLabel(savedMonth) : normalizeMonthLabel(dateLabel);
   });
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(() => {
+    const currentDay = formatDayLabel(getProductionDateBounds().max);
+    if (typeof window === "undefined") return currentDay;
+    return clampProductionDay(window.sessionStorage.getItem(PRODUCTION_DAY_STORAGE_KEY) ?? currentDay);
+  });
+  const selectedDayDate = parseDayLabel(selectedDay) ?? getProductionDateBounds().max;
+  const [dayView, setDayView] = useState(() => ({ year: selectedDayDate.getFullYear(), month: selectedDayDate.getMonth() }));
   const { year: selectedYear } = getDateParts(selectedMonth);
   const visibleMonthOptions = getMonthOptions(selectedYear);
 
@@ -97,6 +131,30 @@ function GlobalHeader({
     window.dispatchEvent(new CustomEvent("global-month-change", { detail: month }));
     requestAnimationFrame(() => monthTriggerRef.current?.focus());
   };
+
+  const handleDayChange = (date: Date) => {
+    const nextDay = clampProductionDay(formatDayLabel(date));
+    setSelectedDay(nextDay);
+    setMonthPickerOpen(false);
+    window.sessionStorage.setItem(PRODUCTION_DAY_STORAGE_KEY, nextDay);
+    window.dispatchEvent(new CustomEvent("production-day-change", { detail: nextDay }));
+    requestAnimationFrame(() => monthTriggerRef.current?.focus());
+  };
+
+  const moveDayView = (offset: number) => {
+    const next = new Date(dayView.year, dayView.month + offset, 1);
+    const { min, max } = getProductionDateBounds();
+    const minMonth = new Date(min.getFullYear(), min.getMonth(), 1);
+    const maxMonth = new Date(max.getFullYear(), max.getMonth(), 1);
+    const clamped = next < minMonth ? minMonth : next > maxMonth ? maxMonth : next;
+    setDayView({ year: clamped.getFullYear(), month: clamped.getMonth() });
+  };
+
+  const dayCells = (() => {
+    const firstWeekday = new Date(dayView.year, dayView.month, 1).getDay();
+    const dayCount = new Date(dayView.year, dayView.month + 1, 0).getDate();
+    return [...Array.from({ length: firstWeekday }, () => null), ...Array.from({ length: dayCount }, (_, index) => new Date(dayView.year, dayView.month, index + 1))];
+  })();
 
   const handleYearChange = (year: number) => {
     const currentMonth = getDateParts(selectedMonth).month;
@@ -263,8 +321,8 @@ function GlobalHeader({
                 <button
                   ref={monthTriggerRef}
                   type="button"
-                  className={cn("global-month-select-shell", monthPickerOpen && "is-open")}
-                  aria-label={`月份筛选，当前${selectedMonth}`}
+                  className={cn("global-month-select-shell", dateMode === "day" && "is-day", monthPickerOpen && "is-open")}
+                  aria-label={`${dateMode === "day" ? "日期" : "月份"}筛选，当前${dateMode === "day" ? selectedDay : selectedMonth}`}
                   aria-haspopup="dialog"
                   aria-expanded={monthPickerOpen}
                   onClick={() => setMonthPickerOpen((open) => !open)}
@@ -274,12 +332,12 @@ function GlobalHeader({
                     <rect x="2.25" y="3.5" width="11.5" height="10" rx="2" stroke="currentColor" strokeWidth="1.4" opacity="0.72"/>
                     <path d="M5 2.25v2.5M11 2.25v2.5M2.75 6.5h10.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.72"/>
                   </svg>
-                  <span>{selectedMonth}</span>
+                  <span>{dateMode === "day" ? selectedDay : selectedMonth}</span>
                   <svg className="global-month-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
                     <path d="M2.5 3.75L5 6.25L7.5 3.75" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" opacity="0.7"/>
                   </svg>
                 </button>
-                {monthPickerOpen && (
+                {monthPickerOpen && dateMode === "month" && (
                   <div className="global-month-popover" role="dialog" aria-label="选择年月">
                     <div className="global-month-popover-head">
                       <span>选择年月</span>
@@ -313,6 +371,26 @@ function GlobalHeader({
                         </button>
                       ))}
                     </div>
+                  </div>
+                )}
+                {monthPickerOpen && dateMode === "day" && (
+                  <div className="global-month-popover global-day-popover" role="dialog" aria-label="选择生产日期">
+                    <div className="global-day-popover-head">
+                      <button type="button" aria-label="上个月" onClick={() => moveDayView(-1)}>‹</button>
+                      <strong>{dayView.year}年{dayView.month + 1}月</strong>
+                      <button type="button" aria-label="下个月" onClick={() => moveDayView(1)}>›</button>
+                    </div>
+                    <div className="global-day-weekdays" aria-hidden="true">{["日", "一", "二", "三", "四", "五", "六"].map(day => <span key={day}>{day}</span>)}</div>
+                    <div className="global-day-grid" role="grid" aria-label={`${dayView.year}年${dayView.month + 1}月日期`}>
+                      {dayCells.map((date, index) => {
+                        if (!date) return <span key={`blank-${index}`} />;
+                        const { min, max } = getProductionDateBounds();
+                        const disabled = date < min || date > max;
+                        const label = formatDayLabel(date);
+                        return <button key={label} type="button" disabled={disabled} aria-selected={selectedDay === label} className={cn("global-day-option", selectedDay === label && "is-selected")} onClick={() => handleDayChange(date)}>{date.getDate()}</button>;
+                      })}
+                    </div>
+                    <div className="global-day-range-note">可选范围：近2年</div>
                   </div>
                 )}
               </div>
