@@ -11010,22 +11010,79 @@
   font-size: 10px;
 }
 
-.app-phone-screen .repair-fleet-note {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: 12px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--app-fill-extra-light);
-  color: var(--app-text-secondary);
-  font-size: 11px;
-  line-height: 17px;
-}
-
-.app-phone-screen .repair-fleet-note > strong { color: var(--app-primary-900); }
-.app-phone-screen .repair-fleet-note b { color: var(--app-text-primary); }
-
 .app-phone-screen .repair-daily-page .repair-fleet-statistics-section {
   margin: 0;
+}
+
+/* Senior-readable production theme typography and compact summary annotations. */
+.app-phone-screen .production-summary-grid em {
+  display: block;
+  min-height: 17px;
+  margin-top: 2px;
+  color: var(--app-text-secondary);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 17px;
+  white-space: nowrap;
+}
+
+.app-phone-screen :is(.repair-section-heading small, .repair-resource-copy small, .repair-resource-facts span) {
+  font-size: 12px !important;
+  line-height: 17px !important;
+}
+
+.app-phone-screen :is(.repair-resource-copy strong, .repair-resource-compare-title) {
+  font-size: 14px !important;
+  line-height: 20px !important;
+}
+
+.app-phone-screen :is(.repair-resource-compare-toolbar > span, .repair-resource-compare-switch button) {
+  font-size: 11px !important;
+  line-height: 16px !important;
+}
+
+.app-phone-screen .repair-resource-detail > div:not(.repair-resource-compare-head):not(.repair-resource-compare-toolbar) > span {
+  font-size: 11px !important;
+}
+
+.app-phone-screen .production-bar-item > strong,
+.app-phone-screen .production-bar-item > span,
+.app-phone-screen .production-chart-unit,
+.app-phone-screen .chart-inline-unit,
+.app-phone-screen .production-update-note {
+  font-size: 11px !important;
+  line-height: 15px !important;
+}
+
+.app-phone-screen .stage-legend span,
+.app-phone-screen .stage-legend strong,
+.app-phone-screen .stage-legend strong small {
+  font-size: 12px !important;
+  line-height: 17px !important;
+}
+
+.app-phone-screen .ship-stage-matrix-head {
+  font-size: 11px !important;
+}
+
+.app-phone-screen .ship-stage-matrix-row > strong {
+  font-size: 12px !important;
+}
+
+.app-phone-screen .repair-fleet-legend > div,
+.app-phone-screen .repair-fleet-axis {
+  font-size: 12px;
+}
+
+.app-phone-screen .repair-fleet-company-heading > span {
+  font-size: 14px;
+}
+
+.app-phone-screen .repair-fleet-company-heading > strong {
+  font-size: 16px;
+}
+
+.app-phone-screen .repair-fleet-stacked-bar span {
+  font-size: 11px;
 }

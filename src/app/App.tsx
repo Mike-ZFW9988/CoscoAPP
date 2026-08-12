@@ -3232,18 +3232,18 @@ const REPAIR_OVERVIEW_STATISTICS = [
   { name: "南通船务", value: 20 },
 ];
 
-function RepairFleetStatistics() {
+function RepairFleetStatistics({ showSummary = true }: { showSummary?: boolean }) {
   const companies = REPAIR_FLEET_STATISTICS;
   const maxTotal = Math.max(...companies.map((company) => company.total));
 
   return (
     <div className="repair-fleet-statistics-section">
-      <Card title="在厂艘数统计" className="repair-fleet-summary-card">
+      {showSummary && <Card title="在厂艘数统计" className="repair-fleet-summary-card">
         <div className="repair-fleet-summary">
           <div className="repair-fleet-total"><strong>92</strong><span>艘</span></div>
           <div className="repair-fleet-flow"><div><span>本月进厂</span><strong>18<small>艘</small></strong><em>集团船5艘</em></div><div><span>本月出厂</span><strong>15<small>艘</small></strong><em>集团船4艘</em></div></div>
         </div>
-      </Card>
+      </Card>}
 
       <Card title="各企业在厂分布" className="repair-fleet-distribution-card">
         <div className="repair-fleet-legend">
@@ -3287,10 +3287,6 @@ function RepairFleetStatistics() {
           {[0, 10, 20, 30].map(v => (
             <span key={v}>{v}</span>
           ))}
-        </div>
-        <div className="repair-fleet-note">
-          <strong>注</strong>
-          <span><b>南通川崎</b>在厂体量最高，共 22 艘</span>
         </div>
       </Card>
     </div>
@@ -3421,15 +3417,15 @@ function PageProdRepair() {
         ))}
       </div>
 
-      {/* 码头泊位吊车 — 摘要卡 */}
+      {/* 码头泊位岸吊 — 摘要卡 */}
       <div className="repair-resource-summary">
         <span className="repair-resource-icon"><Factory size={24} strokeWidth={1.8} /></span>
-        <div className="repair-resource-copy"><strong>码头泊位与吊车</strong><small>岸线、泊位及起重能力</small></div>
+        <div className="repair-resource-copy"><strong>码头泊位与岸吊</strong><small>岸线、泊位及起重能力</small></div>
         <div className="repair-resource-total"><strong>84</strong><span>个泊位</span></div>
         <div className="repair-resource-facts"><span>岸线 <b>22,100m</b></span><span>码头 <b>19,400m</b></span></div>
       </div>
 
-      {/* 码头泊位吊车 — 条形图卡 */}
+      {/* 码头泊位岸吊 — 条形图卡 */}
       <div className="repair-resource-detail" style={{ background: C.card, margin: "8px 10px 8px", borderRadius: 12, padding: "10px 10px 10px", boxShadow: "var(--app-shadow-card)" }}>
         <div className="repair-resource-compare-head">
           <div className="repair-resource-compare-title">各企业资源对比</div>
@@ -3441,8 +3437,8 @@ function PageProdRepair() {
             shore:   { label: "岸线长",              vals: [3200, 4800, 5100, 6200, 2800], unit: "m",  maxVal: 7000 },
             berth:   { label: "码头长",              vals: [2800, 4100, 4600, 5500, 2400], unit: "m",  maxVal: 7000 },
             slots:   { label: "泊位数",              vals: [12, 18, 20, 24, 10],           unit: "个", maxVal: 28   },
-            crane_s: { label: "码头吊车（100米以下变幅）", vals: [6, 10, 12, 8, 5],         unit: "台", maxVal: 15   },
-            crane_l: { label: "码头吊车（100米以上变幅）", vals: [2, 4, 5, 6, 2],           unit: "台", maxVal: 8    },
+            crane_s: { label: "码头岸吊（100米以下变幅）", vals: [6, 10, 12, 8, 5],         unit: "台", maxVal: 15   },
+            crane_l: { label: "码头岸吊（100米以上变幅）", vals: [2, 4, 5, 6, 2],           unit: "台", maxVal: 8    },
             float:   { label: "浮吊",                vals: [1, 2, 3, 2, 1],               unit: "台", maxVal: 4    },
           };
           const active = metricMap[dockMetric] ?? metricMap["shore"];
@@ -3456,8 +3452,8 @@ function PageProdRepair() {
                     { key: "shore", short: "岸线" },
                     { key: "berth", short: "码头长" },
                     { key: "slots", short: "泊位" },
-                    { key: "crane_s", short: "吊车≤100m" },
-                    { key: "crane_l", short: "吊车＞100m" },
+                    { key: "crane_s", short: "岸吊≤100m" },
+                    { key: "crane_l", short: "岸吊＞100m" },
                     { key: "float", short: "浮吊" },
                   ].map((metric) => (
                     <button
@@ -3582,7 +3578,11 @@ function PageProdRepairDaily() {
 
       <div className="production-detail-page repair-daily-page">
         <Card title="每日运营摘要" className="production-summary-card">
-          <div className="production-summary-grid"><div><span>在厂船舶</span><strong>92<small>艘</small></strong></div><div><span>本月进厂</span><strong>18<small>艘</small></strong></div><div><span>本月出厂</span><strong className="is-good">15<small>艘</small></strong></div></div>
+          <div className="production-summary-grid">
+            <div><span>在厂船舶</span><strong>92<small>艘</small></strong></div>
+            <div><span>本月进厂</span><strong>18<small>艘</small></strong><em>集团船5艘</em></div>
+            <div><span>本月出厂</span><strong className="is-good">15<small>艘</small></strong><em>集团船5艘</em></div>
+          </div>
         </Card>
         <Card title="企业每日动态" className="production-list-card">
           <div className="daily-list-head"><span>企业</span><span>进厂</span><span>完工出厂</span></div>
@@ -3590,7 +3590,7 @@ function PageProdRepairDaily() {
             {rows.map(row => <div className="daily-enterprise-row" key={row.name}><div className="daily-company"><strong>{row.name}</strong></div><span><b>{row.inbound}</b><small>艘</small></span><em>{row.completed}<small>艘</small></em></div>)}
           </div>
         </Card>
-        <RepairFleetStatistics />
+        <RepairFleetStatistics showSummary={false} />
       </div>
 
       <Footer />
