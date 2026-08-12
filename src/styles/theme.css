@@ -1347,6 +1347,45 @@
 .app-phone-screen .production-enterprise-row > span b { color: var(--app-primary-900); font-weight: 700; }
 .app-phone-screen .production-enterprise-row > em { justify-self: end; font-size: 11px; font-style: normal; font-weight: 650; white-space: nowrap; }
 .app-phone-screen .repair-completion-page .production-enterprise-row > em { color: var(--app-primary-900); font-size: 14px; font-weight: 750; }
+.app-phone-screen .repair-completion-page .production-list-head,
+.app-phone-screen .repair-completion-page .production-enterprise-row {
+  grid-template-columns: minmax(0, 1.2fr) minmax(62px, .72fr) minmax(96px, 1fr);
+}
+.app-phone-screen .repair-completion-page .production-list-head {
+  min-height: 34px;
+  align-items: center;
+  font-size: 12px;
+}
+.app-phone-screen .repair-completion-page .production-enterprise-row {
+  min-height: 50px;
+}
+.app-phone-screen .repair-completion-page .production-enterprise-row > strong {
+  font-size: 13px;
+}
+.app-phone-screen .repair-completion-page .production-enterprise-row > span {
+  font-size: 13px;
+}
+.app-phone-screen .repair-completion-page .production-list-head span:last-child {
+  white-space: normal;
+  line-height: 16px;
+}
+.app-phone-screen .repair-completion-summary-card .production-summary-grid > div {
+  padding-right: 5px;
+  padding-left: 5px;
+}
+.app-phone-screen .repair-completion-summary-card .production-summary-grid span {
+  min-height: 36px;
+  font-size: 12px !important;
+  line-height: 18px !important;
+  white-space: normal;
+}
+.app-phone-screen .repair-completion-summary-card .production-summary-grid strong {
+  font-size: 22px;
+  line-height: 28px;
+}
+.app-phone-screen .repair-completion-summary-card .production-summary-grid strong small {
+  font-size: 10px !important;
+}
 .app-phone-screen .repair-completion-page .production-list-card .app-data-table { overflow: visible; border: 0; border-radius: 0; background: transparent; }
 .app-phone-screen .repair-completion-page .production-list-card [data-slot="card-content"] { padding-right: 12px; padding-left: 12px; }
 .app-phone-screen .production-enterprise-row > em.is-good { color: var(--app-success-900); }.app-phone-screen .production-enterprise-row > em.is-watch { color: var(--app-warning-900); }.app-phone-screen .production-enterprise-row > em.is-late { color: var(--app-danger-900); }

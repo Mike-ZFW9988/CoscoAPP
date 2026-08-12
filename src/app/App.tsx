@@ -81,6 +81,19 @@ const C = {
   chart: ["#00508E","#0B69C7","#79BBFF","#9FCEFF","#C6E2FF","#D9ECFF","#ECF5FF","#6C94B8"],
 };
 
+/**
+ * 集团规定的企业展示顺序。所有企业对比图表、排名和明细均从该数组首项开始按需截取。
+ * 接入后端后，建议用企业编码匹配，再按此顺序排序，避免接口返回顺序影响页面展示。
+ */
+const COMPANY_DISPLAY_ORDER = [
+  "南通川崎", "大连川崎", "扬州重工", "南通船务", "启东海工", "大连重工", "舟山重工",
+  "上海重工", "广东重工", "南京船配", "大连海事", "南通重工", "南通威海", "丰昌船务",
+] as const;
+
+const companyNames = (count: number) => COMPANY_DISPLAY_ORDER.slice(0, count);
+const orderNamedCompanies = <T extends { name: string }>(rows: T[]): T[] => rows.map((row, index) => ({ ...row, name: COMPANY_DISPLAY_ORDER[index] ?? row.name }));
+const orderCompanyRows = <T extends { company: string }>(rows: T[]): T[] => rows.map((row, index) => ({ ...row, company: COMPANY_DISPLAY_ORDER[index] ?? row.company }));
+
 /* ─── Page Registry ─── */
 const PAGES = [
   { id: "home",                 label: "1  首页" },
@@ -257,7 +270,7 @@ function getTitleIcon(title?: string): LucideIcon {
 
 const DETAIL_CARD_TITLES = new Set([
   "在厂艘数统计",
-  "修船完工·计划与实绩",
+  "修船完工实绩",
   "在建艘数统计",
   "本周交付",
   "交付进度",
@@ -2065,11 +2078,11 @@ function SupportRevenueAnalysis({ detail = false }: { detail?: boolean } = {}) {
     { label: "开票", value: 54 },
     { label: "关闭", value: 21 },
   ];
-  const companyRows = [
-    { name: "南通配套", finish: 18, settlement: 16, invoice: 12, close: 5 },
-    { name: "威海科技", finish: 15, settlement: 13, invoice: 11, close: 6 },
-    { name: "大连装备", finish: 12, settlement: 10, invoice: 9, close: 4 },
-  ];
+  const companyRows = companyNames(3).map((name, index) => ({ name, ...[
+    { finish: 18, settlement: 16, invoice: 12, close: 5 },
+    { finish: 15, settlement: 13, invoice: 11, close: 6 },
+    { finish: 12, settlement: 10, invoice: 9, close: 4 },
+  ][index] }));
   const [selectedStageIndex, setSelectedStageIndex] = useState(3);
   const selectedStage = projectStages[selectedStageIndex] ?? projectStages[0];
   const stageMax = Math.max(...projectStages.map(item => item.value), 1);
@@ -2140,25 +2153,25 @@ function PageBiz({ initialTab = "修船" }: { initialTab?: BizInsightTab } = {})
   const marketSuppressClickRef = useRef(false);
   const [showDonut, setShowDonut] = useState(false);
   const [includeKawasaki, setIncludeKawasaki] = useState(false);
-  const repairChartData = [
+  const repairChartData = orderNamedCompanies([
     { x: 42,  label: "南通船务", actual: 270, target: 750,  marginRate: 78 },
     { x: 104, label: "大连重工", actual: 275, target: 750,  marginRate: 70 },
     { x: 166, label: "舟山重工", actual: 380, target: 780,  marginRate: 82 },
     { x: 228, label: "上海重工", actual: 430, target: 1280, marginRate: 43 },
     { x: 290, label: "广东重工", actual: 280, target: 1250, marginRate: 76 },
-  ];
-  const shipbuildingChartData = [
+  ]);
+  const shipbuildingChartData = orderNamedCompanies([
     { x: 44, label: "南通川崎", actual: 470, target: 750, marginRate: 82 },
     { x: 92, label: "大连川崎", actual: 450, target: 750, marginRate: 70 },
     { x: 140, label: "扬州重工", actual: 360, target: 780, marginRate: 88 },
     { x: 188, label: "大连重工", actual: 280, target: 1280, marginRate: 64 },
     { x: 236, label: "舟山重工", actual: 420, target: 1250, marginRate: 72 },
     { x: 284, label: "广东重工", actual: 325, target: 1250, marginRate: 80 },
-  ];
-  const offshoreValueMarginData: BusinessValueMarginPoint[] = [
-    { id: "offshore-zhoushan", label: "舟山重工", actual: 420, target: 680, marginRate: 76 },
-    { id: "offshore-qidong", label: "启东海工", actual: 360, target: 620, marginRate: 72 },
-  ];
+  ]);
+  const offshoreValueMarginData: BusinessValueMarginPoint[] = companyNames(2).map((label, index) => ({ ...[
+    { id: "offshore-zhoushan", actual: 420, target: 680, marginRate: 76 },
+    { id: "offshore-qidong", actual: 360, target: 620, marginRate: 72 },
+  ][index], label }));
   const marketRegions = [
     { short: "希腊区", full: "希腊区", target: 9.5, actual: 11.2 },
     { short: "中欧西葡", full: "中欧及西葡区", target: 3.1, actual: 2.7 },
@@ -3442,7 +3455,7 @@ function PageProdRepair() {
             float:   { label: "浮吊",                vals: [1, 2, 3, 2, 1],               unit: "台", maxVal: 4    },
           };
           const active = metricMap[dockMetric] ?? metricMap["shore"];
-          const companies = ["南通船务", "大连重工", "舟山重工", "上海重工", "广东重工"];
+          const companies = companyNames(5);
           return (
             <>
               <div className="repair-resource-compare-toolbar">
@@ -3501,7 +3514,7 @@ function PageProdRepairCompletion() {
   const [period, setPeriod] = useState<"月度" | "年累计">("月度");
   const [metric, setMetric] = useState<"艘数" | "产值">("艘数");
 
-  const companies = ["南通船务", "大连重工", "舟山重工", "上海重工", "广东重工"];
+  const companies = companyNames(5);
   const shipNums  = [28, 22, 30, 18, 24];
   const valNums   = [420, 380, 510, 290, 400];
   const shipMax   = Math.max(...shipNums);
@@ -3513,11 +3526,11 @@ function PageProdRepairCompletion() {
       <NavBar title="修船完工明细" backLabel="返回修船主题" backPage="prod-repair" dateMode="day" />
       <BreadcrumbBar crumbs={["首页", "生产主题", "修船", "完工明细"]} period="截至7.10" />
       <div className="production-detail-page repair-completion-page">
-        <Card title="完工表现总览" className="production-summary-card">
+        <Card title="完工表现总览" className="production-summary-card repair-completion-summary-card">
           <div className="production-summary-grid">
             <div><span>本月完工</span><strong>122<small>艘</small></strong></div>
             <div><span>完工产值</span><strong>2,000<small>万元</small></strong></div>
-            <div><span>达成率</span><strong>97.6<small>%</small></strong></div>
+            <div><span>产值达成率</span><strong>97.6<small>%</small></strong></div>
           </div>
         </Card>
 
@@ -3542,17 +3555,18 @@ function PageProdRepairCompletion() {
         </Card>
 
         <Card title="企业完工明细" className="production-list-card">
-          <div className="production-list-head"><span>企业</span><span>计划 / 实绩</span><span>达成率</span></div>
+          <div className="production-list-head"><span>企业</span><span>实绩</span><span>产值达成率</span></div>
           <div className="production-enterprise-list">
             {[
-              { name: "南通船务", plan: 30, actual: 28 },
-              { name: "大连重工", plan: 25, actual: 22 },
-              { name: "舟山重工", plan: 28, actual: 30 },
-              { name: "上海重工", plan: 20, actual: 18 },
-              { name: "广东重工", plan: 22, actual: 24 },
-            ].map((row) => {
+              { plan: 30, actual: 28 },
+              { plan: 25, actual: 22 },
+              { plan: 28, actual: 30 },
+              { plan: 20, actual: 18 },
+              { plan: 22, actual: 24 },
+            ].map((row, index) => {
               const rate = Math.round((row.actual / row.plan) * 100);
-              return <div className="production-enterprise-row" key={row.name}><strong>{row.name}</strong><span><b>{row.plan}</b> / <b>{row.actual}</b> 艘</span><em className={rate > 100 ? "is-over" : ""}>{rate}%</em></div>;
+              const name = companies[index];
+              return <div className="production-enterprise-row" key={name}><strong>{name}</strong><span><b>{row.actual}</b> 艘</span><em className={rate > 100 ? "is-over" : ""}>{rate}%</em></div>;
             })}
           </div>
         </Card>
@@ -3603,7 +3617,7 @@ function PageProdShip() {
   const [seg, setSeg] = useState<"造船" | "修船">("造船");
   const [bubbleIdx, setBubbleIdx] = useState<number | null>(null);
   const [resourceDetail, setResourceDetail] = useState<"dock" | "berth" | null>(null);
-  const resourceRows = ["南通川崎", "大连川崎", "扬州重工", "启东海工", "舟山重工"];
+  const resourceRows = companyNames(5);
 
   // 造船数据
   const shipData = {
@@ -3627,11 +3641,7 @@ function PageProdShip() {
       { label: "本周计划完工", value: "10", unit: "艘" },
       { label: "本周实际完工", value: "9",  unit: "艘" },
     ],
-    trackBars: [
-      { name: "上海重工", v: 29 }, { name: "舟山重工", v: 20 },
-      { name: "广东重工", v: 20 }, { name: "南通船务", v: 14 },
-      { name: "大连重工", v: 9  },
-    ],
+    trackBars: companyNames(5).map((name, index) => ({ name, v: [29, 20, 20, 14, 9][index] })),
     deliveryRate: 90, deliveryCnt: "30", dwt: "100", cgt: "88",
     trendPts: [4, 6, 5, 8, 7, 9, 8, 10, 9, 10, 11, 11],
   };
@@ -3916,9 +3926,7 @@ function PageProdShip() {
       </div>
 
       <div className="ship-resource-enterprises">
-        {[
-          "南通川崎", "大连川崎", "扬州重工", "大连重工", "舟山重工", "广东重工",
-        ].map((name, index) => (
+        {companyNames(6).map((name, index) => (
           <div className="ship-resource-enterprise" key={name}>
             <span className="ship-resource-enterprise-icon"><Factory size={16} strokeWidth={1.8} /></span>
             <strong>{name}</strong>
@@ -3972,13 +3980,13 @@ function PageProdShip() {
 }
 
 function PageProdShipDelivery() {
-  const deliveryRows = [
+  const deliveryRows = orderCompanyRows([
     { company: "南通川崎", project: "NE440", contract: "2024-12-26", schedule: "2024-10-30", actual: "2024-10-30", ac: 57, bc: 0 },
     { company: "大连川崎", project: "DE153", contract: "2024-12-20", schedule: "2024-11-20", actual: "2024-11-20", ac: 30, bc: 0 },
     { company: "大连重工", project: "N1118", contract: "2025-02-28", schedule: "2024-11-20", actual: "2024-11-20", ac: 100, bc: 0 },
     { company: "舟山重工", project: "N1142", contract: "2024-12-31", schedule: "2024-11-12", actual: "2024-11-08", ac: 53, bc: 4 },
     { company: "舟山重工", project: "N787", contract: "2024-10-30", schedule: "2024-10-30", actual: "2024-10-30", ac: 0, bc: 0 },
-  ];
+  ]);
   return (
     <>
       <StatusBar />
@@ -4022,7 +4030,7 @@ function PageProdShipDelivery() {
 }
 
 function PageProdShipDeliveryDetail() {
-  const companies = ["南通川崎", "大连川崎", "扬州重工", "大连重工", "舟山重工", "广东重工"];
+  const companies = companyNames(6);
   const dwt  = [62, 78, 55, 72, 80, 30]; // 万载重吨
   const cgt  = [50, 57, 65, 40, 90, 25]; // 万修正总吨
   const maxV = 100;
@@ -4106,7 +4114,7 @@ function PageProdShipDeliveryDetail() {
 }
 
 function PageProdShipTrack() {
-  const companies = [
+  const companies = orderNamedCompanies([
     { name: "扬州重工", total: 17, stages: [4, 4, 7, 2] },
     { name: "南通川崎", total: 11, stages: [2, 3, 5, 1] },
     { name: "启东海工", total: 11, stages: [3, 3, 4, 1] },
@@ -4114,7 +4122,7 @@ function PageProdShipTrack() {
     { name: "大连重工", total: 10, stages: [2, 3, 4, 1] },
     { name: "大连川崎", total: 10, stages: [2, 2, 4, 2] },
     { name: "广东重工", total: 3, stages: [1, 1, 1, 0] },
-  ];
+  ]);
   return (
     <>
       <StatusBar />
@@ -4159,7 +4167,7 @@ type FinanceAssessmentCompany = {
 };
 
 // 演示数据与后端字段一一对应；接入接口后仅需替换此数据源。
-const FINANCE_ASSESSMENT_DATA: FinanceAssessmentCompany[] = [
+const FINANCE_ASSESSMENT_DATA: FinanceAssessmentCompany[] = orderCompanyRows([
   { id: "build-01", company: "上海重工", segment: "造修企业", revenueTarget: 126000, revenueActual: 82320, profitTarget: 9200, profitActual: 6164 },
   { id: "build-02", company: "广东重工", segment: "造修企业", revenueTarget: 118000, revenueActual: 71980, profitTarget: 8600, profitActual: 5590 },
   { id: "build-03", company: "扬州重工", segment: "造修企业", revenueTarget: 96000, revenueActual: 46940, profitTarget: 7100, profitActual: 3266 },
@@ -4168,11 +4176,17 @@ const FINANCE_ASSESSMENT_DATA: FinanceAssessmentCompany[] = [
   { id: "build-06", company: "南通船务", segment: "造修企业", revenueTarget: 84000, revenueActual: 53760, profitTarget: 6200, profitActual: 3596 },
   { id: "build-07", company: "大连川崎", segment: "造修企业", revenueTarget: 110000, revenueActual: 52800, profitTarget: 8500, profitActual: 4165 },
   { id: "build-08", company: "大连重工", segment: "造修企业", revenueTarget: 98000, revenueActual: 59780, profitTarget: 7300, profitActual: 3869 },
-  { id: "support-01", company: "南通配套", segment: "配套企业", revenueTarget: 46000, revenueActual: 29440, profitTarget: 3900, profitActual: 2535 },
-  { id: "support-02", company: "威海科技", segment: "配套企业", revenueTarget: 42000, revenueActual: 21840, profitTarget: 3500, profitActual: 1715 },
-  { id: "support-03", company: "大连装备", segment: "配套企业", revenueTarget: 38000, revenueActual: 22420, profitTarget: 3100, profitActual: 1767 },
+  { id: "support-01", company: "南京船配", segment: "配套企业", revenueTarget: 46000, revenueActual: 29440, profitTarget: 3900, profitActual: 2535 },
+  { id: "support-02", company: "大连海事", segment: "配套企业", revenueTarget: 42000, revenueActual: 21840, profitTarget: 3500, profitActual: 1715 },
+  { id: "support-03", company: "南通重工", segment: "配套企业", revenueTarget: 38000, revenueActual: 22420, profitTarget: 3100, profitActual: 1767 },
   { id: "support-04", company: "南京船配", segment: "配套企业", revenueTarget: 32000, revenueActual: 14560, profitTarget: 2600, profitActual: 1092 },
-];
+]);
+const FINANCE_ASSESSMENT_BUILD_COUNT = 8;
+FINANCE_ASSESSMENT_DATA.forEach((row, index) => {
+  row.company = index < FINANCE_ASSESSMENT_BUILD_COUNT
+    ? COMPANY_DISPLAY_ORDER[index]
+    : COMPANY_DISPLAY_ORDER[9 + index - FINANCE_ASSESSMENT_BUILD_COUNT];
+});
 
 const FINANCE_ASSESSMENT_TIME_PROGRESS = 66.7;
 let financeAssessmentPreferredSegment: FinanceAssessmentSegment = "造修企业";
@@ -4321,7 +4335,7 @@ type FinanceFundCompanyDTO = {
 };
 
 // 模拟数据：三个币种均按人民币折算为亿元，便于前端统一比较和后端直接映射。
-const FINANCE_FUND_MOCK: FinanceFundCompanyDTO[] = [
+const FINANCE_FUND_MOCK: FinanceFundCompanyDTO[] = orderCompanyRows([
   { id: "fund-01", company: "大连川崎", cny: 2.05, usdConverted: 0.52, eurConverted: 0.04 },
   { id: "fund-02", company: "上海重工", cny: 2.75, usdConverted: 0.75, eurConverted: 0.03 },
   { id: "fund-03", company: "舟山重工", cny: 2.80, usdConverted: 0.93, eurConverted: 0.05 },
@@ -4331,8 +4345,8 @@ const FINANCE_FUND_MOCK: FinanceFundCompanyDTO[] = [
   { id: "fund-07", company: "启东海工", cny: 1.65, usdConverted: 0.82, eurConverted: 0.04 },
   { id: "fund-08", company: "大连重工", cny: 2.32, usdConverted: 1.00, eurConverted: 0.08 },
   { id: "fund-09", company: "南京船配", cny: 0.62, usdConverted: 0.28, eurConverted: 0.06 },
-  { id: "fund-10", company: "威海科技", cny: 0.07, usdConverted: 0.40, eurConverted: 0.08 },
-];
+  { id: "fund-10", company: "南京船配", cny: 0.07, usdConverted: 0.40, eurConverted: 0.08 },
+]);
 
 function PageFinanceFund() {
   const [fundCurrency, setFundCurrency] = useState<"total" | "cny" | "usd" | "eur">("total");
@@ -4349,7 +4363,7 @@ function PageFinanceFund() {
   };
   const activeCurrency = currencyMap[fundCurrency];
   const maxValue = Math.max(...activeCurrency.values);
-  const rankedCompanies = FINANCE_FUND_MOCK.map((item, index) => ({ company: item.company, index, value: activeCurrency.values[index] })).sort((a, b) => b.value - a.value);
+  const rankedCompanies = FINANCE_FUND_MOCK.map((item, index) => ({ company: item.company, index, value: activeCurrency.values[index] }));
 
   return (
     <>
@@ -4461,13 +4475,13 @@ const FINANCE_BALANCE_MOCK: FinanceBalanceSheetDTO = {
     { label: "借款", value: 46.20, share: 21.6 },
     { label: "其他负债", value: 36.70, share: 17.1 },
   ],
-  companies: [
+  companies: orderCompanyRows([
     { id: "balance-01", company: "大连重工", assetTotal: 58.40, liabilityTotal: 36.10, debtRatio: 61.8, currentRatio: 1.38 },
     { id: "balance-02", company: "启东海工", assetTotal: 49.80, liabilityTotal: 35.70, debtRatio: 71.7, currentRatio: 1.08 },
     { id: "balance-03", company: "舟山重工", assetTotal: 46.20, liabilityTotal: 29.30, debtRatio: 63.4, currentRatio: 1.31 },
     { id: "balance-04", company: "广东重工", assetTotal: 41.60, liabilityTotal: 30.80, debtRatio: 74.0, currentRatio: 0.96 },
     { id: "balance-05", company: "上海重工", assetTotal: 38.70, liabilityTotal: 24.50, debtRatio: 63.3, currentRatio: 1.27 },
-  ],
+  ]),
 };
 
 function FinanceBalanceComposition({ title, total, items, tone }: { title: string; total: number; items: FinanceBalanceCompositionDTO[]; tone: "asset" | "liability" }) {
@@ -4662,14 +4676,14 @@ function PageFinanceRevenue() {
   const LIGHT_BLUE = "#79BBFF";
   const GREEN  = "#39BB82";
   const ORANGE = "#E6A23C";
-  const companyRevenueData = [
+  const companyRevenueData = orderCompanyRows([
     { company: "南通川崎", revenue: 98500, profit: 13790, margin: 14.0, revenueMom: 8.6 },
     { company: "大连川崎", revenue: 86200, profit: 11120, margin: 12.9, revenueMom: 5.2 },
     { company: "扬州重工", revenue: 77800, profit: 8940,  margin: 11.5, revenueMom: -2.1 },
     { company: "舟山重工", revenue: 71600, profit: 9380,  margin: 13.1, revenueMom: 6.8 },
     { company: "上海重工", revenue: 65400, profit: 7520,  margin: 11.5, revenueMom: -1.4 },
     { company: "广东重工", revenue: 59800, profit: 7410,  margin: 12.4, revenueMom: 4.3 },
-  ];
+  ]);
   const ECW = 470, ECH = 176, EPAD_L = 34, EPAD_R = 32, EPAD_T = 16, EPAD_B = 32;
   const ePlotW = ECW - EPAD_L - EPAD_R;
   const ePlotH = ECH - EPAD_T - EPAD_B;
@@ -5041,7 +5055,7 @@ function PagePurchaseSteelDist() {
   const [selectedCompany, setSelectedCompany] = useState(0);
   const supplierColors = ["#00508E", "#79BBFF", "#67C23A", "#E6A23C"];
   const supplierNames = ["南钢", "湘钢", "上海建发", "物产中大（含鞍钢）"];
-  const detailCompanies = ["扬州重工","启东海工","大连重工","舟山重工","广东海工"];
+  const detailCompanies = companyNames(5);
   const detailValues = [[22,15,8,5],[18,12,6,4],[30,25,14,10],[20,40,18,12],[12,10,5,3]];
   return (
     <>
@@ -5060,8 +5074,8 @@ function PagePurchaseSteelDist() {
         </div>
         {/* Stacked bar chart: supplier distribution by company */}
         {(() => {
-          const companies = ["扬州重工","启东海工","大连重工","舟山重工","广东海工"];
-          const shortNames = ["扬州","启东","大连","舟山","广东"];
+          const companies = companyNames(5);
+          const shortNames = companies;
           const nangangData =  [22, 18, 30, 20, 12];
           const xiangData   =  [15, 12, 25, 40, 10];
           const jianfaData  =  [ 8,  6, 14, 18,  5];
@@ -5118,7 +5132,7 @@ function PagePurchaseSteelDist() {
 }
 
 function PagePurchaseSteelDelivery() {
-  const companies = ["扬州重工", "启东海工", "大连重工", "舟山重工", "广东海工"];
+  const companies = companyNames(5);
   const suppliers = [
     { name: "南钢", color: "#00508E", values: [62, 54, 24, 42, 32] },
     { name: "湘钢", color: "#79BBFF", values: [58, 52, 32, 54, 72] },
@@ -5136,9 +5150,8 @@ function PagePurchaseSteelDelivery() {
 }
 
 function PagePurchaseSteelCost() {
-  return <><StatusBar/><NavBar title="锁价成本与预算" backLabel="返回钢材采购" backPage="purchase-group-steel"/><Card title="各企业钢板锁价成本差额" className="mt-2 app-production-card"><GroupedBarChart data={[
-    {label:"扬州重工",primary:46.2,secondary:52.8},{label:"启东海工",primary:45.7,secondary:51.4},{label:"大连重工",primary:38.9,secondary:43.6},{label:"舟山重工",primary:46.5,secondary:52.1},{label:"广东海工",primary:46.1,secondary:51.6},
-  ]} primaryLabel="锁价成本" secondaryLabel="预算成本" unit="亿元" secondaryColor="#9FCEFF" valueSuffix="亿" goodWhen="lte"/></Card><Footer text="钢板锁价成本与预算对比 · 成本低于预算为达标"/></>;
+  const data = companyNames(5).map((label, index) => ({ label, primary: [46.2,45.7,38.9,46.5,46.1][index], secondary: [52.8,51.4,43.6,52.1,51.6][index] }));
+  return <><StatusBar/><NavBar title="锁价成本与预算" backLabel="返回钢材采购" backPage="purchase-group-steel"/><Card title="各企业钢板锁价成本差额" className="mt-2 app-production-card"><GroupedBarChart data={data} primaryLabel="锁价成本" secondaryLabel="预算成本" unit="亿元" secondaryColor="#9FCEFF" valueSuffix="亿" goodWhen="lte"/></Card><Footer text="钢板锁价成本与预算对比 · 成本低于预算为达标"/></>;
 }
 
 function SteelMetricIcon({ type }: { type: "project" | "steel" | "delivered" | "pending" }) {
@@ -5237,12 +5250,12 @@ function PurchaseSteelPanel() {
 function PurchaseSupplierPanel() {
   const months = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
   const trend = [140,145,151,148,154,150,149,148,146,152,147,168];
-  const enterprises = [
+  const enterprises = orderNamedCompanies([
     { name: "扬州重工", actual: 162, target: 125 }, { name: "南通船务", actual: 118, target: 82 },
     { name: "启东海工", actual: 140, target: 98 }, { name: "大连重工", actual: 162, target: 125 },
     { name: "舟山重工", actual: 204, target: 196 }, { name: "上海重工", actual: 162, target: 125 },
     { name: "广东重工", actual: 134, target: 110 },
-  ];
+  ]);
   const W = 480, H = 150, padL = 28, padR = 12, padT = 18, padB = 28;
   const x = (i:number) => padL + i * ((W-padL-padR)/(months.length-1));
   const y = (v:number) => padT + (180-v)/60*(H-padT-padB);
@@ -5278,15 +5291,15 @@ function PagePurchaseGroup({ initialSection = "management" }: { initialSection?:
   const BLUE  = C.brand;
   const GREEN = C.success;
 
-  const units = [
+  const units = orderNamedCompanies([
     { name: "扬州重工",        week: 0.98,  total: 13.80 },
     { name: "南通船务/启东海工", week: 0.71,  total: 9.89  },
     { name: "大连重工",        week: 12.10, total: 14.65 },
     { name: "舟山重工",        week: 4.96,  total: 17.98 },
     { name: "上海重工",        week: 0.10,  total: 2.24  },
     { name: "广东重工",        week: 0.29,  total: 6.88  },
-  ];
-  const rankedUnits = [...units].sort((a, b) => rankingPeriod === "year" ? b.total - a.total : b.week - a.week);
+  ]);
+  const rankedUnits = units;
   const maxTotal = Math.max(...rankedUnits.map(u => rankingPeriod === "year" ? u.total : u.week));
 
   // 采购金额结构 横向进度条数据
@@ -5397,8 +5410,8 @@ function PagePurchaseGroupRate() {
         </div>
         {/* Bar chart + reference line: group procurement rate */}
         {(() => {
-          const companies = ["扬州重工","南通船务","启东海工","大连重工","舟山重工","上海重工","广东重工"];
-          const shortNames = ["扬州重工","南通船务","启东海工","大连重工","舟山重工","上海重工","广东重工"];
+          const companies = companyNames(7);
+          const shortNames = companies;
           const rates = [88.2, 54.1, 76.3, 82.5, 79.8, 68.4, 71.6];
           const avg = 74.4;
           const yTicks = [0, 25, 50, 75, 100];
@@ -5811,7 +5824,7 @@ function PageEnergyLegacy() {
     },
   };
 
-  const d = data[seg];
+  const d = { ...data[seg], ranking: data[seg].ranking.map((row, index) => [String(index + 1), COMPANY_DISPLAY_ORDER[index] ?? row[1], row[2], row[3]] as [string,string,string,string]) };
   const tabs: Seg[] = ["整体", "造船", "修船", "海工"];
 
   return (
@@ -6010,7 +6023,7 @@ function PageEnergy() {
     intensity:{ 整体:[.0362,.0358,.0341,.0336,.0348,.0352,.0356,.0362,.0371,.0355,.0349,.0345],造船:[.0318,.0312,.0298,.0291,.0305,.0309,.0314,.0320,.0328,.0315,.0308,.0298],修船:[.0421,.0415,.0398,.0392,.0408,.0412,.0417,.0424,.0435,.0418,.0411,.0412],海工:[.0395,.0389,.0372,.0365,.0381,.0385,.0390,.0397,.0408,.0392,.0384,.0387]},
     carbon:{ 整体:[.52,.51,.49,.47,.48,.46,.47,.49,.51,.50,.49,.48],造船:[.47,.46,.44,.43,.44,.42,.43,.45,.46,.44,.43,.42],修船:[.58,.57,.55,.54,.56,.55,.57,.58,.60,.58,.57,.56],海工:[.54,.53,.51,.50,.52,.51,.52,.54,.55,.53,.52,.51]},
   };
-  const d = data[seg];
+  const d = { ...data[seg], ranking: data[seg].ranking.map((row, index) => [String(index + 1), COMPANY_DISPLAY_ORDER[index] ?? row[1], row[2], row[3]] as [string,string,string,string]) };
   const modes:{key:TrendMode;label:string;unit:string}[] = [{key:"total",label:"综合能耗",unit:"吨标煤"},{key:"intensity",label:"万元产值能耗",unit:"吨标煤/万元"},{key:"carbon",label:"碳排放",unit:"吨/万元"}];
   const mode = modes.find(item => item.key === trendMode)!;
   const values = trends[trendMode][seg];
