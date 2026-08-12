@@ -10843,3 +10843,37 @@
 .app-phone-screen .home-overdue-kpi-grid article[data-tone="success"] strong { color: var(--app-success-900); }
 .app-phone-screen .home-overdue-kpi-grid small { padding-bottom: 4px; color: var(--app-text-secondary); font-size: 10px; line-height: 14px; white-space: nowrap; }
 .app-phone-screen .home-overdue-kpi-grid em { color: var(--app-success-900); font-size: 9px; font-style: normal; line-height: 15px; white-space: nowrap; }
+
+/* Production ranking alignment: repair and shipbuilding share one row contract. */
+.app-phone-screen .repair-ranking-card .repair-ranking-row,
+.app-phone-screen .production-ship-scope .repair-ranking-card .repair-ranking-row {
+  min-height: 40px !important;
+  grid-template-columns: 22px 76px minmax(0, 1fr) 42px !important;
+  gap: 6px !important;
+}
+
+.app-phone-screen .repair-ranking-card .repair-rank-name,
+.app-phone-screen .production-ship-scope .repair-ranking-card .repair-rank-name {
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  line-height: 18px !important;
+}
+
+.app-phone-screen .repair-ranking-card .app-horizontal-bar,
+.app-phone-screen .production-ship-scope .repair-ranking-card .app-horizontal-bar {
+  width: 100%;
+  min-width: 0;
+  height: 8px;
+}
+
+.app-phone-screen .repair-ranking-card .repair-ranking-row > strong,
+.app-phone-screen .production-ship-scope .repair-ranking-card .repair-ranking-row > strong {
+  min-width: 42px;
+  font-size: 13px !important;
+  line-height: 18px !important;
+}
+
+.app-phone-screen .repair-ranking-card .repair-ranking-row > strong small,
+.app-phone-screen .production-ship-scope .repair-ranking-card .repair-ranking-row > strong small {
+  font-size: 9px !important;
+}

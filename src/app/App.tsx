@@ -1545,9 +1545,9 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
                 <span className="home-ops-name">修船</span>
               </div>
               <div className="home-ops-metrics">
-                <span><em>在厂</em><b>48</b>艘</span>
-                <span><em>年度完工出厂</em><b>12</b>艘</span>
-                <span><em>产值</em><b>892</b>亿</span>
+                <span><em>完工</em><b>18</b>艘</span>
+                <span><em>累计完工</em><b>20</b>艘</span>
+                <span><em>完成率</em><b>72</b>%</span>
               </div>
             </div>
             <div className="home-ops-row" onClick={() => nav("prod-ship")}>
