@@ -120,12 +120,20 @@ const QUALITY_COMPANY_PERFORMANCE: Record<QualityMetricKey, Record<QualityBusine
 
 const QUALITY_ACTIVITY_SLIDES = [
   {
-    id: "lng-pep-review",
-    date: "12月19日",
-    title: "重工LNG双燃料改装PEP评审会",
+    id: "bulk-carrier-standard-release",
+    date: "2026年5月22日",
+    title: "散货船造船质量标准正式发布",
+    location: "中远海运重工",
+    image: "/assets/quality-bulk-carrier-standard-release.png",
+    description: "2026年5月22日，正式发布《中远海运重工散货船造船质量标准》，这是重工发布的首套质量标准。",
+  },
+  {
+    id: "quality-innovation-competition",
+    date: "12月18日",
+    title: "第五届质量创新主题劳动竞赛",
     location: "南通船务",
-    image: "/assets/quality-lng-pep-review.png",
-    description: "12月19日，在南通船务召开重工LNG双燃料改装PEP评审会，会议邀请ABS船级社、重工相关部门和企业代表组成的专家组和代表组共同进行评审。会议由专家组长李新主持，会上专家组一致认为该PEP整体思路清晰，目标明确，内容较为全面，基本满足项目需求，具有一定的可行性和创新性，原则上予以通过。",
+    image: "/assets/quality-innovation-competition.png",
+    description: "12月18日，第五届质量创新主题劳动竞赛在南通船务举办。",
   },
 ];
 
@@ -5521,6 +5529,14 @@ function PageQuality() {
   const [activeBusiness, setActiveBusiness] = useState<QualityBusinessKey>("造船");
   const [qualityActivityIndex, setQualityActivityIndex] = useState(0);
 
+  useEffect(() => {
+    if (QUALITY_ACTIVITY_SLIDES.length < 2) return;
+    const timer = window.setInterval(() => {
+      setQualityActivityIndex(index => (index + 1) % QUALITY_ACTIVITY_SLIDES.length);
+    }, 3000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <>
       <StatusBar />
@@ -5551,7 +5567,7 @@ function PageQuality() {
       </Card>
 
       <Card title="质量活动分享" className="quality-awards-card" extra={<span className="quality-activity-count">{qualityActivityIndex + 1}/{QUALITY_ACTIVITY_SLIDES.length}</span>}>
-        {(() => { const activity = QUALITY_ACTIVITY_SLIDES[qualityActivityIndex]; return <article className="quality-activity-carousel" aria-live="polite">
+        {(() => { const activity = QUALITY_ACTIVITY_SLIDES[qualityActivityIndex]; return <article key={activity.id} className="quality-activity-carousel" aria-live="polite">
           <div className="quality-activity-image-wrap"><img src={activity.image} alt={`${activity.location}${activity.title}会议现场`} /></div>
           <div className="quality-activity-copy"><div><span>{activity.date}</span><b>{activity.location}</b></div><h3>{activity.title}</h3><p>{activity.description}</p></div>
           {QUALITY_ACTIVITY_SLIDES.length > 1 && <div className="quality-activity-controls"><button type="button" aria-label="上一条质量活动" onClick={() => setQualityActivityIndex(index => (index - 1 + QUALITY_ACTIVITY_SLIDES.length) % QUALITY_ACTIVITY_SLIDES.length)}><ChevronRight size={16}/></button><div>{QUALITY_ACTIVITY_SLIDES.map((item, index) => <button type="button" key={item.id} aria-label={`查看第${index + 1}条质量活动`} aria-current={index === qualityActivityIndex} className={index === qualityActivityIndex ? "is-active" : ""} onClick={() => setQualityActivityIndex(index)}/>)}</div><button type="button" aria-label="下一条质量活动" onClick={() => setQualityActivityIndex(index => (index + 1) % QUALITY_ACTIVITY_SLIDES.length)}><ChevronRight size={16}/></button></div>}

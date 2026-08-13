@@ -7505,6 +7505,16 @@
     border: 1px solid var(--app-border);
     border-radius: 12px;
     background: linear-gradient(180deg, var(--app-white), var(--app-primary-soft));
+    animation: quality-activity-enter 240ms ease-out;
+  }
+
+  @keyframes quality-activity-enter {
+    from { opacity: 0.25; transform: translateX(6px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .app-phone-screen .quality-activity-carousel { animation: none; }
   }
 
   .app-phone-screen .quality-activity-image-wrap {
