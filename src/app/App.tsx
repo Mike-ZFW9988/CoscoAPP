@@ -47,7 +47,6 @@ import {
   StatusBadge,
 } from "./components/dashboard/DashboardPrimitives";
 import { GroupedBarChart } from "./components/dashboard/GroupedBarChart";
-import { EnergyModeTabs, type EnergyMode } from "./components/dashboard/EnergyModeTabs";
 import { PurchaseModeTabs, type PurchaseMode } from "./components/dashboard/PurchaseModeTabs";
 import { ProductionModeTabs, type ProductionMode } from "./components/dashboard/ProductionModeTabs";
 
@@ -335,8 +334,7 @@ const DETAIL_CARD_TITLES = new Set([
   "企业结构RT/PAUT一次性合规率表现",
   "报验一次合规率总览",
   "企业报验一次合规率表现",
-  "能效趋势",
-  "年累计万元产值综合能耗排名",
+  "年累计万元产值综合能耗统计",
 ]);
 
 function Card({ title, titleMeta, tag, extra, onExtra, noPad = false, className, children }: { title?: string; titleMeta?: string; tag?: string; extra?: React.ReactNode; onExtra?: () => void; noPad?: boolean; className?: string; children: React.ReactNode }) {
@@ -5948,59 +5946,27 @@ function EnergyRankMedal({ rank }: { rank: 1 | 2 | 3 }) {
 }
 
 function PageEnergy() {
-  type Seg = EnergyMode;
-  type TrendMode = "total" | "intensity" | "carbon";
-  const [seg, setSeg] = useState<Seg>("整体");
-  const [trendMode, setTrendMode] = useState<TrendMode>("total");
-  const data: Record<Seg, { feeRatio:string; feeTarget:string; feeTrend:string; totalEnergy:string; perVal:string; perTarget:string; perYoy:string; carbon:string; carbonTarget:string; carbonYoy:string; ranking:[string,string,string,string][] }> = {
-    整体:{ feeRatio:"2.08",feeTarget:"3.5",feeTrend:"同比 3.9%",totalEnergy:"13,526.83",...ENERGY_KPI_BY_SEGMENT.整体,ranking:[["1","威海重工科技","0.0028","+1"],["2","南通远洋配套","0.0069","+1"],["3","启东海工","0.0163","+1"],["4","南通船务","0.0191","+1"],["5","大连川崎","0.0195","+1"],["6","南通川崎","0.0225","+1"],["7","舟山重工","0.0237","+1"],["8","大连重工","0.0248","+1"],["9","扬州重工","0.0277","+1"],["10","广东重工","0.0438","+1"],["11","上海重工","0.0462","+1"],["12","南通重工装备","—",""],["13","大连迪施","—",""],["14","市一万度力","—",""]]},
-    造船:{ feeRatio:"1.92",feeTarget:"3.2",feeTrend:"同比 2.8%",totalEnergy:"8,312.40",...ENERGY_KPI_BY_SEGMENT.造船,ranking:[["1","南通川崎","18,720","+2"],["2","大连川崎","19,340","-1"],["3","扬州重工","20,180","+1"],["4","大连重工","21,050","-1"],["5","舟山重工","22,610","+3"],["6","上海重工","24,390","-2"],["7","广东重工","25,810","-1"]]},
-    修船:{ feeRatio:"2.54",feeTarget:"4.0",feeTrend:"同比 4.5%",totalEnergy:"3,108.62",...ENERGY_KPI_BY_SEGMENT.修船,ranking:[["1","舟山重工","21,880","+1"],["2","广东重工","22,460","-1"],["3","大连重工","23,190","+2"],["4","上海重工","24,830","-1"],["5","南通船务","26,710","+1"]]},
-    海工:{ feeRatio:"2.31",feeTarget:"3.8",feeTrend:"同比 3.2%",totalEnergy:"2,105.81",...ENERGY_KPI_BY_SEGMENT.海工,ranking:[["1","启东海工","20,310","+1"],["2","南通船务","22,580","-1"],["3","大连重工","24,170","+1"],["4","上海重工","25,490","-1"]]},
-  };
-  const trends: Record<TrendMode, Record<Seg, number[]>> = {
-    total:{ 整体:[14200,13800,12100,11500,12800,13200,13600,14100,14800,13900,13500,14300],造船:[8800,8500,7400,7100,7900,8100,8400,8700,9100,8600,8300,8800],修船:[3200,3100,2700,2600,2900,3000,3100,3200,3400,3200,3100,3300],海工:[2200,2200,2000,1800,2000,2100,2100,2200,2300,2100,2100,2200]},
-    intensity:{ 整体:[.0362,.0358,.0341,.0336,.0348,.0352,.0356,.0362,.0371,.0355,.0349,.0345],造船:[.0318,.0312,.0298,.0291,.0305,.0309,.0314,.0320,.0328,.0315,.0308,.0298],修船:[.0421,.0415,.0398,.0392,.0408,.0412,.0417,.0424,.0435,.0418,.0411,.0412],海工:[.0395,.0389,.0372,.0365,.0381,.0385,.0390,.0397,.0408,.0392,.0384,.0387]},
-    carbon:{ 整体:[.52,.51,.49,.47,.48,.46,.47,.49,.51,.50,.49,.48],造船:[.47,.46,.44,.43,.44,.42,.43,.45,.46,.44,.43,.42],修船:[.58,.57,.55,.54,.56,.55,.57,.58,.60,.58,.57,.56],海工:[.54,.53,.51,.50,.52,.51,.52,.54,.55,.53,.52,.51]},
-  };
-  const d = { ...data[seg], ranking: data[seg].ranking.map((row, index) => [String(index + 1), COMPANY_DISPLAY_ORDER[index] ?? row[1], row[2], row[3]] as [string,string,string,string]) };
-  const modes:{key:TrendMode;label:string;unit:string}[] = [{key:"total",label:"综合能耗",unit:"吨标煤"},{key:"intensity",label:"万元产值能耗",unit:"吨标煤/万元"},{key:"carbon",label:"碳排放",unit:"吨/万元"}];
-  const mode = modes.find(item => item.key === trendMode)!;
-  const values = trends[trendMode][seg];
-  const min = Math.min(...values), max = Math.max(...values), range = max-min || 1;
-  const W=340,H=148,pL=36,pR=10,pT=23,pB=25;
-  const x=(i:number)=>pL+i*(W-pL-pR)/(values.length-1);
-  const y=(v:number)=>pT+(max-v)/range*(H-pT-pB-10);
-  const points=values.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
-  const months=["9月","10月","11月","12月","1月","2月","3月","4月","5月","6月","7月","8月"];
-  const target = trendMode === "intensity" ? Number(d.perTarget) : trendMode === "carbon" ? Number(d.carbonTarget) : null;
-  const targetY = target === null ? null : y(Math.max(min,Math.min(max,target)));
-  const ranking = d.ranking;
+  const overview = { feeRatio: "2.08", feeTarget: "3.5", ...ENERGY_KPI_BY_SEGMENT.整体 };
+  const target = 0.0345;
+  const annualValues = [0.0280,0.0292,0.0301,0.0310,0.0318,0.0325,0.0331,0.0338,0.0345,0.0352,0.0360,0.0371,0.0383,0.0395];
+  const statistics = COMPANY_DISPLAY_ORDER.map((company, index) => ({ company, annual: annualValues[index], target }));
   return <>
     <StatusBar/><NavBar title="能源主题" backLabel="返回首页" backPage="home"/><BreadcrumbBar crumbs={["首页","能源主题"]}/>
-    <div className="energy-mode-shell"><EnergyModeTabs value={seg} onValueChange={setSeg}/>
-      <Card className="energy-overview-card attached-overview-card">
-        <div className="attached-overview-heading attached-overview-heading-static">
-          <strong>能源运营总览</strong>
-        </div>
-        <div className="energy-kpi-grid">
-          <div><span>能源费用比率</span><strong>{d.feeRatio}<small>%</small></strong><em className="is-good">目标≤{d.feeTarget}%</em></div>
-          <div><span>年累综合能耗</span><strong>{d.totalEnergy}</strong><em>万吨标煤</em></div>
-          <div><span>万元产值综合能耗</span><strong>{d.perVal}</strong><em className={Number(d.perVal)<=Number(d.perTarget)?"is-good":"is-risk"}>目标≤{d.perTarget} · {d.perYoy}</em></div>
-          <div><span>万元产值碳排放</span><strong>{d.carbon}<small>吨</small></strong><em className={Number(d.carbon)<=Number(d.carbonTarget)?"is-good":"is-risk"}>目标≤{d.carbonTarget} · {d.carbonYoy}</em></div>
-        </div>
-        <div className="energy-alert-strip"><AlertTriangle size={14}/><span>{Number(d.carbon)>Number(d.carbonTarget)?`${seg}万元产值碳排放高于目标 ${(Number(d.carbon)-Number(d.carbonTarget)).toFixed(2)}吨`:`${seg}能源费用与碳排放均处于目标范围内`}</span></div>
-      </Card>
-    </div>
-    <Card title="能效趋势" tag="近12个月" className="energy-trend-card">
-      <div className="energy-trend-toolbar"><div className="energy-trend-switch app-unified-segmented">{modes.map(item=><button type="button" key={item.key} className={trendMode===item.key?"is-active":""} onClick={()=>setTrendMode(item.key)}>{item.label}</button>)}</div><span>单位：{mode.unit}</span></div>
-      <div className="energy-trend-summary">本月{mode.label} <strong>{values.at(-1)?.toLocaleString()}</strong><span>，较上月 {values.at(-1)!>=values.at(-2)!?"上升":"下降"} {Math.abs((values.at(-1)!/values.at(-2)!-1)*100).toFixed(1)}%</span></div>
-      <svg className="energy-line-chart" viewBox={`0 0 ${W} ${H}`}><defs><linearGradient id="energyArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#79BBFF" stopOpacity=".35"/><stop offset="100%" stopColor="#ECF5FF" stopOpacity=".04"/></linearGradient></defs>{[0,.5,1].map((ratio,i)=>{const gy=pT+ratio*(H-pT-pB);return <line key={i} x1={pL} y1={gy} x2={W-pR} y2={gy} stroke={C.divider}/>})}<polygon points={`${x(0)},${H-pB} ${points} ${x(values.length-1)},${H-pB}`} fill="url(#energyArea)"/><polyline points={points} fill="none" stroke={C.brand} strokeWidth="2.4"/>{targetY!==null&&<line x1={pL} y1={targetY} x2={W-pR} y2={targetY} stroke={C.success} strokeWidth="1.2" strokeDasharray="5 4"/>}{values.map((v,i)=><g key={i}><circle cx={x(i)} cy={y(v)} r={i===values.length-1||v===max?3.5:2} fill={C.brand}/>{(i===values.length-1||v===max)&&<text x={x(i)} y={y(v)-7} textAnchor="middle" className="energy-chart-value">{trendMode==="total"?v.toLocaleString():v.toFixed(trendMode==="intensity"?4:2)}</text>}{i%2===0&&<text x={x(i)} y={H-7} textAnchor="middle" className="energy-chart-axis">{months[i]}</text>}</g>)}</svg>
+    <Card title="能源运营总览" className="mt-3 energy-overview-card">
+      <div className="energy-kpi-grid energy-kpi-grid-three">
+        <div><span>能源费用比率</span><strong>{overview.feeRatio}<small>%</small></strong><em>目标≤{overview.feeTarget}%</em></div>
+        <div><span>万元产值综合能耗</span><strong>{overview.perVal}</strong><em>目标≤{overview.perTarget}</em></div>
+        <div><span>万元产值碳排放</span><strong>{overview.carbon}<small>吨</small></strong><em>目标≤{overview.carbonTarget}</em></div>
+      </div>
     </Card>
-    <Card title="年累计万元产值综合能耗排名" className="energy-ranking-card">
-      <div className="energy-ranking-head"><span>排名</span><span>企业名称</span><span>年累计能耗</span><span>排名变化</span></div><div className="energy-ranking-list">{ranking.map(row=>{const displayRank=Number(row[0]);return <div key={`${seg}-${row[1]}`}>{displayRank<=3?<EnergyRankMedal rank={displayRank as 1|2|3}/>:<span className="energy-rank-index">{String(displayRank).padStart(2,"0")}</span>}<strong>{row[1]}</strong><b className={row[2]==="—"?"is-empty":""}>{row[2]}</b><em className={!row[3]?"is-flat":row[3].startsWith("+")?"is-up":"is-down"}>{row[3]&&<>{row[3].replace(/[+-]/,"")}<span>{row[3].startsWith("+")?"▲":"▼"}</span></>}</em></div>})}</div>
+    <Card title="年累计万元产值综合能耗统计" className="energy-ranking-card energy-statistics-card">
+      <div className="energy-ranking-head"><span>企业名称</span><span>年累计</span><span>目标</span></div>
+      <div className="energy-ranking-list">{statistics.map(row => {
+        const attainment = row.annual > row.target ? "above" : row.annual < row.target ? "below" : "equal";
+        return <div key={row.company}><strong>{row.company}</strong><b className={`energy-annual-value is-${attainment}`}>{row.annual.toFixed(4)}</b><em className="energy-target-value">{row.target.toFixed(4)}</em></div>;
+      })}</div>
     </Card>
-    <Footer text={`能源主题 · ${seg}口径 · 综合能耗/万元产值能耗`}/>
+    <Footer text="数据口径月更 · 截至2026.8"/>
   </>;
 }
 

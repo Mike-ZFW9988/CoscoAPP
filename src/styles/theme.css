@@ -6921,6 +6921,14 @@
 
   .app-phone-screen .energy-kpi-grid > div:nth-child(even) { border-left: 1px solid var(--app-divider); }
   .app-phone-screen .energy-kpi-grid > div:nth-child(n+3) { border-top: 1px solid var(--app-divider); }
+
+  .app-phone-screen .energy-kpi-grid-three > div:first-child {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--app-divider);
+  }
+
+  .app-phone-screen .energy-kpi-grid-three > div:nth-child(2) { border-left: 0; border-top: 0; }
+  .app-phone-screen .energy-kpi-grid-three > div:nth-child(3) { border-top: 0; border-left: 1px solid var(--app-divider); }
   .app-phone-screen .energy-kpi-grid span,.app-phone-screen .energy-kpi-grid strong,.app-phone-screen .energy-kpi-grid em { display:block; }
   .app-phone-screen .energy-kpi-grid > div > span { color:var(--app-text-secondary); font-size:10px; font-weight:600; }
   .app-phone-screen .energy-kpi-grid strong { margin-top:4px; color:var(--app-primary); font-size:21px; line-height:1; font-variant-numeric:tabular-nums; white-space:nowrap; }
@@ -7004,6 +7012,43 @@
   .app-phone-screen .energy-ranking-list em.is-up { color:var(--app-success); }
   .app-phone-screen .energy-ranking-list em.is-down { color:var(--app-danger); }
   .app-phone-screen .energy-ranking-list em.is-flat { color:var(--app-text-regular); }
+
+  .app-phone-screen .energy-statistics-card .energy-ranking-head,
+  .app-phone-screen .energy-statistics-card .energy-ranking-list > div {
+    grid-template-columns: minmax(0, 1fr) 88px 72px;
+    gap: 8px;
+  }
+
+  .app-phone-screen .energy-statistics-card .energy-ranking-head {
+    min-height: 32px;
+    padding: 0 9px;
+    font-size: 11px;
+  }
+
+  .app-phone-screen .energy-statistics-card .energy-ranking-head span:nth-child(n + 2) { text-align: right; }
+
+  .app-phone-screen .energy-statistics-card .energy-ranking-list > div {
+    min-height: 44px;
+    padding: 5px 9px;
+  }
+
+  .app-phone-screen .energy-statistics-card .energy-ranking-list strong {
+    font-size: 13px;
+  }
+
+  .app-phone-screen .energy-statistics-card .energy-ranking-list b,
+  .app-phone-screen .energy-statistics-card .energy-ranking-list em {
+    font-size: 13px;
+    font-weight: 700;
+    text-align: right;
+    font-style: normal;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .app-phone-screen .energy-statistics-card .energy-annual-value.is-above { color: var(--app-danger); }
+  .app-phone-screen .energy-statistics-card .energy-annual-value.is-equal { color: var(--app-text-primary); }
+  .app-phone-screen .energy-statistics-card .energy-annual-value.is-below { color: var(--app-success); }
+  .app-phone-screen .energy-statistics-card .energy-target-value { color: var(--app-text-secondary); }
 
   .app-phone-screen .quality-rt-summary-card .app-card-header,
   .app-phone-screen .quality-rt-list-card .app-card-header { min-height:40px; }
