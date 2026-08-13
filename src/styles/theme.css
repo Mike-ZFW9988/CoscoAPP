@@ -7093,7 +7093,8 @@
   .app-phone-screen .quality-overview-metrics small {
     margin-top: 5px;
     color: var(--app-text-regular);
-    font-size: 10px;
+    font-size: 11px;
+    line-height: 16px;
   }
 
   .app-phone-screen .quality-overview-metrics b {
@@ -7227,16 +7228,15 @@
   }
 
   .app-phone-screen .quality-title-controls {
-    display: flex;
+    display: grid;
     min-width: 0;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4px;
-    margin-bottom: 5px;
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
   .app-phone-screen .quality-header-switch,
-  .app-phone-screen .quality-view-switch {
+  .app-phone-screen .quality-view-switch,
+  .app-phone-screen .quality-business-switch {
     display: inline-flex;
     align-items: center;
     padding: 2px;
@@ -7245,9 +7245,8 @@
   }
 
   .app-phone-screen .quality-header-switch {
-    width: 172px !important;
-    flex: 0 0 172px;
-    height: 28px;
+    width: 100% !important;
+    height: 34px;
   }
 
   .app-phone-screen .quality-view-switch {
@@ -7256,8 +7255,14 @@
     height: 28px;
   }
 
+  .app-phone-screen .quality-business-switch {
+    width: 100% !important;
+    height: 34px;
+  }
+
   .app-phone-screen .quality-header-switch button,
-  .app-phone-screen .quality-view-switch button {
+  .app-phone-screen .quality-view-switch button,
+  .app-phone-screen .quality-business-switch button {
     min-width: 0;
     height: 100%;
     flex: 1 1 0;
@@ -7265,7 +7270,7 @@
     border-radius: 999px;
     background: transparent;
     color: var(--app-text-secondary);
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 650;
     white-space: nowrap;
   }
@@ -7276,7 +7281,8 @@
   }
 
   .app-phone-screen .quality-header-switch button.is-active,
-  .app-phone-screen .quality-view-switch button.is-active {
+  .app-phone-screen .quality-view-switch button.is-active,
+  .app-phone-screen .quality-business-switch button.is-active {
     background: var(--app-primary);
     color: var(--app-white);
     box-shadow: 0 2px 5px rgba(0, 80, 142, 0.18);
@@ -7285,18 +7291,34 @@
   .app-phone-screen .quality-performance-head,
   .app-phone-screen .quality-performance-list > div:not(.quality-empty-state) {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 68px 74px;
+    grid-template-columns: minmax(0, 1fr) 82px 68px;
     align-items: center;
     gap: 6px;
   }
 
   .app-phone-screen .quality-performance-head {
-    min-height: 28px;
+    min-height: 32px;
     padding: 0 8px;
     border-radius: 7px;
     background: var(--app-fill-soft);
     color: var(--app-text-regular);
-    font-size: 9px;
+    font-size: 11px;
+  }
+
+  .app-phone-screen .quality-performance-context {
+    display: flex;
+    min-height: 31px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    border-top: 1px solid var(--app-divider);
+    color: var(--app-text-secondary);
+    font-size: 12px;
+  }
+
+  .app-phone-screen .quality-performance-context b {
+    color: var(--app-primary);
+    font-size: 12px;
   }
 
   .app-phone-screen .quality-performance-head span:nth-child(n + 2) {
@@ -7304,8 +7326,8 @@
   }
 
   .app-phone-screen .quality-performance-list > div:not(.quality-empty-state) {
-    min-height: 42px;
-    padding: 3px 8px;
+    min-height: 44px;
+    padding: 5px 8px;
   }
 
   .app-phone-screen .quality-performance-list > div + div {
@@ -7349,7 +7371,7 @@
 
   .app-phone-screen .quality-performance-list .quality-company-cell strong {
     min-width: 0;
-    flex: 0 1 auto;
+    flex: 1 1 auto;
   }
 
   .app-phone-screen .quality-performance-list .quality-company-cell .quality-business-tag {
@@ -7469,8 +7491,102 @@
   .app-phone-screen .quality-news-item > small.is-pending { color: var(--app-warning); }
 
   .app-phone-screen .quality-awards-card .app-card-body {
-    padding-top: 7px;
+    padding: 10px;
   }
+
+  .app-phone-screen .quality-activity-count {
+    color: var(--app-text-regular);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .app-phone-screen .quality-activity-carousel {
+    overflow: hidden;
+    border: 1px solid var(--app-border);
+    border-radius: 12px;
+    background: linear-gradient(180deg, var(--app-white), var(--app-primary-soft));
+  }
+
+  .app-phone-screen .quality-activity-image-wrap {
+    aspect-ratio: 16 / 8.2;
+    overflow: hidden;
+    background: var(--app-fill-soft);
+  }
+
+  .app-phone-screen .quality-activity-image-wrap img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  .app-phone-screen .quality-activity-copy {
+    padding: 10px 11px 12px;
+  }
+
+  .app-phone-screen .quality-activity-copy > div {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--app-text-regular);
+    font-size: 12px;
+  }
+
+  .app-phone-screen .quality-activity-copy > div b {
+    display: inline-flex;
+    min-height: 23px;
+    align-items: center;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--app-primary-soft);
+    color: var(--app-primary);
+    font-size: 11px;
+  }
+
+  .app-phone-screen .quality-activity-copy h3 {
+    margin: 7px 0 0;
+    color: var(--app-text-primary);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 21px;
+  }
+
+  .app-phone-screen .quality-activity-copy p {
+    margin: 7px 0 0;
+    color: var(--app-text-secondary);
+    font-size: 13px;
+    line-height: 21px;
+    text-align: justify;
+  }
+
+  .app-phone-screen .quality-activity-controls {
+    display: grid;
+    grid-template-columns: 34px 1fr 34px;
+    align-items: center;
+    padding: 0 9px 9px;
+  }
+
+  .app-phone-screen .quality-activity-controls > button {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: var(--app-primary-soft);
+    color: var(--app-primary);
+  }
+
+  .app-phone-screen .quality-activity-controls > button:first-child svg { transform: rotate(180deg); }
+  .app-phone-screen .quality-activity-controls > div { display: flex; justify-content: center; gap: 6px; }
+  .app-phone-screen .quality-activity-controls > div button {
+    width: 7px;
+    height: 7px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--app-border-strong);
+  }
+  .app-phone-screen .quality-activity-controls > div button.is-active { width: 18px; background: var(--app-primary); }
 
   .app-phone-screen .quality-awards-title {
     display: inline-flex;
@@ -7547,6 +7663,14 @@
     text-align: left;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  .app-phone-screen .quality-performance-list .quality-target-value {
+    color: var(--app-text-secondary);
+    font-size: 13px;
+    font-weight: 650;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
   }
 
   .app-phone-screen .quality-award-item:active { background: var(--app-primary-soft); }

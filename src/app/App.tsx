@@ -94,6 +94,41 @@ const companyNames = (count: number) => COMPANY_DISPLAY_ORDER.slice(0, count);
 const orderNamedCompanies = <T extends { name: string }>(rows: T[]): T[] => rows.map((row, index) => ({ ...row, name: COMPANY_DISPLAY_ORDER[index] ?? row.name }));
 const orderCompanyRows = <T extends { company: string }>(rows: T[]): T[] => rows.map((row, index) => ({ ...row, company: COMPANY_DISPLAY_ORDER[index] ?? row.company }));
 
+type QualityMetricKey = "inspection" | "rt";
+type QualityBusinessKey = "造船" | "修船" | "海工";
+type QualityCompanyPerformance = { company: string; annual: number; target: number };
+
+/**
+ * 企业质量表现接口模型：接口只需按业务返回年度累计与目标，页面统一按集团企业顺序展示。
+ * 当前数值均为原型模拟数据，后续可直接替换为后端 JSON。
+ */
+const makeQualityCompanyRows = (annualValues: number[], target: number): QualityCompanyPerformance[] =>
+  COMPANY_DISPLAY_ORDER.map((company, index) => ({ company, annual: annualValues[index], target }));
+
+const QUALITY_COMPANY_PERFORMANCE: Record<QualityMetricKey, Record<QualityBusinessKey, QualityCompanyPerformance[]>> = {
+  inspection: {
+    造船: makeQualityCompanyRows([99.7,99.6,99.6,99.3,99.1,98.9,98.8,98.7,98.6,98.5,98.4,98.2,98.1,97.9], 98.0),
+    修船: makeQualityCompanyRows([99.4,99.2,99.1,98.9,98.8,98.7,98.5,98.4,98.3,98.2,98.0,97.9,97.8,97.6], 97.5),
+    海工: makeQualityCompanyRows([99.2,99.0,98.9,98.8,98.7,98.6,98.4,98.3,98.2,98.1,97.9,97.8,97.7,97.5], 97.0),
+  },
+  rt: {
+    造船: makeQualityCompanyRows([98.2,98.0,97.9,97.8,97.7,97.6,97.5,97.4,97.3,97.2,97.1,97.0,96.9,96.8], 97.0),
+    修船: makeQualityCompanyRows([97.9,97.8,97.7,97.6,97.5,97.4,97.3,97.2,97.1,97.0,96.9,96.8,96.7,96.6], 96.5),
+    海工: makeQualityCompanyRows([98.0,97.9,97.8,97.7,97.6,97.5,97.4,97.3,97.2,97.1,97.0,96.9,96.8,96.7], 96.5),
+  },
+};
+
+const QUALITY_ACTIVITY_SLIDES = [
+  {
+    id: "lng-pep-review",
+    date: "12月19日",
+    title: "重工LNG双燃料改装PEP评审会",
+    location: "南通船务",
+    image: "/assets/quality-lng-pep-review.png",
+    description: "12月19日，在南通船务召开重工LNG双燃料改装PEP评审会，会议邀请ABS船级社、重工相关部门和企业代表组成的专家组和代表组共同进行评审。会议由专家组长李新主持，会上专家组一致认为该PEP整体思路清晰，目标明确，内容较为全面，基本满足项目需求，具有一定的可行性和创新性，原则上予以通过。",
+  },
+];
+
 /* ─── Page Registry ─── */
 const PAGES = [
   { id: "home",                 label: "1  首页" },
@@ -122,8 +157,6 @@ const PAGES = [
   { id: "purchase-group",       label: "5  采购·集采主题" },
   { id: "purchase-group-rate",  label: "5  集采·集采率" },
   { id: "quality",              label: "6  质量主题" },
-  { id: "quality-rt",           label: "6  质量·RT合格率" },
-  { id: "quality-inspection",   label: "6  质量·报验一次" },
   { id: "energy",               label: "7  能源主题" },
   { id: "design-tokens",        label: "DS  Design Token System" },
   { id: "atomic-components",    label: "DS  Atomic Components" },
@@ -5484,89 +5517,9 @@ function PagePurchaseGroupRate() {
 }
 
 function PageQuality() {
-  type QualityActivity = {
-    level: string;
-    company: string;
-    title: string;
-    summary: string;
-  };
-  type QualityActivityGroup = {
-    key: "central" | "heavy" | "theme";
-    label: string;
-    detailTitle: string;
-    columns: [string, string, string];
-    overview: string;
-    items: QualityActivity[];
-  };
   const [activeMetric, setActiveMetric] = useState<"报验" | "RT">("RT");
-  const [qualityView, setQualityView] = useState<"ranking" | "attention">("ranking");
-  const [activeAwardGroup, setActiveAwardGroup] = useState<"central" | "heavy" | "theme">("central");
-  const [awardYear, setAwardYear] = useState("2026");
-  const [showAllQualityActivities, setShowAllQualityActivities] = useState(false);
-  const [selectedQualityGroup, setSelectedQualityGroup] = useState<QualityActivityGroup["key"] | null>(null);
-  const [qualitySheetContainer, setQualitySheetContainer] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    setQualitySheetContainer(document.querySelector<HTMLElement>(".app-phone-screen"));
-  }, []);
-
-  const baoyansData = [
-    ["南通川崎", "造船", "98.8%", "99.8%", "99.7%"],
-    ["大连川崎", "造船", "98.7%", "99.5%", "99.6%"],
-    ["扬州重工", "造船", "98.7%", "99.7%", "99.6%"],
-    ["南通船务", "海工", "97.0%", "97.1%", "97.1%"],
-    ["启东海工", "造船", "97.0%", "97.9%", "97.6%"],
-    ["启东海工", "海工", "97.0%", "97.0%", "97.9%"],
-    ["大连重工", "造船", "99.6%", "98.5%", "99.6%"],
-    ["大连重工", "海工", "98.5%", "99.6%", "99.7%"],
-    ["舟山重工", "造船", "98.7%", "99.9%", "99.9%"],
-    ["上海重工", "海工", "98.0%", "98.9%", "99.3%"],
-    ["广东重工", "造船", "98.0%", "98.3%", "98.3%"],
-    ["合计",     "—",   "97.5%", "99.0%", "99.2%"],
-  ];
-  const rtData = [
-    ["南通川崎", "造船", "97.0%", "96.8%", "96.5%"],
-    ["大连川崎", "造船", "97.0%", "96.5%", "96.9%"],
-    ["扬州重工", "造船", "97.0%", "97.3%", "97.1%"],
-    ["南通船务", "海工", "96.5%", "95.8%", "96.0%"],
-    ["启东海工", "造船", "96.5%", "96.2%", "96.4%"],
-    ["启东海工", "海工", "96.5%", "95.9%", "96.1%"],
-    ["大连重工", "造船", "97.5%", "96.7%", "97.0%"],
-    ["大连重工", "海工", "97.0%", "96.3%", "96.8%"],
-    ["舟山重工", "造船", "97.0%", "97.1%", "97.2%"],
-    ["上海重工", "海工", "96.5%", "96.0%", "96.2%"],
-    ["广东重工", "造船", "96.5%", "95.7%", "95.9%"],
-    ["合计",     "—",   "97.0%", "96.2%", "96.5%"],
-  ];
-
-  const tableData  = activeMetric === "报验" ? baoyansData : rtData;
-  const qualityRows = tableData.filter(row => row[0] !== "合计").map(row => {
-    const target = Number(row[2].replace("%", ""));
-    const actual = Number(row[4].replace("%", ""));
-    return { company: row[0], business: row[1], target, actual, delta: actual - target };
-  });
-  const visibleQualityRows = (qualityView === "attention"
-    ? qualityRows.filter(row => row.delta < 0).sort((a, b) => a.delta - b.delta)
-    : qualityRows.sort((a, b) => b.actual - a.actual)).slice(0, qualityView === "attention" ? 6 : qualityRows.length);
-  const centralQcOverview = `${awardYear}年9月8日至11日，央企QC小组成果交流活动在广州举办。集团选送的2项模拟成果从多项参赛成果中脱颖而出，分别获得一等奖和二等奖。本次获奖集中体现了船舶绿色建造与精益质量改进成效，并形成可在相关企业推广的经验做法。`;
-  const awardGroups: QualityActivityGroup[] = [
-    { key: "central", label: "央企QC成果", detailTitle: "央企QC小组成果发表赛", columns: ["获奖等级", "获奖企业", "成果名称"], overview: centralQcOverview, items: [
-      { level: "一等奖", company: "南通川崎", title: "甲醇双燃料船锅炉蒸发量提升方法", summary: "绿色船舶关键设备质量改进" },
-      { level: "二等奖", company: "大连川崎", title: "LNG双燃料大型油船钢材重量优化", summary: "大型船舶轻量化质量改善" },
-    ]},
-    { key: "heavy", label: "重工QC评审", detailTitle: "重工QC成果评审", columns: ["获奖等级", "获奖企业", "成果名称"], overview: `${awardYear}年重工QC成果评审围绕建造质量、修船交付和检测流程改善开展，共形成3项模拟获奖成果。评审组重点关注成果的推广价值和现场应用成效，并形成跨企业共享的质量改进清单。`, items: [
-      { level: "特等奖", company: "启东海工", title: "海工装备质量风险前置管控", summary: "建立重点工序预警机制" },
-      { level: "一等奖", company: "南通船务", title: "修船关键节点质量提升", summary: "提升重点项目交付质量" },
-      { level: "二等奖", company: "广东重工", title: "检测流程标准化改善", summary: "统一检验标准与闭环流程" },
-    ]},
-    { key: "theme", label: "质量月活动", detailTitle: "质量月活动开展情况", columns: ["活动时间", "组织单位", "活动名称"], overview: `${awardYear}年质量月围绕“强化质量意识、推进风险预防”开展3场模拟专题活动，覆盖QC方法培训、年度重点工作部署和质量风险交流。各项活动均形成任务清单和后续跟踪事项，推动质量要求落实到项目和班组。`, items: [
-      { level: "03月11–12", company: "大连重工", title: "QC小组活动专题培训班", summary: "112人参与 · 培训完成" },
-      { level: "03月10日", company: "上海环境+线上", title: "质量管理年度重点工作部署会", summary: "69人参与 · 形成任务清单" },
-      { level: "03月13日", company: "质量管理部", title: "质量风险管控专题交流", summary: "10人参与 · 完成经验交流" },
-    ]},
-  ];
-  const activeAwards = awardGroups.find(group => group.key === activeAwardGroup) ?? awardGroups[0];
-  const selectedAwardGroup = awardGroups.find(group => group.key === selectedQualityGroup);
+  const [activeBusiness, setActiveBusiness] = useState<QualityBusinessKey>("造船");
+  const [qualityActivityIndex, setQualityActivityIndex] = useState(0);
 
   return (
     <>
@@ -5576,67 +5529,34 @@ function PageQuality() {
 
       <Card title="质量运营总览" className="mt-3 quality-overview-card">
         <div className="quality-overview-metrics">
-          {QUALITY_OVERVIEW_METRICS.map(item => {
-            const ok = Number(item.value) >= Number(item.target);
-            return <div key={item.key}><span>{item.label}</span><strong>{item.value}%</strong><small>目标 ≥{item.target}% · {item.yoy}</small><b className={ok ? "is-good" : "is-warning"}>{ok ? <ShieldCheck size={12}/> : <AlertTriangle size={12}/>} {ok ? "达标" : `待提升 ${(Number(item.target) - Number(item.value)).toFixed(1)}%`}</b></div>;
-          })}
-        </div>
-        <div className="quality-overview-alerts">
-          <div className="quality-overview-alert-title"><AlertTriangle size={14}/><strong>重点提醒</strong><span>2项待关注</span></div>
-          <div className="quality-overview-alert-items"><span><b>广东重工</b>95.9%</span><i/><span><b>南通船务</b>96.0%</span></div>
+          {QUALITY_OVERVIEW_METRICS.map(item => <div key={item.key}><span>{item.label}</span><strong>{item.value}%</strong><small>目标 ≥{item.target}% · {item.yoy}</small></div>)}
         </div>
       </Card>
 
-      <Card title="企业质量表现" className="quality-performance-card" extra="下钻明细" onExtra={() => nav(activeMetric === "报验" ? "quality-inspection" : "quality-rt")}>
-        <div className="quality-title-controls"><div className="quality-header-switch app-unified-segmented" role="group" aria-label="质量指标切换"><button type="button" className={activeMetric === "报验" ? "is-active" : ""} onClick={() => setActiveMetric("报验")}>报验一次</button><button type="button" className={activeMetric === "RT" ? "is-active" : ""} onClick={() => setActiveMetric("RT")}>RT/PAUT一次</button></div><div className="quality-view-switch app-unified-segmented" role="group" aria-label="质量排序切换"><button type="button" className={qualityView === "ranking" ? "is-active" : ""} onClick={() => setQualityView("ranking")}>年度排名</button><button type="button" className={qualityView === "attention" ? "is-active" : ""} onClick={() => setQualityView("attention")}>待提升</button></div></div>
-        <div className="quality-performance-head"><span>企业 / 业务</span><span>年度累计</span><span>较目标</span></div>
+      <Card title="企业质量表现" className="quality-performance-card">
+        <div className="quality-title-controls">
+          <div className="quality-header-switch app-unified-segmented" role="tablist" aria-label="质量指标切换">
+            <button type="button" role="tab" aria-selected={activeMetric === "报验"} className={activeMetric === "报验" ? "is-active" : ""} onClick={() => setActiveMetric("报验")}>报验一次</button>
+            <button type="button" role="tab" aria-selected={activeMetric === "RT"} className={activeMetric === "RT" ? "is-active" : ""} onClick={() => setActiveMetric("RT")}>RT/PAUT一次</button>
+          </div>
+          <div className="quality-business-switch app-unified-segmented" role="tablist" aria-label="业务板块切换">
+            {(["造船", "修船", "海工"] as QualityBusinessKey[]).map(item => <button type="button" role="tab" aria-selected={activeBusiness === item} className={activeBusiness === item ? "is-active" : ""} key={item} onClick={() => setActiveBusiness(item)}>{item}</button>)}
+          </div>
+        </div>
+        <div className="quality-performance-context"><span>{activeMetric === "报验" ? "报验一次合规率" : "RT/PAUT一次合规率"}</span><b>{activeBusiness}</b></div>
+        <div className="quality-performance-head"><span>企业</span><span>年度累计</span><span>目标</span></div>
         <div className="quality-performance-list">
-          {visibleQualityRows.length ? visibleQualityRows.map((row, index) => {
-            const tone = row.delta >= 0 ? "good" : row.delta > -0.5 ? "watch" : "risk";
-            return <div key={`${activeMetric}-${row.company}-${row.business}`}><div className="quality-company-cell"><span className="quality-rank">{String(index + 1).padStart(2, "0")}</span><strong>{row.company}</strong><span className={`quality-business-tag is-${row.business}`}>{row.business}</span></div><b>{row.actual.toFixed(1)}%</b><div className="quality-row-status"><em className={`is-${tone}`}>{row.delta >= 0 ? "+" : ""}{row.delta.toFixed(1)}% {tone === "good" ? "达标" : tone === "watch" ? "关注" : "待提升"}</em></div></div>;
-          }) : <div className="quality-empty-state"><ShieldCheck size={18}/><span>当前指标暂无待提升企业</span></div>}
+          {QUALITY_COMPANY_PERFORMANCE[activeMetric === "报验" ? "inspection" : "rt"][activeBusiness].map((row, index) => <div key={`${activeMetric}-${activeBusiness}-${row.company}`}><div className="quality-company-cell"><span className="quality-rank">{String(index + 1).padStart(2, "0")}</span><strong>{row.company}</strong></div><b>{row.annual.toFixed(1)}%</b><strong className="quality-target-value">{row.target.toFixed(1)}%</strong></div>)}
         </div>
       </Card>
 
-      <Card title="质量活动分享" className="quality-awards-card" extra={<select className="quality-awards-year" aria-label="质量活动年份" value={awardYear} onChange={event => { setAwardYear(event.target.value); setShowAllQualityActivities(false); }}><option value="2026">2026年</option><option value="2025">2025年</option><option value="2024">2024年</option></select>}>
-        <div className="quality-awards-tabs" role="tablist" aria-label="质量获奖类别">
-          {awardGroups.map(group => <button key={group.key} type="button" role="tab" aria-selected={activeAwardGroup === group.key} className={activeAwardGroup === group.key ? "is-active" : ""} onClick={() => { setActiveAwardGroup(group.key); setShowAllQualityActivities(false); }}>{group.label}</button>)}
-        </div>
-        <div className="quality-awards-list">
-          {activeAwards.items.slice(0, showAllQualityActivities ? activeAwards.items.length : 2).map((item, index) => <button type="button" className="quality-award-item" key={`${activeAwards.key}-${item.level}-${item.company}`} onClick={() => setSelectedQualityGroup(activeAwards.key)} aria-label={`查看${activeAwards.label}详情`}>
-            <span className={`quality-award-rank is-${index + 1}`}>{item.level}</span>
-            <div className="quality-award-copy"><strong>{item.title}</strong><span>{item.company} · {item.summary}</span></div>
-            <ChevronRight size={14} strokeWidth={2.2} aria-hidden="true" />
-          </button>)}
-        </div>
-        {activeAwards.items.length > 2 && <button type="button" className="quality-awards-more" onClick={() => setShowAllQualityActivities(value => !value)}>{showAllQualityActivities ? "收起" : "查看更多"}<ChevronRight size={13}/></button>}
+      <Card title="质量活动分享" className="quality-awards-card" extra={<span className="quality-activity-count">{qualityActivityIndex + 1}/{QUALITY_ACTIVITY_SLIDES.length}</span>}>
+        {(() => { const activity = QUALITY_ACTIVITY_SLIDES[qualityActivityIndex]; return <article className="quality-activity-carousel" aria-live="polite">
+          <div className="quality-activity-image-wrap"><img src={activity.image} alt={`${activity.location}${activity.title}会议现场`} /></div>
+          <div className="quality-activity-copy"><div><span>{activity.date}</span><b>{activity.location}</b></div><h3>{activity.title}</h3><p>{activity.description}</p></div>
+          {QUALITY_ACTIVITY_SLIDES.length > 1 && <div className="quality-activity-controls"><button type="button" aria-label="上一条质量活动" onClick={() => setQualityActivityIndex(index => (index - 1 + QUALITY_ACTIVITY_SLIDES.length) % QUALITY_ACTIVITY_SLIDES.length)}><ChevronRight size={16}/></button><div>{QUALITY_ACTIVITY_SLIDES.map((item, index) => <button type="button" key={item.id} aria-label={`查看第${index + 1}条质量活动`} aria-current={index === qualityActivityIndex} className={index === qualityActivityIndex ? "is-active" : ""} onClick={() => setQualityActivityIndex(index)}/>)}</div><button type="button" aria-label="下一条质量活动" onClick={() => setQualityActivityIndex(index => (index + 1) % QUALITY_ACTIVITY_SLIDES.length)}><ChevronRight size={16}/></button></div>}
+        </article>; })()}
       </Card>
-
-      <Sheet open={selectedAwardGroup !== undefined} onOpenChange={(open) => { if (!open) setSelectedQualityGroup(null); }}>
-        <SheetContent side="bottom" className="quality-activity-sheet" container={qualitySheetContainer}>
-          {selectedAwardGroup && <>
-            <SheetHeader className="quality-activity-sheet-head quality-qc-group-head">
-              <div className="quality-activity-sheet-kicker"><ClipboardList size={15} aria-hidden="true" /><span>成果下钻详情</span></div>
-              <SheetTitle>{selectedAwardGroup.detailTitle}</SheetTitle>
-              <SheetDescription>{awardYear}年 · 共{selectedAwardGroup.items.length}项记录</SheetDescription>
-            </SheetHeader>
-            <div className="quality-activity-sheet-body quality-qc-group-body">
-              <section className="quality-qc-award-table" aria-label={`${selectedAwardGroup.label}记录`}>
-                <div className="quality-qc-award-head">{selectedAwardGroup.columns.map(column => <span key={column}>{column}</span>)}</div>
-                {selectedAwardGroup.items.map((item, index) => <div className="quality-qc-award-row" key={`${item.level}-${item.company}`}>
-                  <span className={`quality-award-rank is-${index + 1}`}>{item.level}</span>
-                  <strong>{item.company}</strong>
-                  <p>{item.title}</p>
-                </div>)}
-              </section>
-              <section className="quality-activity-overview quality-qc-shared-overview">
-                <h3><ClipboardList size={16} aria-hidden="true" />情况简述</h3>
-                <p>{selectedAwardGroup.overview}</p>
-              </section>
-            </div>
-          </>}
-        </SheetContent>
-      </Sheet>
 
       <Footer text="质量主题 · 一次合格率含造船/修船/海工分类口径" />
     </>
@@ -6103,8 +6023,6 @@ function renderPage(id: string) {
     case "purchase-group-steel": return <PagePurchaseGroup initialSection="steel" />;
     case "purchase-group-rate": return <PagePurchaseGroupRate />;
     case "quality":           return <PageQuality />;
-    case "quality-rt":        return <PageQualityRT />;
-    case "quality-inspection": return <PageQualityInspection />;
     case "energy":            return <PageEnergy />;
     case "design-tokens":     return <PageDesignTokens />;
     case "atomic-components": return <PageAtomicComponents />;
