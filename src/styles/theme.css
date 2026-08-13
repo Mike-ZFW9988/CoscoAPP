@@ -2672,7 +2672,7 @@
 .app-phone-screen .finance-fund-row {
   display: grid;
   min-height: 36px !important;
-  grid-template-columns: 22px 68px minmax(0, 1fr) 52px;
+  grid-template-columns: 82px minmax(0, 1fr) 52px;
   align-items: center;
   gap: 6px;
   padding: 0 !important;
@@ -2721,7 +2721,7 @@
 }
 
 .app-phone-screen .finance-fund-row > strong {
-  color: var(--app-text-primary);
+  color: var(--app-text-primary) !important;
   font-size: 10px;
   font-variant-numeric: tabular-nums;
   font-weight: 750;
@@ -2839,7 +2839,7 @@
 }
 
 .app-phone-screen .finance-overview-primary-value strong {
-  color: var(--app-primary);
+  color: var(--app-text-primary);
   font-size: 30px;
   font-variant-numeric: tabular-nums;
   font-weight: 800;
@@ -2952,7 +2952,7 @@
 .app-phone-screen .finance-fund-kpis strong { font-size: 20px; }
 .app-phone-screen .finance-fund-kpis small { font-size: 10px; }
 .app-phone-screen .finance-fund-unit { font-size: 10px; }
-.app-phone-screen .finance-fund-row { min-height: 42px !important; grid-template-columns: 24px 78px minmax(0, 1fr) 50px; }
+.app-phone-screen .finance-fund-row { min-height: 42px !important; grid-template-columns: 92px minmax(0, 1fr) 54px; }
 .app-phone-screen .finance-fund-rank { font-size: 10px; }
 .app-phone-screen .finance-fund-company { font-size: 11px; }
 .app-phone-screen .finance-fund-row > strong { font-size: 11px; }
@@ -4020,6 +4020,10 @@
   margin: 0;
 }
 
+.app-phone-screen .purchase-ranking-row.is-statistics {
+  grid-template-columns: 112px minmax(0, 1fr) 52px;
+}
+
 .app-phone-screen .global-month-select-wrap {
   position: relative;
   z-index: 20;
@@ -4283,7 +4287,7 @@
 }
 
 .app-phone-screen .repair-core-financial-value strong {
-  color: var(--app-primary);
+  color: var(--app-text-primary);
   font-size: 24px;
   font-weight: var(--app-weight-data);
   font-variant-numeric: tabular-nums;
@@ -4368,7 +4372,7 @@
 }
 
 .app-phone-screen .repair-core-fleet-stat strong {
-  color: var(--app-primary);
+  color: var(--app-text-primary);
   font-size: 25px;
   font-weight: var(--app-weight-data);
   line-height: 1;
@@ -6985,6 +6989,72 @@
     font-weight: 600;
   }
 
+  .app-phone-screen .energy-overview-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .app-phone-screen .energy-overview-cards article {
+    min-width: 0;
+    min-height: 118px;
+    padding: 12px;
+    border: 1px solid var(--app-border);
+    border-radius: 12px;
+    background: linear-gradient(145deg, var(--app-white), var(--app-primary-soft));
+  }
+
+  .app-phone-screen .energy-overview-cards article.is-primary {
+    grid-column: 1 / -1;
+    min-height: 104px;
+    background: linear-gradient(135deg, var(--app-primary-soft), var(--app-white));
+  }
+
+  .app-phone-screen .energy-overview-cards article > span {
+    display: block;
+    min-height: 20px;
+    color: var(--app-text-primary);
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 18px;
+  }
+
+  .app-phone-screen .energy-overview-cards article > div {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 3px;
+    margin-top: 9px;
+  }
+
+  .app-phone-screen .energy-overview-cards article strong {
+    color: var(--app-text-primary);
+    font-size: 27px;
+    font-weight: 780;
+    line-height: 30px;
+    letter-spacing: -.3px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .app-phone-screen .energy-overview-cards article strong.is-good { color: var(--app-success-900); }
+  .app-phone-screen .energy-overview-cards article strong.is-risk { color: var(--app-danger-900); }
+  .app-phone-screen .energy-overview-cards article strong.is-equal { color: var(--app-text-primary); }
+
+  .app-phone-screen .energy-overview-cards article.is-primary strong { font-size: 31px; line-height: 34px; }
+  .app-phone-screen .energy-overview-cards article small {
+    color: var(--app-text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .app-phone-screen .energy-overview-cards article em {
+    display: block;
+    margin-top: 8px;
+    color: var(--app-text-secondary);
+    font-size: 12px;
+    font-style: normal;
+    line-height: 16px;
+  }
+
   .app-phone-screen .energy-alert-strip {
     display:flex;
     min-height:34px;
@@ -8684,7 +8754,7 @@
   min-width: 0;
   align-items: baseline;
   justify-content: flex-end;
-  color: var(--app-primary) !important;
+  color: var(--app-text-primary) !important;
   font-family: var(--app-font-family);
   font-size: 13px !important;
   font-variant-numeric: tabular-nums;
@@ -10983,7 +11053,7 @@
 .app-phone-screen .finance-assessment-summary article + article { border-left: 1px solid var(--app-border); }
 .app-phone-screen .finance-assessment-summary span,.app-phone-screen .finance-assessment-summary small,.app-phone-screen .finance-assessment-summary em { display: block; }
 .app-phone-screen .finance-assessment-summary span { color: var(--app-text-regular); font-size: 10px; white-space: nowrap; }
-.app-phone-screen .finance-assessment-summary strong { display: block; margin-top: 3px; color: var(--app-primary-900); font-size: 20px; font-weight: 760; font-variant-numeric: tabular-nums; line-height: 25px; white-space: nowrap; }
+.app-phone-screen .finance-assessment-summary strong { display: block; margin-top: 3px; color: var(--app-text-primary); font-size: 20px; font-weight: 760; font-variant-numeric: tabular-nums; line-height: 25px; white-space: nowrap; }
 .app-phone-screen .finance-assessment-summary strong small { display: inline; margin-left: 2px; font-size: 10px; }
 .app-phone-screen .finance-assessment-summary article > small,.app-phone-screen .finance-assessment-summary em { overflow: hidden; margin-top: 2px; color: var(--app-text-secondary); font-size: 9px; font-style: normal; text-overflow: ellipsis; white-space: nowrap; }
 .app-phone-screen .finance-assessment-summary .is-count em { color: var(--app-warning-900); }
@@ -11004,7 +11074,7 @@
 .app-phone-screen .finance-assessment-detail-summary article { min-width: 0; padding: 10px 5px; text-align: center; }
 .app-phone-screen .finance-assessment-detail-summary article + article { border-left: 1px solid var(--app-border); }
 .app-phone-screen .finance-assessment-detail-summary span,.app-phone-screen .finance-assessment-detail-summary article > small { display: block; overflow: hidden; color: var(--app-text-secondary); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
-.app-phone-screen .finance-assessment-detail-summary strong { display: block; margin: 3px 0 2px; color: var(--app-primary-900); font-size: 20px; font-variant-numeric: tabular-nums; line-height: 25px; }
+.app-phone-screen .finance-assessment-detail-summary strong { display: block; margin: 3px 0 2px; color: var(--app-text-primary); font-size: 20px; font-variant-numeric: tabular-nums; line-height: 25px; }
 .app-phone-screen .finance-assessment-detail-summary strong small { color: var(--app-text-secondary); font-size: 9px; }
 .app-phone-screen .finance-assessment-legend { display: flex; justify-content: flex-end; gap: 12px; padding: 9px 2px 6px; color: var(--app-text-secondary); font-size: 10px; }
 .app-phone-screen .finance-assessment-legend span { display: inline-flex; align-items: center; gap: 4px; }
@@ -11020,8 +11090,8 @@
 .app-phone-screen .finance-assessment-metric + .finance-assessment-metric { margin-top: 8px; border-top: 1px dashed var(--app-border); }
 .app-phone-screen .finance-assessment-metric-head,.app-phone-screen .finance-assessment-metric-value { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .app-phone-screen .finance-assessment-metric-head strong { color: var(--app-text-regular); font-size: 11px; font-weight: 650; }.app-phone-screen .finance-assessment-metric-head span { color: var(--app-text-secondary); font-size: 10px; font-variant-numeric: tabular-nums; }
-.app-phone-screen .finance-assessment-metric-value { justify-content: flex-start; margin-top: 3px; }.app-phone-screen .finance-assessment-metric-value b { color: var(--app-primary-900); font-size: 21px; font-weight: 760; font-variant-numeric: tabular-nums; line-height: 26px; }
-.app-phone-screen .finance-assessment-metric-value small { color: var(--app-text-secondary); font-size: 9px; }.app-phone-screen .finance-assessment-metric-value em { margin-left: auto; color: var(--app-primary-900); font-size: 13px; font-style: normal; font-weight: 720; font-variant-numeric: tabular-nums; }
+.app-phone-screen .finance-assessment-metric-value { justify-content: flex-start; margin-top: 3px; }.app-phone-screen .finance-assessment-metric-value b { color: var(--app-text-primary); font-size: 21px; font-weight: 760; font-variant-numeric: tabular-nums; line-height: 26px; }
+.app-phone-screen .finance-assessment-metric-value small { color: var(--app-text-secondary); font-size: 9px; }.app-phone-screen .finance-assessment-metric-value em { margin-left: auto; color: var(--app-text-primary); font-size: 13px; font-style: normal; font-weight: 720; font-variant-numeric: tabular-nums; }
 .app-phone-screen .finance-assessment-progress { position: relative; height: 7px; margin-top: 5px; overflow: hidden; border-radius: 999px; background: var(--app-primary-100); }
 .app-phone-screen .finance-assessment-progress i { display: block; height: 100%; border-radius: inherit; }.app-phone-screen .finance-assessment-progress i.is-good { background: linear-gradient(90deg,var(--app-success-900),var(--app-success)); }.app-phone-screen .finance-assessment-progress i.is-watch { background: linear-gradient(90deg,var(--app-danger-900),var(--app-danger)); }
 .app-phone-screen .finance-assessment-progress span { position: absolute; top: 0; width: 1px; height: 100%; background: rgb(255 255 255/.88); box-shadow: 0 0 0 1px rgb(0 52 95/.15); }
@@ -11083,8 +11153,10 @@
   font-variant-numeric: tabular-nums;
   line-height: 32px;
 }
-.app-phone-screen .home-shared-kpi[data-tone="success"] strong { color: var(--app-success-900); }
-.app-phone-screen .home-shared-kpi[data-tone="warning"] strong { color: var(--app-warning-900); }
+.app-phone-screen .home-shared-kpi strong { color: var(--app-text-primary); }
+.app-phone-screen .home-shared-kpi[data-has-target="true"][data-status="good"] strong { color: var(--app-success-900); }
+.app-phone-screen .home-shared-kpi[data-has-target="true"][data-status="risk"] strong { color: var(--app-danger-900); }
+.app-phone-screen .home-shared-kpi[data-has-target="true"][data-status="equal"] strong { color: var(--app-text-primary); }
 .app-phone-screen .home-shared-kpi small {
   padding-bottom: 4px;
   color: var(--app-text-secondary);
@@ -11102,8 +11174,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.app-phone-screen .home-shared-kpi em b { color: var(--app-success-900); font-weight: 650; }
-.app-phone-screen .home-shared-kpi[data-tone="warning"] em b { color: var(--app-warning-900); }
+.app-phone-screen .home-shared-kpi em b { color: var(--app-text-primary); font-weight: 650; }
+.app-phone-screen .home-shared-kpi em b.is-positive { color: var(--app-success-900); }
+.app-phone-screen .home-shared-kpi em b.is-negative { color: var(--app-danger-900); }
+.app-phone-screen .home-shared-kpi em b.is-neutral { color: var(--app-text-primary); }
 .app-phone-screen .energy-kpi-grid em { line-height: 14px; white-space: normal; }
 
 /* Homepage overdue receivables and four-sector order progress */
@@ -11126,31 +11200,29 @@
 .app-phone-screen .home-order-progress-summary-head > span small { margin-left: 4px; color: var(--app-text-regular); font-size: 11px; font-weight: 500; }
 .app-phone-screen .home-order-progress-summary-head > em { color: var(--app-success-900); font-size: 11px; font-style: normal; font-weight: 650; white-space: nowrap; }
 .app-phone-screen .home-order-progress-summary-value { display: flex; align-items: flex-end; justify-content: center; gap: 3px; margin: 7px 0; }
-.app-phone-screen .home-order-progress-summary-value strong { color: var(--app-primary-900); font-size: 28px; font-weight: 780; font-variant-numeric: tabular-nums; line-height: 32px; }
+.app-phone-screen .home-order-progress-summary-value strong { color: var(--app-text-primary); font-size: 28px; font-weight: 780; font-variant-numeric: tabular-nums; line-height: 32px; }
 .app-phone-screen .home-order-progress-summary-value span { padding-bottom: 3px; color: var(--app-text-secondary); font-size: 11px; }
 .app-phone-screen .home-order-progress-summary-track,
 .app-phone-screen .home-order-progress-sector-track { height: 7px; overflow: hidden; border-radius: 999px; background: var(--app-primary-100); }
 .app-phone-screen .home-order-progress-summary-track i,
 .app-phone-screen .home-order-progress-sector-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,var(--app-primary),var(--app-primary-500)); }
 .app-phone-screen .home-order-progress-summary-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 7px; color: var(--app-text-secondary); font-size: 11px; }
-.app-phone-screen .home-order-progress-summary-meta b { color: var(--app-primary-900); font-weight: 700; }
+.app-phone-screen .home-order-progress-summary-meta b { color: var(--app-text-primary); font-weight: 700; }
 .app-phone-screen .home-order-progress-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; padding: 8px 10px 10px; }
 .app-phone-screen .home-order-progress-grid article { min-width: 0; padding: 9px 10px; border: 1px solid var(--app-border-lighter); border-radius: 10px; background: linear-gradient(180deg,#fff 0%,var(--app-fill-extra-light) 100%); }
 .app-phone-screen .home-order-progress-grid header { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .app-phone-screen .home-order-progress-grid header strong { overflow: hidden; color: var(--foreground); font-size: 13px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.app-phone-screen .home-order-progress-grid header em { color: var(--app-primary-900); font-size: 13px; font-style: normal; font-weight: 760; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.app-phone-screen .home-order-progress-grid header em { color: var(--app-text-primary); font-size: 13px; font-style: normal; font-weight: 760; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .app-phone-screen .home-order-progress-sector-track { height: 6px; margin-top: 8px; }
 .app-phone-screen .home-order-progress-grid footer { display: flex; align-items: center; justify-content: space-between; gap: 5px; margin-top: 6px; }
 .app-phone-screen .home-order-progress-grid footer > span { color: var(--app-text-secondary); font-size: 11px; white-space: nowrap; }
-.app-phone-screen .home-order-progress-grid footer b { color: var(--app-primary-900); font-weight: 650; }
+.app-phone-screen .home-order-progress-grid footer b { color: var(--app-text-primary); font-weight: 650; }
 .app-phone-screen .home-overdue-kpi-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); padding: 13px 0 14px; }
 .app-phone-screen .home-overdue-kpi-grid article { position: relative; display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 5px; padding: 0 5px; text-align: center; }
 .app-phone-screen .home-overdue-kpi-grid article > i { position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: var(--app-divider); }
 .app-phone-screen .home-overdue-kpi-grid article > span { color: var(--app-text-secondary); font-size: 11px; line-height: 16px; white-space: nowrap; }
 .app-phone-screen .home-overdue-kpi-grid article > div { display: flex; min-height: 34px; min-width: 0; align-items: flex-end; justify-content: center; gap: 2px; }
-.app-phone-screen .home-overdue-kpi-grid strong { color: var(--app-primary-900); font-size: 26px; font-weight: 760; font-variant-numeric: tabular-nums; line-height: 32px; white-space: nowrap; }
-.app-phone-screen .home-overdue-kpi-grid article[data-tone="danger"] strong { color: var(--app-danger); }
-.app-phone-screen .home-overdue-kpi-grid article[data-tone="success"] strong { color: var(--app-success-900); }
+.app-phone-screen .home-overdue-kpi-grid strong { color: var(--app-text-primary); font-size: 26px; font-weight: 760; font-variant-numeric: tabular-nums; line-height: 32px; white-space: nowrap; }
 .app-phone-screen .home-overdue-kpi-grid small { padding-bottom: 4px; color: var(--app-text-secondary); font-size: 10px; line-height: 14px; white-space: nowrap; }
 .app-phone-screen .home-overdue-kpi-grid em { color: var(--app-success-900); font-size: 9px; font-style: normal; line-height: 15px; white-space: nowrap; }
 

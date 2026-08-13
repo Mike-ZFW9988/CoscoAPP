@@ -92,6 +92,7 @@ const COMPANY_DISPLAY_ORDER = [
 const companyNames = (count: number) => COMPANY_DISPLAY_ORDER.slice(0, count);
 const orderNamedCompanies = <T extends { name: string }>(rows: T[]): T[] => rows.map((row, index) => ({ ...row, name: COMPANY_DISPLAY_ORDER[index] ?? row.name }));
 const orderCompanyRows = <T extends { company: string }>(rows: T[]): T[] => rows.map((row, index) => ({ ...row, company: COMPANY_DISPLAY_ORDER[index] ?? row.company }));
+type EnergyMode = "整体" | "造船" | "修船" | "海工";
 
 type QualityMetricKey = "inspection" | "rt";
 type QualityBusinessKey = "造船" | "修船" | "海工";
@@ -1424,9 +1425,9 @@ const getCurrentMonthLabels = (date = new Date()) => ({
 });
 
 const PURCHASE_OVERVIEW_METRICS = [
-  { label: "总采购金额（船用物资）", homeLabel: "总采购金额", value: "128", unit: "亿", subLabel: "本月新增", subValue: "19.14亿元" },
-  { label: "集采金额", homeLabel: "集采金额", value: "104", unit: "亿", subLabel: "本月新增", subValue: "18.14亿元" },
-  { label: "集采率", homeLabel: "集采率", value: "81.3", unit: "%", subLabel: "较上月", subValue: "+1%" },
+  { label: "总采购金额（船用物资）", homeLabel: "总采购金额", value: "128", unit: "亿", subLabel: "本月新增", subValue: "19.14亿元", subTone: "neutral" },
+  { label: "集采金额", homeLabel: "集采金额", value: "104", unit: "亿", subLabel: "本月新增", subValue: "18.14亿元", subTone: "neutral" },
+  { label: "集采率", homeLabel: "集采率", value: "81.3", unit: "%", subLabel: "较上月", subValue: "+1%", subTone: "positive" },
 ] as const;
 
 const QUALITY_OVERVIEW_METRICS = [
@@ -1668,7 +1669,7 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
         </div>
         <div className="home-overdue-kpi-grid">
           {HOME_OVERDUE_RECEIVABLE_OVERVIEW.map((item, index) => (
-            <article key={item.key} data-tone={item.tone}>
+            <article key={item.key}>
               <span>{item.label}</span>
               <div><strong>{item.value}</strong><small>{item.unit}</small></div>
               <em>{item.mom}</em>
@@ -1705,10 +1706,10 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
         {/* 与采购主题总览共用同一组指标数据 */}
         <div className="home-shared-kpi-grid is-three">
           {PURCHASE_OVERVIEW_METRICS.map((item, index) => (
-            <div key={item.label} className="home-shared-kpi" data-tone={item.unit === "%" ? "warning" : "default"}>
+            <div key={item.label} className="home-shared-kpi">
               <span>{item.homeLabel}</span>
               <div><strong>{item.value}</strong><small>{item.unit}</small></div>
-              <em>{item.subLabel} <b>{item.subValue}</b></em>
+              <em>{item.subLabel} <b className={`is-${item.subTone}`}>{item.subValue}</b></em>
               {index < PURCHASE_OVERVIEW_METRICS.length - 1 && <i aria-hidden="true" />}
             </div>
           ))}
@@ -1743,8 +1744,8 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
         {/* 与质量主题总览共用同一组指标数据 */}
         <div className="home-shared-kpi-grid is-two">
           {QUALITY_OVERVIEW_METRICS.map(item => {
-            const ok = Number(item.value) >= Number(item.target);
-            return <div key={item.key} className="home-shared-kpi" data-tone={ok ? "success" : "warning"}>
+            const status = Number(item.value) > Number(item.target) ? "good" : Number(item.value) < Number(item.target) ? "risk" : "equal";
+            return <div key={item.key} className="home-shared-kpi" data-has-target="true" data-status={status}>
               <span>{item.label}</span>
               <div><strong>{item.value}</strong><small>%</small></div>
               <em>目标≥{item.target}% · <b>{item.yoy}</b></em>
@@ -1783,8 +1784,8 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
             { label: "万元产值综合能耗", value: ENERGY_KPI_BY_SEGMENT.整体.perVal, unit: "吨标煤/万元", target: ENERGY_KPI_BY_SEGMENT.整体.perTarget, yoy: ENERGY_KPI_BY_SEGMENT.整体.perYoy },
             { label: "万元产值碳排放", value: ENERGY_KPI_BY_SEGMENT.整体.carbon, unit: "吨/万元", target: ENERGY_KPI_BY_SEGMENT.整体.carbonTarget, yoy: ENERGY_KPI_BY_SEGMENT.整体.carbonYoy },
           ].map(item => {
-            const ok = Number(item.value) <= Number(item.target);
-            return <div key={item.label} className="home-shared-kpi" data-tone={ok ? "success" : "warning"}>
+            const status = Number(item.value) < Number(item.target) ? "good" : Number(item.value) > Number(item.target) ? "risk" : "equal";
+            return <div key={item.label} className="home-shared-kpi" data-has-target="true" data-status={status}>
               <span>{item.label}</span>
               <div><strong>{item.value}</strong><small>{item.unit}</small></div>
               <em>目标≤{item.target} · <b>{item.yoy}</b></em>
@@ -4422,19 +4423,18 @@ function PageFinanceFund() {
         </div>
       </div>
 
-      <Card title="各企业可用资金" tag="企业排名" className="app-production-card finance-fund-chart-card">
+      <Card title="各企业可用资金统计" className="app-production-card finance-fund-chart-card">
         <div className="finance-currency-segmented app-unified-segmented" role="group" aria-label="币种切换">
           {(Object.keys(currencyMap) as Array<keyof typeof currencyMap>).map((key) => (
             <button type="button" key={key} className={fundCurrency === key ? "is-active" : ""} onClick={() => setFundCurrency(key)}>{currencyMap[key].label}</button>
           ))}
         </div>
         <div className="finance-fund-unit">
-          单位：{activeCurrency.unit} · 统一折算人民币 · 按金额从高到低
+          单位：{activeCurrency.unit} · 统一折算人民币 · 按集团企业顺序
         </div>
         <div className="finance-fund-ranking">
-          {rankedCompanies.map((item, rank) => (
+          {rankedCompanies.map((item) => (
             <button type="button" className="finance-fund-row" key={item.company} onClick={() => setSelectedCompany(item.index)}>
-              <span className="finance-fund-rank">{String(rank + 1).padStart(2, "0")}</span>
               <span className="finance-fund-company">{item.company}</span>
               <span className="finance-fund-track"><i style={{ width: `${(item.value / maxValue) * 100}%`, background: activeCurrency.color }} /></span>
               <strong>{item.value.toFixed(2)}</strong>
@@ -5411,13 +5411,13 @@ function PagePurchaseGroup({ initialSection = "management" }: { initialSection?:
         )}
       </Card>
 
-      <Card title="企业采购排名" extra="共6家" className="app-production-card repair-ranking-card purchase-ranking-card">
-        <div className="purchase-ranking-toolbar"><span>单位：亿元</span><div className="purchase-period-switch purchase-ranking-period app-unified-segmented" role="group" aria-label="企业采购排名周期">
+      <Card title="企业采购统计" extra="共6家" className="app-production-card repair-ranking-card purchase-ranking-card">
+        <div className="purchase-ranking-toolbar"><span>单位：亿元</span><div className="purchase-period-switch purchase-ranking-period app-unified-segmented" role="group" aria-label="企业采购统计周期">
           <button type="button" className={rankingPeriod === "month" ? "is-active" : ""} onClick={() => setRankingPeriod("month")}>本月</button>
           <button type="button" className={rankingPeriod === "year" ? "is-active" : ""} onClick={() => setRankingPeriod("year")}>本年</button>
         </div></div>
         <div className="purchase-ranking-list">
-          {rankedUnits.map((unit, index) => { const value = rankingPeriod === "year" ? unit.total : unit.week; return <div className="purchase-ranking-row" key={unit.name}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{unit.name}</strong>{rankingPeriod === "year" && <small>本月 {unit.week.toFixed(2)}亿</small>}</div><HorizontalBar value={(value / maxTotal) * 100} label={`${unit.name} ${value.toFixed(2)}亿`} /><b>{value.toFixed(2)}<small>亿</small></b></div>; })}
+          {rankedUnits.map((unit) => { const value = rankingPeriod === "year" ? unit.total : unit.week; return <div className="purchase-ranking-row is-statistics" key={unit.name}><div><strong>{unit.name}</strong>{rankingPeriod === "year" && <small>本月 {unit.week.toFixed(2)}亿</small>}</div><HorizontalBar value={(value / maxTotal) * 100} label={`${unit.name} ${value.toFixed(2)}亿`} /><b>{value.toFixed(2)}<small>亿</small></b></div>; })}
         </div>
       </Card>
       </> : activeSection === "steel" ? <PurchaseSteelPanel /> : <PurchaseSupplierPanel />}
@@ -5563,7 +5563,7 @@ function PageQuality() {
           {QUALITY_COMPANY_PERFORMANCE[activeMetric === "报验" ? "inspection" : "rt"][activeBusiness].map((row, index) => {
             const attainment = row.annual > row.target ? "above" : row.annual < row.target ? "below" : "equal";
             const attainmentLabel = attainment === "above" ? "超过目标" : attainment === "below" ? "低于目标" : "达到目标";
-            return <div key={`${activeMetric}-${activeBusiness}-${row.company}`}><div className="quality-company-cell"><span className="quality-rank">{String(index + 1).padStart(2, "0")}</span><strong>{row.company}</strong></div><b className={`quality-annual-value is-${attainment}`} title={attainmentLabel} aria-label={`年度累计${row.annual.toFixed(1)}%，${attainmentLabel}`}>{row.annual.toFixed(1)}%</b><strong className="quality-target-value">{row.target.toFixed(1)}%</strong></div>;
+            return <div key={`${activeMetric}-${activeBusiness}-${row.company}`}><div className="quality-company-cell"><strong>{row.company}</strong></div><b className={`quality-annual-value is-${attainment}`} title={attainmentLabel} aria-label={`年度累计${row.annual.toFixed(1)}%，${attainmentLabel}`}>{row.annual.toFixed(1)}%</b><strong className="quality-target-value">{row.target.toFixed(1)}%</strong></div>;
           })}
         </div>
       </Card>
@@ -5648,12 +5648,12 @@ function PageFinanceAssessment() {
         </div>
         <div className="finance-assessment-legend"><span><i className="is-good" />已达时间进度</span><span><i className="is-watch" />未达时间进度</span></div>
         <div className="finance-assessment-company-list">
-          {rows.map((row, index) => {
+          {rows.map((row) => {
             const revenueRate = assessmentProgress(row.revenueActual, row.revenueTarget);
             const profitRate = assessmentProgress(row.profitActual, row.profitTarget);
             const achieved = assessmentStatus(row);
             return <article className="finance-assessment-company-card" key={row.id}>
-              <header><span><b>{String(index + 1).padStart(2, "0")}</b><strong>{row.company}</strong></span><em className={achieved ? "is-good" : "is-watch"}>{achieved ? "达进度" : "待关注"}</em></header>
+              <header><span><strong>{row.company}</strong></span><em className={achieved ? "is-good" : "is-watch"}>{achieved ? "达进度" : "待关注"}</em></header>
               <div className="finance-assessment-metric">
                 <div className="finance-assessment-metric-head"><strong>营业收入</strong><span>目标 {formatAssessmentAmount(row.revenueTarget)}万</span></div>
                 <div className="finance-assessment-metric-value"><b>{formatAssessmentAmount(row.revenueActual)}</b><small>万元</small><em>{revenueRate}%</em></div>
@@ -5918,10 +5918,10 @@ function PageEnergyLegacy() {
         })()}
       </Card>
 
-      {/* 万元产值综合能耗排名 */}
-      <Card title="万元产值综合能耗排名">
-        <TRow cells={["排名", "企业名称", "万元产值综合能耗", "排名变化"]} head />
-        {d.ranking.map((row, i) => <TRow key={i} cells={row} />)}
+      {/* 万元产值综合能耗统计 */}
+      <Card title="万元产值综合能耗统计">
+        <TRow cells={["企业名称", "万元产值综合能耗", "目标"]} head />
+        {d.ranking.map((row, i) => <TRow key={i} cells={[row[1], row[2], "0.0345"]} />)}
       </Card>
 
       <Footer text={`能源主题 · ${seg}口径 · 综合能耗/万元产值能耗`} />
@@ -5947,16 +5947,22 @@ function EnergyRankMedal({ rank }: { rank: 1 | 2 | 3 }) {
 
 function PageEnergy() {
   const overview = { feeRatio: "2.08", feeTarget: "3.5", ...ENERGY_KPI_BY_SEGMENT.整体 };
+  const lowerIsBetterTone = (value: string | number, targetValue: string | number) => {
+    const current = Number(value);
+    const targetNumber = Number(targetValue);
+    if (!Number.isFinite(current) || !Number.isFinite(targetNumber)) return "equal";
+    return current < targetNumber ? "good" : current > targetNumber ? "risk" : "equal";
+  };
   const target = 0.0345;
   const annualValues = [0.0280,0.0292,0.0301,0.0310,0.0318,0.0325,0.0331,0.0338,0.0345,0.0352,0.0360,0.0371,0.0383,0.0395];
   const statistics = COMPANY_DISPLAY_ORDER.map((company, index) => ({ company, annual: annualValues[index], target }));
   return <>
     <StatusBar/><NavBar title="能源主题" backLabel="返回首页" backPage="home"/><BreadcrumbBar crumbs={["首页","能源主题"]}/>
     <Card title="能源运营总览" className="mt-3 energy-overview-card">
-      <div className="energy-overview-list">
-        <div><span><b>能源费用比率</b><em>目标 ≤ {overview.feeTarget}%</em></span><strong>{overview.feeRatio}<small>%</small></strong></div>
-        <div><span><b>万元产值综合能耗</b><em>目标 ≤ {overview.perTarget}</em></span><strong>{overview.perVal}</strong></div>
-        <div><span><b>万元产值碳排放</b><em>目标 ≤ {overview.carbonTarget}吨</em></span><strong>{overview.carbon}<small>吨</small></strong></div>
+      <div className="energy-overview-cards">
+        <article className="is-primary"><span>能源费用比率</span><div><strong className={`is-${lowerIsBetterTone(overview.feeRatio, overview.feeTarget)}`}>{overview.feeRatio}</strong><small>%</small></div><em>目标 ≤ {overview.feeTarget}%</em></article>
+        <article><span>万元产值综合能耗</span><div><strong className={`is-${lowerIsBetterTone(overview.perVal, overview.perTarget)}`}>{overview.perVal}</strong></div><em>目标 ≤ {overview.perTarget}</em></article>
+        <article><span>万元产值碳排放</span><div><strong className={`is-${lowerIsBetterTone(overview.carbon, overview.carbonTarget)}`}>{overview.carbon}</strong><small>吨</small></div><em>目标 ≤ {overview.carbonTarget}吨</em></article>
       </div>
     </Card>
     <Card title="年累计万元产值综合能耗统计" className="energy-ranking-card energy-statistics-card">
