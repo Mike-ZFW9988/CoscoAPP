@@ -7408,6 +7408,10 @@
     font-variant-numeric: tabular-nums;
   }
 
+  .app-phone-screen .quality-performance-list .quality-annual-value.is-below { color: var(--app-danger); }
+  .app-phone-screen .quality-performance-list .quality-annual-value.is-equal { color: var(--app-warning); }
+  .app-phone-screen .quality-performance-list .quality-annual-value.is-above { color: var(--app-success); }
+
   .app-phone-screen .quality-performance-list > div > div:last-child {
     text-align: right;
   }

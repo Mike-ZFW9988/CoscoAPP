@@ -5545,7 +5545,7 @@ function PageQuality() {
 
       <Card title="质量运营总览" className="mt-3 quality-overview-card">
         <div className="quality-overview-metrics">
-          {QUALITY_OVERVIEW_METRICS.map(item => <div key={item.key}><span>{item.label}</span><strong>{item.value}%</strong><small>目标 ≥{item.target}% · {item.yoy}</small></div>)}
+          {QUALITY_OVERVIEW_METRICS.map(item => <div key={item.key}><span>{item.label}</span><strong>{item.value}%</strong><small>目标 ≥{item.target}%</small></div>)}
         </div>
       </Card>
 
@@ -5562,7 +5562,11 @@ function PageQuality() {
         <div className="quality-performance-context"><span>{activeMetric === "报验" ? "报验一次合规率" : "RT/PAUT一次合规率"}</span><b>{activeBusiness}</b></div>
         <div className="quality-performance-head"><span>企业</span><span>年度累计</span><span>目标</span></div>
         <div className="quality-performance-list">
-          {QUALITY_COMPANY_PERFORMANCE[activeMetric === "报验" ? "inspection" : "rt"][activeBusiness].map((row, index) => <div key={`${activeMetric}-${activeBusiness}-${row.company}`}><div className="quality-company-cell"><span className="quality-rank">{String(index + 1).padStart(2, "0")}</span><strong>{row.company}</strong></div><b>{row.annual.toFixed(1)}%</b><strong className="quality-target-value">{row.target.toFixed(1)}%</strong></div>)}
+          {QUALITY_COMPANY_PERFORMANCE[activeMetric === "报验" ? "inspection" : "rt"][activeBusiness].map((row, index) => {
+            const attainment = row.annual > row.target ? "above" : row.annual < row.target ? "below" : "equal";
+            const attainmentLabel = attainment === "above" ? "超过目标" : attainment === "below" ? "低于目标" : "达到目标";
+            return <div key={`${activeMetric}-${activeBusiness}-${row.company}`}><div className="quality-company-cell"><span className="quality-rank">{String(index + 1).padStart(2, "0")}</span><strong>{row.company}</strong></div><b className={`quality-annual-value is-${attainment}`} title={attainmentLabel} aria-label={`年度累计${row.annual.toFixed(1)}%，${attainmentLabel}`}>{row.annual.toFixed(1)}%</b><strong className="quality-target-value">{row.target.toFixed(1)}%</strong></div>;
+          })}
         </div>
       </Card>
 
