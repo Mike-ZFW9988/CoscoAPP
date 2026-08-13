@@ -5574,7 +5574,7 @@ function PageQuality() {
         {(() => { const activity = QUALITY_ACTIVITY_SLIDES[qualityActivityIndex]; return <article key={activity.id} className="quality-activity-carousel" aria-live="polite">
           <div className="quality-activity-image-wrap"><img src={activity.image} alt={`${activity.location}${activity.title}会议现场`} /></div>
           <div className="quality-activity-copy"><div><span>{activity.date}</span><b>{activity.location}</b></div><h3>{activity.title}</h3><p>{activity.description}</p></div>
-          {QUALITY_ACTIVITY_SLIDES.length > 1 && <div className="quality-activity-controls"><button type="button" aria-label="上一条质量活动" onClick={() => setQualityActivityIndex(index => (index - 1 + QUALITY_ACTIVITY_SLIDES.length) % QUALITY_ACTIVITY_SLIDES.length)}><ChevronRight size={16}/></button><div>{QUALITY_ACTIVITY_SLIDES.map((item, index) => <button type="button" key={item.id} aria-label={`查看第${index + 1}条质量活动`} aria-current={index === qualityActivityIndex} className={index === qualityActivityIndex ? "is-active" : ""} onClick={() => setQualityActivityIndex(index)}/>)}</div><button type="button" aria-label="下一条质量活动" onClick={() => setQualityActivityIndex(index => (index + 1) % QUALITY_ACTIVITY_SLIDES.length)}><ChevronRight size={16}/></button></div>}
+          {QUALITY_ACTIVITY_SLIDES.length > 1 && <div className="quality-activity-dots" aria-label="质量活动轮播进度">{QUALITY_ACTIVITY_SLIDES.map((item, index) => <span key={item.id} aria-current={index === qualityActivityIndex} className={index === qualityActivityIndex ? "is-active" : ""}/>)}</div>}
         </article>; })()}
       </Card>
 

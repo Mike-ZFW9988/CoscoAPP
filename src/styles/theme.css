@@ -7409,7 +7409,7 @@
   }
 
   .app-phone-screen .quality-performance-list .quality-annual-value.is-below { color: var(--app-danger); }
-  .app-phone-screen .quality-performance-list .quality-annual-value.is-equal { color: var(--app-warning); }
+  .app-phone-screen .quality-performance-list .quality-annual-value.is-equal { color: var(--app-text-primary); }
   .app-phone-screen .quality-performance-list .quality-annual-value.is-above { color: var(--app-success); }
 
   .app-phone-screen .quality-performance-list > div > div:last-child {
@@ -7601,6 +7601,28 @@
     background: var(--app-border-strong);
   }
   .app-phone-screen .quality-activity-controls > div button.is-active { width: 18px; background: var(--app-primary); }
+
+  .app-phone-screen .quality-activity-dots {
+    display: flex;
+    min-height: 20px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 0 8px;
+  }
+
+  .app-phone-screen .quality-activity-dots span {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--app-border-strong);
+    transition: width 180ms ease, background-color 180ms ease;
+  }
+
+  .app-phone-screen .quality-activity-dots span.is-active {
+    width: 18px;
+    background: var(--app-primary);
+  }
 
   .app-phone-screen .quality-awards-title {
     display: inline-flex;
