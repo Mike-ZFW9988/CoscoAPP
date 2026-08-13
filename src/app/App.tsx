@@ -5953,10 +5953,10 @@ function PageEnergy() {
   return <>
     <StatusBar/><NavBar title="能源主题" backLabel="返回首页" backPage="home"/><BreadcrumbBar crumbs={["首页","能源主题"]}/>
     <Card title="能源运营总览" className="mt-3 energy-overview-card">
-      <div className="energy-kpi-grid energy-kpi-grid-three">
-        <div><span>能源费用比率</span><strong>{overview.feeRatio}<small>%</small></strong><em>目标≤{overview.feeTarget}%</em></div>
-        <div><span>万元产值综合能耗</span><strong>{overview.perVal}</strong><em>目标≤{overview.perTarget}</em></div>
-        <div><span>万元产值碳排放</span><strong>{overview.carbon}<small>吨</small></strong><em>目标≤{overview.carbonTarget}</em></div>
+      <div className="energy-overview-list">
+        <div><span><b>能源费用比率</b><em>目标 ≤ {overview.feeTarget}%</em></span><strong>{overview.feeRatio}<small>%</small></strong></div>
+        <div><span><b>万元产值综合能耗</b><em>目标 ≤ {overview.perTarget}</em></span><strong>{overview.perVal}</strong></div>
+        <div><span><b>万元产值碳排放</b><em>目标 ≤ {overview.carbonTarget}吨</em></span><strong>{overview.carbon}<small>吨</small></strong></div>
       </div>
     </Card>
     <Card title="年累计万元产值综合能耗统计" className="energy-ranking-card energy-statistics-card">
