@@ -3936,14 +3936,6 @@
   color: var(--app-primary) !important;
   box-shadow: 0 2px 8px rgb(0 80 142 / 12%) !important;
 }
-.app-phone-screen .purchase-data-source {
-  margin-top: 5px;
-  padding-top: 5px;
-  border-top: 1px solid var(--app-divider);
-  color: var(--app-text-secondary);
-  font-size: 11px;
-  line-height: 16px;
-}
 .app-phone-screen .purchase-title-switch {
   width: 112px;
   height: 28px;
@@ -6991,68 +6983,81 @@
 
   .app-phone-screen .energy-overview-cards {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
   }
 
   .app-phone-screen .energy-overview-cards article {
+    position: relative;
+    display: grid;
     min-width: 0;
-    min-height: 118px;
-    padding: 12px;
-    border: 1px solid var(--app-border);
-    border-radius: 12px;
-    background: linear-gradient(145deg, var(--app-white), var(--app-primary-soft));
+    min-height: 102px;
+    grid-template-rows: minmax(32px, auto) 34px 22px;
+    align-items: center;
+    padding: 2px 8px;
+    background: transparent;
+    text-align: center;
   }
 
-  .app-phone-screen .energy-overview-cards article.is-primary {
-    grid-column: 1 / -1;
-    min-height: 104px;
-    background: linear-gradient(135deg, var(--app-primary-soft), var(--app-white));
+  .app-phone-screen .energy-overview-cards article + article::before {
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    left: 0;
+    width: 1px;
+    background: var(--app-border-extra-light);
+    content: "";
   }
 
   .app-phone-screen .energy-overview-cards article > span {
-    display: block;
-    min-height: 20px;
-    color: var(--app-text-primary);
-    font-size: 13px;
-    font-weight: 650;
-    line-height: 18px;
+    display: flex;
+    min-height: 32px;
+    align-items: center;
+    justify-content: center;
+    color: var(--app-text-regular);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
   }
 
   .app-phone-screen .energy-overview-cards article > div {
     display: flex;
     min-width: 0;
     align-items: baseline;
+    justify-content: center;
     gap: 3px;
-    margin-top: 9px;
+    margin: 0;
   }
 
   .app-phone-screen .energy-overview-cards article strong {
     color: var(--app-text-primary);
-    font-size: 27px;
+    font-size: 23px;
     font-weight: 780;
-    line-height: 30px;
+    line-height: 32px;
     letter-spacing: -.3px;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .app-phone-screen .energy-overview-cards article strong.is-good { color: var(--app-success-900); }
   .app-phone-screen .energy-overview-cards article strong.is-risk { color: var(--app-danger-900); }
   .app-phone-screen .energy-overview-cards article strong.is-equal { color: var(--app-text-primary); }
 
-  .app-phone-screen .energy-overview-cards article.is-primary strong { font-size: 31px; line-height: 34px; }
   .app-phone-screen .energy-overview-cards article small {
     color: var(--app-text-secondary);
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 600;
   }
   .app-phone-screen .energy-overview-cards article em {
     display: block;
-    margin-top: 8px;
+    overflow: hidden;
+    margin: 0;
     color: var(--app-text-secondary);
-    font-size: 12px;
+    font-size: 10px;
     font-style: normal;
-    line-height: 16px;
+    line-height: 18px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .app-phone-screen .energy-alert-strip {
@@ -9127,8 +9132,7 @@
   line-height: 16px !important;
 }
 .app-phone-screen .purchase-overview-kpis em,
-.app-phone-screen .purchase-overview-note,
-.app-phone-screen .purchase-data-source {
+.app-phone-screen .purchase-overview-note {
   color: var(--app-text-regular) !important;
   font-size: 12px !important;
   line-height: 17px !important;

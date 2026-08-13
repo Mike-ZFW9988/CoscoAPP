@@ -5386,7 +5386,6 @@ function PagePurchaseGroup({ initialSection = "management" }: { initialSection?:
         <div className="purchase-overview-kpis">
           {PURCHASE_OVERVIEW_METRICS.map((item) => <div key={item.label}><span>{item.label}</span><strong>{item.value}<small>{item.unit}</small></strong><em>{item.subLabel} <b>{item.subValue}</b></em></div>)}
         </div>
-        <div className="purchase-data-source">采购数据来源为EP系统，价格不含税</div>
       </Card>
 
       <Card title="采购金额构成" className="app-production-card purchase-structure-card" extra={<div className="purchase-structure-switch purchase-title-switch" role="group" aria-label="采购结构视图"><button type="button" className={structureView === "amount" ? "is-active" : ""} onClick={() => setStructureView("amount")}>金额</button><button type="button" className={structureView === "share" ? "is-active" : ""} onClick={() => setStructureView("share")}>占比</button></div>}>
@@ -5959,8 +5958,8 @@ function PageEnergy() {
   return <>
     <StatusBar/><NavBar title="能源主题" backLabel="返回首页" backPage="home"/><BreadcrumbBar crumbs={["首页","能源主题"]}/>
     <Card title="能源运营总览" className="mt-3 energy-overview-card">
-      <div className="energy-overview-cards">
-        <article className="is-primary"><span>能源费用比率</span><div><strong className={`is-${lowerIsBetterTone(overview.feeRatio, overview.feeTarget)}`}>{overview.feeRatio}</strong><small>%</small></div><em>目标 ≤ {overview.feeTarget}%</em></article>
+      <div className="energy-overview-cards is-three-column">
+        <article><span>能源费用比率</span><div><strong className={`is-${lowerIsBetterTone(overview.feeRatio, overview.feeTarget)}`}>{overview.feeRatio}</strong><small>%</small></div><em>目标≤{overview.feeTarget}%</em></article>
         <article><span>万元产值综合能耗</span><div><strong className={`is-${lowerIsBetterTone(overview.perVal, overview.perTarget)}`}>{overview.perVal}</strong></div><em>目标 ≤ {overview.perTarget}</em></article>
         <article><span>万元产值碳排放</span><div><strong className={`is-${lowerIsBetterTone(overview.carbon, overview.carbonTarget)}`}>{overview.carbon}</strong><small>吨</small></div><em>目标 ≤ {overview.carbonTarget}吨</em></article>
       </div>
