@@ -1661,8 +1661,12 @@ function PageFineReportPlaceholder() {
   return <>
     <StatusBar />
     <PortalTopTabs active="theme-zone" />
-    <NavBar title={`${theme.label}主题`} subtitle={company.name} backLabel="返回主题菜单" backPage="enterprise-themes" hideDateBadge />
+    <NavBar title=" " backLabel="返回主题菜单" backPage="enterprise-themes" hideDateBadge />
     <main className="portal-report-page">
+      <section className="portal-report-context" aria-label={`${company.name}${theme.label}主题`}>
+        <span className="portal-report-context-icon"><Icon size={21} strokeWidth={1.9} /></span>
+        <div><strong>{theme.label}主题</strong><span>{company.name}</span></div>
+      </section>
       <section className="portal-report-placeholder">
         <div className="portal-report-brand"><EnterpriseLogo company={company} size="large" /><ChevronRight size={18} /><span><Icon size={26} /></span></div>
         <span className="portal-report-eyebrow">帆软移动报表</span>
