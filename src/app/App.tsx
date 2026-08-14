@@ -1631,10 +1631,10 @@ function PageEnterpriseThemes() {
   return <>
     <StatusBar />
     <PortalTopTabs active="theme-zone" />
-    <NavBar title={company.name} subtitle="帆软移动报表" backLabel="返回企业列表" backPage="theme-zone" hideDateBadge />
+    <NavBar title=" " backLabel="返回企业列表" backPage="theme-zone" hideDateBadge />
     <main className="portal-enterprise-page">
       <section className="portal-enterprise-hero">
-        <EnterpriseLogo company={company} size="large" />
+        <EnterpriseLogo company={company} />
         <div><span>当前单位</span><strong>{company.name}</strong><small>请选择需要查看的业务主题</small></div>
       </section>
       <section aria-labelledby="portal-theme-title">

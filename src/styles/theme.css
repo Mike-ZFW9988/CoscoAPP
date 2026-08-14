@@ -11588,9 +11588,9 @@
   font-weight: 700;
 }
 
-.portal-zone-intro span,
-.portal-enterprise-hero span,
-.portal-enterprise-hero small {
+.portal-zone-intro > div:last-child > span,
+.portal-enterprise-hero > div:last-child > span,
+.portal-enterprise-hero > div:last-child > small {
   color: var(--app-text-secondary);
   font-size: 12px;
   line-height: 17px;

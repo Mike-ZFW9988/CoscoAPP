@@ -79,7 +79,8 @@ function GlobalHeader({
   onBadgeClick,
   dateMode = "month",
 }: GlobalHeaderProps) {
-  const hasPageChrome = Boolean(pageTitle && onBack);
+  const hasPageChrome = Boolean(onBack);
+  const hasPageCopy = Boolean(pageTitle?.trim());
   const isFreshnessBadge = badgeMode === "freshness";
   const monthPickerRef = useRef<HTMLDivElement | null>(null);
   const monthTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -219,10 +220,10 @@ function GlobalHeader({
               <path d="M9.75 3.5L5.25 8l4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <div className="brand-page-copy">
+          {hasPageCopy && <div className="brand-page-copy">
             <div className="brand-page-title">{pageTitle}</div>
             {pageSubtitle && <div className="brand-page-subtitle">{pageSubtitle}</div>}
-          </div>
+          </div>}
         </div>
       )}
 
@@ -250,7 +251,7 @@ function GlobalHeader({
 
       <div className={cn("relative h-full px-3 flex items-center pr-[92px] py-2")}>
         <div className="w-full h-full relative">
-          <div className={cn("absolute left-[-26px] min-w-0", hasPageChrome ? "top-[17px]" : "top-[-10px]")}>
+          <div className={cn("absolute left-[-26px] min-w-0", hasPageCopy ? "top-[17px]" : "top-[-10px]")}>
             <div className="h-[60px] w-[258px] max-w-none flex items-center overflow-visible">
               <img
                 src="/assets/brand/platform-logo.png"
