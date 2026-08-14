@@ -11554,13 +11554,13 @@
   margin: -7px 0 9px;
   border: 1px solid var(--app-border-lighter);
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--app-white) 0%, var(--app-primary-soft) 100%);
+  background: linear-gradient(105deg, var(--app-white) 0%, var(--app-primary-soft) 66%, rgba(248, 251, 255, 0.42) 100%);
   box-shadow: var(--app-shadow-card);
 }
 
 .portal-zone-page.is-root .portal-zone-intro,
 .portal-enterprise-page .portal-enterprise-hero {
-  margin-top: -18px;
+  margin-top: -38px;
 }
 
 .portal-zone-intro-mark {
