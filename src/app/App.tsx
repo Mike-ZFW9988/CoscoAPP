@@ -1635,7 +1635,7 @@ function PageEnterpriseThemes() {
     <main className="portal-enterprise-page">
       <section className="portal-enterprise-hero">
         <EnterpriseLogo company={company} />
-        <div><span>当前单位</span><strong>{company.name}</strong><small>请选择需要查看的业务主题</small></div>
+        <div><span>当前单位</span><strong>{company.name}</strong></div>
       </section>
       <section aria-labelledby="portal-theme-title">
         <div className="portal-section-heading"><div><strong id="portal-theme-title">主题菜单</strong></div></div>
