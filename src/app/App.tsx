@@ -19,21 +19,32 @@ import {
   AlertTriangle,
   Anchor,
   BarChart3,
+  BookOpenText,
+  Boxes,
+  BriefcaseBusiness,
+  Building2,
   CalendarClock,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
   CircleDollarSign,
   ClipboardList,
+  DraftingCompass,
   Factory,
+  Flag,
   Gauge,
+  HardHat,
   Landmark,
+  Lightbulb,
   LineChart,
+  MonitorCog,
   PackageCheck,
+  Scale,
   ShieldCheck,
   Ship,
   Table2,
   TrendingUp,
+  Users,
   Wrench,
   Zap,
   type LucideIcon,
@@ -140,6 +151,9 @@ const QUALITY_ACTIVITY_SLIDES = [
 /* ─── Page Registry ─── */
 const PAGES = [
   { id: "home",                 label: "1  首页" },
+  { id: "theme-zone",           label: "1  主题专区·企业入口" },
+  { id: "enterprise-themes",    label: "1  主题专区·主题菜单" },
+  { id: "fine-report",          label: "1  主题专区·报表入口" },
   { id: "biz",                  label: "2  经营主题" },
   { id: "biz-overdue",          label: "2  经营·逾期应收" },
   { id: "biz-collection-plan",  label: "2  经营·计划收款" },
@@ -1491,6 +1505,176 @@ const buildOrderProgressSummary = (rows: ReadonlyArray<BusinessOrderProgressDTO>
 const BIZ_ORDER_PROGRESS_SUMMARY = buildOrderProgressSummary(BIZ_ORDER_PROGRESS_ROWS, 30.28);
 const BIZ_ORDER_PROGRESS_BASE_SUMMARY = buildOrderProgressSummary(BIZ_ORDER_PROGRESS_BASE_ROWS, 18.60);
 
+type PortalMode = "overview" | "theme-zone";
+type PortalCompany = {
+  code: string;
+  name: string;
+  kind: "headquarters" | "shipyard" | "offshore" | "support";
+};
+type PortalTheme = { key: string; label: string; icon: LucideIcon };
+
+const PORTAL_COMPANY_STORAGE_KEY = "cosco-dashboard-portal-company";
+const PORTAL_THEME_STORAGE_KEY = "cosco-dashboard-portal-theme";
+
+/**
+ * 主题专区企业主数据。后端接入时保持 code 稳定，名称可由接口覆盖；
+ * 展示顺序严格遵循集团规定，并在首位固定展示重工本部。
+ */
+const PORTAL_COMPANIES: ReadonlyArray<PortalCompany> = [
+  { code: "HQ", name: "重工本部", kind: "headquarters" },
+  { code: "NACKS", name: "南通川崎", kind: "shipyard" },
+  { code: "DACKS", name: "大连川崎", kind: "shipyard" },
+  { code: "YZHI", name: "扬州重工", kind: "shipyard" },
+  { code: "COSCO-NANTONG", name: "南通船务", kind: "shipyard" },
+  { code: "COSCO-QIDONG", name: "启东海工", kind: "offshore" },
+  { code: "COSCO-DALIAN", name: "大连重工", kind: "shipyard" },
+  { code: "COSCO-ZHOUSHAN", name: "舟山重工", kind: "shipyard" },
+  { code: "COSCO-SHANGHAI", name: "上海重工", kind: "shipyard" },
+  { code: "COSCO-GUANGDONG", name: "广东重工", kind: "shipyard" },
+  { code: "NANJING-MARINE", name: "南京船配", kind: "support" },
+  { code: "DALIAN-MARINE", name: "大连海事", kind: "support" },
+  { code: "NANTONG-HI", name: "南通重工", kind: "support" },
+  { code: "NANTONG-WEHAI", name: "南通威海", kind: "support" },
+  { code: "FENGCHANG", name: "丰昌船务", kind: "support" },
+];
+
+const PORTAL_THEMES: ReadonlyArray<PortalTheme> = [
+  { key: "operation", label: "经营", icon: BriefcaseBusiness },
+  { key: "design", label: "设计", icon: DraftingCompass },
+  { key: "production", label: "生产", icon: Factory },
+  { key: "materials", label: "物资", icon: Boxes },
+  { key: "quality", label: "质量", icon: ShieldCheck },
+  { key: "energy", label: "能源", icon: Zap },
+  { key: "finance", label: "财务", icon: CircleDollarSign },
+  { key: "administration", label: "行政", icon: ClipboardList },
+  { key: "strategy", label: "战企", icon: TrendingUp },
+  { key: "hr", label: "人力", icon: Users },
+  { key: "innovation", label: "科创", icon: Lightbulb },
+  { key: "digital", label: "数智", icon: MonitorCog },
+  { key: "safety", label: "安监", icon: HardHat },
+  { key: "legal", label: "法务", icon: Scale },
+  { key: "party", label: "党建", icon: Flag },
+];
+
+/**
+ * 帆软报表链接配置：key 为企业 code，第二层 key 为主题 key。
+ * 当前原型不写入真实地址；后续可由后端 JSON 或运行时配置中心覆盖。
+ */
+const FINE_REPORT_LINKS: Partial<Record<string, Partial<Record<string, string>>>> = {};
+
+function getPortalCompany() {
+  if (typeof window === "undefined") return PORTAL_COMPANIES[0];
+  const code = window.sessionStorage.getItem(PORTAL_COMPANY_STORAGE_KEY);
+  return PORTAL_COMPANIES.find(item => item.code === code) ?? PORTAL_COMPANIES[0];
+}
+
+function getPortalTheme() {
+  if (typeof window === "undefined") return PORTAL_THEMES[0];
+  const key = window.sessionStorage.getItem(PORTAL_THEME_STORAGE_KEY);
+  return PORTAL_THEMES.find(item => item.key === key) ?? PORTAL_THEMES[0];
+}
+
+function PortalTopTabs({ active }: { active: PortalMode }) {
+  return <nav className="portal-top-tabs" aria-label="驾驶舱主导航">
+    <button type="button" className={active === "overview" ? "is-active" : ""} aria-current={active === "overview" ? "page" : undefined} onClick={() => nav("home")}>高管速览</button>
+    <button type="button" className={active === "theme-zone" ? "is-active" : ""} aria-current={active === "theme-zone" ? "page" : undefined} onClick={() => nav("theme-zone")}>主题专区</button>
+  </nav>;
+}
+
+function EnterpriseLogo({ company, size = "normal" }: { company: PortalCompany; size?: "normal" | "large" }) {
+  const LogoIcon = company.kind === "headquarters" ? Building2 : company.kind === "offshore" ? Anchor : company.kind === "support" ? BookOpenText : Ship;
+  return <span className={cn("portal-enterprise-logo", size === "large" && "is-large")} aria-hidden="true">
+    <LogoIcon strokeWidth={1.9} />
+  </span>;
+}
+
+function PageThemeZone() {
+  const openCompany = (company: PortalCompany) => {
+    window.sessionStorage.setItem(PORTAL_COMPANY_STORAGE_KEY, company.code);
+    nav("enterprise-themes");
+  };
+  return <>
+    <StatusBar />
+    <PortalTopTabs active="theme-zone" />
+    <NavBar title=" " backLabel="返回高管速览" backPage="home" hideDateBadge />
+    <main className="portal-zone-page is-root">
+      <section className="portal-zone-intro">
+        <div className="portal-zone-intro-mark"><Building2 size={20} strokeWidth={2} /></div>
+        <div><strong>帆软移动报表专区</strong><span>选择重工本部或所属企业，进入主题菜单</span></div>
+      </section>
+      <section aria-labelledby="portal-company-title">
+        <div className="portal-section-heading"><div><strong id="portal-company-title">选择单位</strong></div></div>
+        <div className="portal-company-grid">
+          {PORTAL_COMPANIES.map(company => <button key={company.code} type="button" className="portal-company-card" onClick={() => openCompany(company)} aria-label={`进入${company.name}主题菜单`}>
+            <EnterpriseLogo company={company} />
+            <strong>{company.name}</strong>
+            <span>进入专区 <ChevronRight size={12} /></span>
+          </button>)}
+        </div>
+      </section>
+    </main>
+    <Footer text="企业专区 · 帆软移动报表统一入口" />
+  </>;
+}
+
+function PageEnterpriseThemes() {
+  const company = getPortalCompany();
+  const openTheme = (theme: PortalTheme) => {
+    window.sessionStorage.setItem(PORTAL_THEME_STORAGE_KEY, theme.key);
+    const reportUrl = FINE_REPORT_LINKS[company.code]?.[theme.key]?.trim();
+    if (reportUrl) {
+      window.location.assign(reportUrl);
+      return;
+    }
+    nav("fine-report");
+  };
+  return <>
+    <StatusBar />
+    <PortalTopTabs active="theme-zone" />
+    <NavBar title={company.name} subtitle="帆软移动报表" backLabel="返回企业列表" backPage="theme-zone" hideDateBadge />
+    <main className="portal-enterprise-page">
+      <section className="portal-enterprise-hero">
+        <EnterpriseLogo company={company} size="large" />
+        <div><span>当前单位</span><strong>{company.name}</strong><small>请选择需要查看的业务主题</small></div>
+      </section>
+      <section aria-labelledby="portal-theme-title">
+        <div className="portal-section-heading"><div><strong id="portal-theme-title">主题菜单</strong></div></div>
+        <div className="portal-theme-grid">
+          {PORTAL_THEMES.map(theme => {
+            const Icon = theme.icon;
+            return <button key={theme.key} type="button" className="portal-theme-card" onClick={() => openTheme(theme)} aria-label={`查看${company.name}${theme.label}主题`}>
+              <span><Icon size={22} strokeWidth={1.9} /></span>
+              <strong>{theme.label}</strong>
+            </button>;
+          })}
+        </div>
+      </section>
+    </main>
+    <Footer text={`${company.name} · 帆软移动报表主题菜单`} />
+  </>;
+}
+
+function PageFineReportPlaceholder() {
+  const company = getPortalCompany();
+  const theme = getPortalTheme();
+  const Icon = theme.icon;
+  return <>
+    <StatusBar />
+    <PortalTopTabs active="theme-zone" />
+    <NavBar title={`${theme.label}主题`} subtitle={company.name} backLabel="返回主题菜单" backPage="enterprise-themes" hideDateBadge />
+    <main className="portal-report-page">
+      <section className="portal-report-placeholder">
+        <div className="portal-report-brand"><EnterpriseLogo company={company} size="large" /><ChevronRight size={18} /><span><Icon size={26} /></span></div>
+        <span className="portal-report-eyebrow">帆软移动报表</span>
+        <h2>{company.name} · {theme.label}</h2>
+        <p>当前为链接接入占位页。配置对应企业与主题的帆软报表地址后，点击主题将直接进入既有移动端报表。</p>
+        <button type="button" onClick={() => nav("enterprise-themes")}>返回主题菜单</button>
+      </section>
+    </main>
+    <Footer text="报表链接由统一配置中心维护" />
+  </>;
+}
+
 function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; focusSection?: "overdue" | "business-progress" }) {
   const [freshnessOpen, setFreshnessOpen] = useState(false);
   const [freshnessContainer, setFreshnessContainer] = useState<HTMLElement | null>(null);
@@ -1523,6 +1707,7 @@ function PageHome({ repairMode = false, focusSection }: { repairMode?: boolean; 
   return (
     <>
       <StatusBar />
+      <PortalTopTabs active="overview" />
       <NavBar
         title="重工数字化运营平台"
         dateBadge="数据口径：最新可用"
@@ -5993,6 +6178,9 @@ function PageEnergy() {
 function renderPage(id: string) {
   switch (id) {
     case "home":              return <PageHome />;
+    case "theme-zone":        return <PageThemeZone />;
+    case "enterprise-themes": return <PageEnterpriseThemes />;
+    case "fine-report":       return <PageFineReportPlaceholder />;
     case "home-overdue":      return <PageHome focusSection="overdue" />;
     case "home-business-progress": return <PageHome focusSection="business-progress" />;
     case "biz":               return <PageBiz />;
