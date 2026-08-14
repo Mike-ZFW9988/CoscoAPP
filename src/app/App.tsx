@@ -1600,7 +1600,7 @@ function PageThemeZone() {
     <main className="portal-zone-page is-root">
       <section className="portal-zone-intro">
         <div className="portal-zone-intro-mark"><Building2 size={20} strokeWidth={2} /></div>
-        <div><strong>帆软移动报表专区</strong><span>选择重工本部或所属企业，进入主题菜单</span></div>
+        <div><strong>主题报表专区</strong><span>选择重工本部或所属企业，进入主题菜单</span></div>
       </section>
       <section aria-labelledby="portal-company-title">
         <div className="portal-section-heading"><div><strong id="portal-company-title">选择单位</strong></div></div>
