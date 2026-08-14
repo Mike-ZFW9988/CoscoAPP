@@ -1394,10 +1394,10 @@ function RepairCoreMetricsCard() {
           <span>在厂艘数</span>
           <div><strong>82</strong><em>艘</em></div>
         </div>
-        <div className="repair-core-fleet-stat">
-          <span>完工艘数</span>
+        <button type="button" className="repair-core-fleet-stat is-drilldown" onClick={() => nav("biz-repair-completion")} aria-label="查看修船完工艘数明细">
+          <span>完工艘数 <small>查看明细</small><ChevronRight aria-hidden="true" /></span>
           <div><strong>914</strong><em>艘</em></div>
-        </div>
+        </button>
       </article>
     </section>
   );
@@ -3550,27 +3550,47 @@ function PageProdRepair() {
   );
 }
 
-function PageProdRepairCompletion() {
-  const [period, setPeriod] = useState<"月度" | "年累计">("月度");
+function PageProdRepairCompletion({ fromBusiness = false }: { fromBusiness?: boolean } = {}) {
+  const [period, setPeriod] = useState<"月度" | "年累计">(fromBusiness ? "年累计" : "月度");
   const [metric, setMetric] = useState<"艘数" | "产值">("艘数");
 
   const companies = companyNames(5);
-  const shipNums  = [28, 22, 30, 18, 24];
-  const valNums   = [420, 380, 510, 290, 400];
+  const periodData = period === "年累计"
+    ? {
+        summary: { completed: "914", output: "72.36", outputUnit: "亿元", rate: "67.0" },
+        shipNums: [210, 188, 176, 170, 170],
+        valNums: [16.80, 14.20, 13.10, 15.00, 13.26],
+        plans: [220, 190, 180, 170, 170],
+      }
+    : {
+        summary: { completed: "122", output: "2,000", outputUnit: "万元", rate: "97.6" },
+        shipNums: [28, 22, 30, 18, 24],
+        valNums: [420, 380, 510, 290, 400],
+        plans: [30, 25, 28, 20, 22],
+      };
+  const { shipNums, valNums } = periodData;
   const shipMax   = Math.max(...shipNums);
   const valMax    = Math.max(...valNums);
+  const chartUnit = metric === "艘数" ? "艘" : period === "年累计" ? "亿元" : "万元";
+  const formatChartValue = (value: number) => metric === "产值" && period === "年累计" ? value.toFixed(2) : value.toLocaleString();
 
   return (
     <>
       <StatusBar />
-      <NavBar title="修船完工明细" backLabel="返回修船主题" backPage="prod-repair" dateMode="day" />
-      <BreadcrumbBar crumbs={["首页", "生产主题", "修船", "完工明细"]} period="截至7.10" />
+      <NavBar
+        title="修船完工明细"
+        subtitle={fromBusiness ? "修船·经营口径" : "修船·生产口径"}
+        backLabel={fromBusiness ? "返回修船经营洞察" : "返回修船主题"}
+        backPage={fromBusiness ? "biz-repair" : "prod-repair"}
+        dateMode={fromBusiness ? "month" : "day"}
+      />
+      <BreadcrumbBar crumbs={fromBusiness ? ["首页", "经营主题", "修船", "完工明细"] : ["首页", "生产主题", "修船", "完工明细"]} />
       <div className="production-detail-page repair-completion-page">
         <Card title="完工表现总览" className="production-summary-card repair-completion-summary-card">
           <div className="production-summary-grid">
-            <div><span>本月完工</span><strong>122<small>艘</small></strong></div>
-            <div><span>完工产值</span><strong>2,000<small>万元</small></strong></div>
-            <div><span>产值达成率</span><strong>97.6<small>%</small></strong></div>
+            <div><span>{period === "年累计" ? "年度累计完工" : "本月完工"}</span><strong>{periodData.summary.completed}<small>艘</small></strong></div>
+            <div><span>完工产值</span><strong>{periodData.summary.output}<small>{periodData.summary.outputUnit}</small></strong></div>
+            <div><span>产值达成率</span><strong>{periodData.summary.rate}<small>%</small></strong></div>
           </div>
         </Card>
 
@@ -3583,13 +3603,13 @@ function PageProdRepairCompletion() {
             <div className="app-segment-control compact app-unified-segmented" role="tablist">
               {(["月度", "年累计"] as const).map(t => <button key={t} role="tab" className={period === t ? "is-active" : ""} onClick={() => setPeriod(t)}>{t}</button>)}
             </div>
-            <span className="chart-inline-unit">单位：{metric === "艘数" ? "艘" : "万元"}</span>
+            <span className="chart-inline-unit">单位：{chartUnit}</span>
           </div>
           <div className="production-bar-chart" aria-label={`企业完工${metric}`}>
             {companies.map((co, i) => {
               const value = metric === "艘数" ? shipNums[i] : valNums[i];
               const max = metric === "艘数" ? shipMax : valMax;
-              return <div className="production-bar-item" key={co}><strong>{value}</strong><div><i style={{ height: `${Math.round((value / max) * 78)}px` }} /></div><span>{co}</span></div>;
+              return <div className="production-bar-item" key={co}><strong>{formatChartValue(value)}</strong><div><i style={{ height: `${Math.round((value / max) * 78)}px` }} /></div><span>{co}</span></div>;
             })}
           </div>
         </Card>
@@ -3597,13 +3617,8 @@ function PageProdRepairCompletion() {
         <Card title="企业完工明细" className="production-list-card">
           <div className="production-list-head"><span>企业</span><span>实绩</span><span>产值达成率</span></div>
           <div className="production-enterprise-list">
-            {[
-              { plan: 30, actual: 28 },
-              { plan: 25, actual: 22 },
-              { plan: 28, actual: 30 },
-              { plan: 20, actual: 18 },
-              { plan: 22, actual: 24 },
-            ].map((row, index) => {
+            {shipNums.map((actual, index) => {
+              const row = { plan: periodData.plans[index], actual };
               const rate = Math.round((row.actual / row.plan) * 100);
               const name = companies[index];
               return <div className="production-enterprise-row" key={name}><strong>{name}</strong><span><b>{row.actual}</b> 艘</span><em className={rate > 100 ? "is-over" : ""}>{rate}%</em></div>;
@@ -5996,6 +6011,7 @@ function renderPage(id: string) {
     case "prod-repair":       return <PageProdRepair />;
     case "prod-repair-ships":      return <PageProdRepairShips />;
     case "prod-repair-completion": return <PageProdRepairCompletion />;
+    case "biz-repair-completion": return <PageProdRepairCompletion fromBusiness />;
     case "prod-repair-daily":      return <PageProdRepairDaily />;
     case "prod-ship":         return <div className="production-ship-scope"><PageProdShip /></div>;
     case "prod-ship-delivery":        return <PageProdShipDelivery />;

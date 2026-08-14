@@ -4341,10 +4341,15 @@
 
 .app-phone-screen .repair-core-fleet-stat {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: 5px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
 }
 
 .app-phone-screen .repair-core-fleet-stat + .repair-core-fleet-stat {
@@ -4352,9 +4357,35 @@
 }
 
 .app-phone-screen .repair-core-fleet-stat > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
   color: var(--app-text-secondary);
   font-size: 11px;
   font-weight: 650;
+}
+
+.app-phone-screen .repair-core-fleet-stat > span small {
+  color: var(--app-primary);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.app-phone-screen .repair-core-fleet-stat > span svg {
+  width: 12px;
+  height: 12px;
+  color: var(--app-primary);
+}
+
+.app-phone-screen .repair-core-fleet-stat.is-drilldown {
+  min-height: 66px;
+  cursor: pointer;
+  transition: background-color 160ms ease;
+}
+
+.app-phone-screen .repair-core-fleet-stat.is-drilldown:active {
+  background: var(--app-primary-soft);
 }
 
 .app-phone-screen .repair-core-fleet-stat > div {
